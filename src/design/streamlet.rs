@@ -2,11 +2,15 @@
 //!
 //! A streamlet is a component where every [Interface] has a [LogicalType].
 
+use crate::design::composer::impl_graph::ImplementationGraph;
+use crate::design::{IFKey, StreamletKey};
 use crate::logical::LogicalType;
 use crate::traits::Identify;
 use crate::util::UniquelyNamedBuilder;
 use crate::{Document, Error, Name, Result};
+use std::collections::HashMap;
 use std::convert::TryInto;
+use std::rc::Rc;
 use std::str::FromStr;
 
 /// Streamlet interface mode.
@@ -121,6 +125,10 @@ impl Interface {
         self.doc = Some(doc.into());
         self
     }
+
+    pub fn name(&self) -> &IFKey {
+        &self.name
+    }
 }
 
 impl Document for Interface {
@@ -135,17 +143,41 @@ pub struct Streamlet {
     /// The name of the streamlet.
     name: Name,
     /// The interfaces of the streamlet.
-    interfaces: Vec<Interface>,
+    interfaces: HashMap<IFKey, Interface>,
     /// An optional documentation string for the streamlet to be used by back-ends.
     doc: Option<String>,
     /// Placeholder for future implementation of the streamlet. If this is None, it is a primitive.
-    implementation: Option<()>,
+    implementation: Option<Rc<ImplementationGraph>>,
 }
 
 impl Streamlet {
     /// Return an iterator over the interfaces of this Streamlet.
     pub fn interfaces(&self) -> impl Iterator<Item = &Interface> {
-        self.interfaces.iter()
+        self.interfaces.iter().map(|(_, i)| i)
+    }
+
+    pub fn get_interface(&self, key: IFKey) -> Result<&Interface> {
+        match self.interfaces.get(&key) {
+            None => Err(Error::InterfaceError(format!(
+                "Interface {} does not exist for Streamlet  {}.",
+                key,
+                self.identifier()
+            ))),
+            Some(iface) => Ok(iface),
+        }
+    }
+
+    pub fn get_implementation(&self) -> Option<Rc<ImplementationGraph>> {
+        self.implementation.clone()
+    }
+
+    pub fn attach_implementation(&mut self, impl_graph: ImplementationGraph) -> Result<()> {
+        self.implementation = Some(Rc::new(impl_graph));
+        Ok(())
+    }
+
+    pub fn name(&self) -> &StreamletKey {
+        &self.name
     }
 
     /// Construct a new streamlet from an interface builder that makes sure all interface names
@@ -180,7 +212,11 @@ impl Streamlet {
     ) -> Result<Self> {
         Ok(Streamlet {
             name,
-            interfaces: builder.finish()?,
+            interfaces: builder
+                .finish()?
+                .into_iter()
+                .map(|iface| (iface.name().clone(), iface))
+                .collect::<HashMap<IFKey, Interface>>(),
             doc: if let Some(d) = doc {
                 Some(d.to_string())
             } else {

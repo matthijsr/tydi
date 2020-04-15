@@ -3,19 +3,20 @@
 //! This allows users to build up libraries of streamlets and helps to generate language-specific
 //! output (e.g. a package in VHDL).
 
-use crate::design::Streamlet;
+use crate::design::{LibKey, Streamlet, StreamletKey};
 use crate::error::Error::{FileIOError, ParsingError};
 use crate::parser::nom::list_of_streamlets;
 use crate::traits::Identify;
-use crate::{Name, Result, UniquelyNamedBuilder};
+use crate::{Error, Name, Result, UniquelyNamedBuilder};
 use log::debug;
+use std::collections::HashMap;
 use std::path::Path;
 
 /// A collection of Streamlets.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Library {
     name: Name,
-    streamlets: Vec<Streamlet>,
+    streamlets: HashMap<StreamletKey, Streamlet>,
 }
 
 impl crate::traits::Identify for Library {
@@ -25,15 +26,19 @@ impl crate::traits::Identify for Library {
 }
 
 impl Library {
-    pub fn streamlets(&self) -> Vec<Streamlet> {
-        self.streamlets.clone()
+    pub fn streamlets(&self) -> impl Iterator<Item = &Streamlet> {
+        self.streamlets.iter().map(|(_, streamlet)| streamlet)
     }
 
     /// Construct a Library from a UniquelyNamedBuilder with Streamlets.
     pub fn from_builder(name: Name, builder: UniquelyNamedBuilder<Streamlet>) -> Result<Self> {
         Ok(Library {
             name,
-            streamlets: builder.finish()?,
+            streamlets: builder
+                .finish()?
+                .into_iter()
+                .map(|streamlet| (streamlet.name().clone(), streamlet))
+                .collect::<HashMap<StreamletKey, Streamlet>>(),
         })
     }
 
@@ -73,6 +78,21 @@ impl Library {
             )
         }
     }
+
+    pub fn name(&self) -> &LibKey {
+        &self.name
+    }
+
+    pub fn add_streamlet(&mut self, streamlet: Streamlet) -> Result<StreamletKey> {
+        let key = streamlet.name().clone();
+        match self.streamlets.insert(streamlet.name().clone(), streamlet) {
+            Some(_lib) => Ok(key),
+            None => Err(Error::ProjectError(format!(
+                "Error while adding {} to the library",
+                key,
+            ))),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -98,7 +118,7 @@ pub mod tests {
         pub(crate) fn empty_lib() -> Library {
             Library {
                 name: Name::try_new("lib").unwrap(),
-                streamlets: vec![],
+                streamlets: HashMap::new(),
             }
         }
     }

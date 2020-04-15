@@ -1,13 +1,13 @@
-use crate::design::Library;
+use crate::design::{LibKey, Library, Streamlet};
 use crate::util::UniquelyNamedBuilder;
-use crate::Result;
+use crate::{Error, Result};
 use crate::{Identify, Name};
+use std::collections::HashMap;
 
 /// A collection of Streamlets.
-#[derive(Clone, Debug, PartialEq)]
 pub struct Project {
     name: Name,
-    libraries: Vec<Library>,
+    libraries: HashMap<LibKey, Library>,
 }
 
 impl Identify for Project {
@@ -21,13 +21,37 @@ impl Project {
     pub fn from_builder(name: Name, builder: UniquelyNamedBuilder<Library>) -> Result<Self> {
         Ok(Project {
             name,
-            libraries: builder.finish()?,
+            libraries: builder
+                .finish()?
+                .into_iter()
+                .map(|lib| (lib.name().clone(), lib))
+                .collect::<HashMap<LibKey, Library>>(),
         })
     }
 
     // Return an iterator over the libraries in this project.
     pub fn libraries(&self) -> impl Iterator<Item = &Library> {
-        self.libraries.iter()
+        self.libraries.iter().map(|(_, l)| l)
+    }
+
+    pub fn add_lib(&mut self, lib: Library) -> Result<LibKey> {
+        let key = lib.name().clone();
+        match self.libraries.insert(lib.name().clone(), lib) {
+            Some(_lib) => Ok(key),
+            None => Err(Error::ProjectError(format!(
+                "Error while adding {} to the project",
+                key,
+            ))),
+        }
+    }
+
+    pub fn get_lib(&self, lib: LibKey) -> Result<&Library> {
+        self.libraries.get(&lib).ok_or_else(|| {
+            Error::ProjectError(format!(
+                "Error while retrieving {:?}, it does not exist in project.",
+                lib
+            ))
+        })
     }
 }
 
@@ -42,7 +66,7 @@ pub mod tests {
         pub(crate) fn empty_proj() -> Project {
             Project {
                 name: Name::try_new("proj").unwrap(),
-                libraries: vec![crate::design::library::tests::libs::empty_lib()],
+                libraries: HashMap::new(),
             }
         }
     }

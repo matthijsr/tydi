@@ -28,6 +28,8 @@ pub enum Error {
     BackEndError(String),
     /// Forbidden interface name.
     InterfaceError(String),
+    /// Project error
+    ProjectError(String),
 }
 
 impl fmt::Display for Error {
@@ -43,6 +45,7 @@ impl fmt::Display for Error {
             Error::InvalidTarget(ref msg) => write!(f, "Invalid target: {}", msg),
             Error::BackEndError(ref msg) => write!(f, "Back-end error: {}", msg),
             Error::InterfaceError(ref msg) => write!(f, "Interface error: {}", msg),
+            Error::ProjectError(ref msg) => write!(f, "Project error: {}", msg),
         }
     }
 }
