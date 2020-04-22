@@ -3,15 +3,16 @@
 //! A streamlet is a component where every [Interface] has a [LogicalType].
 
 use crate::design::composer::impl_graph::ImplementationGraph;
-use crate::design::{IFKey, StreamletKey};
+use crate::design::{IFKey, StreamletKey, ComponentKey};
 use crate::logical::LogicalType;
 use crate::traits::Identify;
 use crate::util::UniquelyNamedBuilder;
-use crate::{Document, Error, Name, Result};
+use crate::{Document, Error, Name, Result, UniqueKeyBuilder, Reverse, Reversed};
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::rc::Rc;
 use std::str::FromStr;
+use crate::design::composer::GenericComponent;
 
 /// Streamlet interface mode.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -20,6 +21,15 @@ pub enum Mode {
     Out,
     /// The interface is an input of the streamlet.
     In,
+}
+
+impl Reverse for Mode {
+    fn reverse(&mut self) {
+        match self {
+            Mode::Out => *self = Mode::In,
+            Mode::In => *self = Mode::Out,
+        }
+    }
 }
 
 impl FromStr for Mode {
@@ -43,7 +53,7 @@ impl FromStr for Mode {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Interface {
     /// The name of the interface.
-    name: Name,
+    key: Name,
     /// The mode of the interface.
     mode: Mode,
     /// The type of the interface.
@@ -66,7 +76,7 @@ impl Interface {
 
 impl Identify for Interface {
     fn identifier(&self) -> &str {
-        self.name.as_ref()
+        self.key.as_ref()
     }
 }
 
@@ -109,7 +119,7 @@ impl Interface {
         match n.to_string().as_str() {
             "clk" | "rst" => Err(Error::InterfaceError(format!("Name {} forbidden.", n))),
             _ => Ok(Interface {
-                name: n,
+                key: n,
                 mode,
                 typ: t,
                 doc: if let Some(d) = doc {
@@ -126,22 +136,24 @@ impl Interface {
         self
     }
 
-    pub fn name(&self) -> &IFKey {
-        &self.name
+    pub fn key(&self) -> &IFKey {
+        &self.key
     }
 }
 
-impl Document for Interface {
-    fn doc(&self) -> Option<String> {
-        self.doc.clone()
+impl Reverse for Interface {
+    fn reverse(&mut self) {
+        self.mode = self.mode.reversed()
     }
 }
+
+
 
 /// Streamlet interface definition.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Streamlet {
     /// The name of the streamlet.
-    name: Name,
+    key: Name,
     /// The interfaces of the streamlet.
     interfaces: HashMap<IFKey, Interface>,
     /// An optional documentation string for the streamlet to be used by back-ends.
@@ -150,34 +162,38 @@ pub struct Streamlet {
     implementation: Option<Rc<ImplementationGraph>>,
 }
 
-impl Streamlet {
-    /// Return an iterator over the interfaces of this Streamlet.
-    pub fn interfaces(&self) -> impl Iterator<Item = &Interface> {
-        self.interfaces.iter().map(|(_, i)| i)
+impl GenericComponent for Streamlet {
+
+    fn key(&self) -> ComponentKey {
+        self.key.clone()
     }
 
-    pub fn get_interface(&self, key: IFKey) -> Result<&Interface> {
+    /// Return an iterator over the interfaces of this Streamlet.
+    fn interfaces<'a>(&'a self) -> Box<(dyn Iterator<Item = &'a Interface> +'a)> {
+        Box::new(self.interfaces.iter().map(|(_, i)| i))
+    }
+
+    fn get_interface(&self, key: IFKey) -> Result<Interface> {
         match self.interfaces.get(&key) {
             None => Err(Error::InterfaceError(format!(
                 "Interface {} does not exist for Streamlet  {}.",
                 key,
                 self.identifier()
             ))),
-            Some(iface) => Ok(iface),
+            Some(iface) => Ok(iface.clone()),
         }
     }
 
-    pub fn get_implementation(&self) -> Option<Rc<ImplementationGraph>> {
+    fn get_implementation(&self) -> Option<Rc<ImplementationGraph>> {
         self.implementation.clone()
     }
+}
+
+impl Streamlet {
 
     pub fn attach_implementation(&mut self, impl_graph: ImplementationGraph) -> Result<()> {
         self.implementation = Some(Rc::new(impl_graph));
         Ok(())
-    }
-
-    pub fn name(&self) -> &StreamletKey {
-        &self.name
     }
 
     /// Construct a new streamlet from an interface builder that makes sure all interface names
@@ -207,15 +223,15 @@ impl Streamlet {
     /// ```
     pub fn from_builder(
         name: Name,
-        builder: UniquelyNamedBuilder<Interface>,
+        builder: UniqueKeyBuilder<Interface>,
         doc: Option<&str>,
     ) -> Result<Self> {
         Ok(Streamlet {
-            name,
+            key: name,
             interfaces: builder
                 .finish()?
                 .into_iter()
-                .map(|iface| (iface.name().clone(), iface))
+                .map(|iface| (iface.key().clone(), iface))
                 .collect::<HashMap<IFKey, Interface>>(),
             doc: if let Some(d) = doc {
                 Some(d.to_string())
@@ -241,7 +257,7 @@ impl Document for Streamlet {
 
 impl Identify for Streamlet {
     fn identifier(&self) -> &str {
-        self.name.as_ref()
+        self.key.as_ref()
     }
 }
 
@@ -256,7 +272,7 @@ pub mod tests {
         pub(crate) fn nulls_streamlet(name: impl Into<String>) -> Streamlet {
             Streamlet::from_builder(
                 Name::try_new(name).unwrap(),
-                UniquelyNamedBuilder::new().with_items(vec![
+                UniqueKeyBuilder::new().with_items(vec![
                     Interface::try_new("a", Mode::In, LogicalType::Null, None).unwrap(),
                     Interface::try_new("b", Mode::Out, LogicalType::Null, None).unwrap(),
                 ]),

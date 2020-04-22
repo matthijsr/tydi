@@ -1,4 +1,4 @@
-use crate::design::{LibKey, Library, Streamlet};
+use crate::design::{LibKey, Library};
 use crate::util::UniquelyNamedBuilder;
 use crate::{Error, Result};
 use crate::{Identify, Name};
@@ -17,6 +17,14 @@ impl Identify for Project {
 }
 
 impl Project {
+
+    pub fn new(name: Name) -> Project {
+        Project {
+            name,
+            libraries: HashMap::new(),
+        }
+    }
+
     /// Construct a Project from a UniquelyNamedBuilder with Libraries.
     pub fn from_builder(name: Name, builder: UniquelyNamedBuilder<Library>) -> Result<Self> {
         Ok(Project {
@@ -24,7 +32,7 @@ impl Project {
             libraries: builder
                 .finish()?
                 .into_iter()
-                .map(|lib| (lib.name().clone(), lib))
+                .map(|lib| (lib.key().clone(), lib))
                 .collect::<HashMap<LibKey, Library>>(),
         })
     }
@@ -35,8 +43,8 @@ impl Project {
     }
 
     pub fn add_lib(&mut self, lib: Library) -> Result<LibKey> {
-        let key = lib.name().clone();
-        match self.libraries.insert(lib.name().clone(), lib) {
+        let key = lib.key().clone();
+        match self.libraries.insert(lib.key().clone(), lib) {
             Some(_lib) => Ok(key),
             None => Err(Error::ProjectError(format!(
                 "Error while adding {} to the project",

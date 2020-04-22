@@ -1,19 +1,23 @@
-use crate::design::composer::{GenericNode, NodeIFHandle, StreamletNode};
-use crate::design::{StreamletHandle, StreamletKey};
-use crate::Name;
+use crate::design::composer::GenericComponent;
+use crate::design::{
+    IFKey, Interface, NodeIFHandle, NodeKey, Project, StreamletHandle, StreamletKey,
+};
+use crate::{Error, Name, Result, Reversed};
 use nom::lib::std::fmt::Formatter;
 use std::collections::HashMap;
 use std::fmt::Debug;
+use std::rc::Rc;
+use std::convert::TryInto;
 
 pub mod frontend;
-
-pub type NodeKey = Name;
+pub mod generic;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Edge {
     source: NodeIFHandle,
     sink: NodeIFHandle,
 }
+
 impl Edge {
     pub fn source(&self) -> NodeIFHandle {
         self.source.clone()
@@ -23,9 +27,44 @@ impl Edge {
     }
 }
 
-pub enum Node {
-    Streamlet(StreamletNode),
-    Generic(Box<dyn GenericNode>),
+#[derive(Clone)]
+pub struct Node {
+    key: NodeKey,
+    item: Rc<dyn GenericComponent>,
+}
+
+impl Node {
+    pub fn key(&self) -> NodeKey {
+        self.key.clone()
+    }
+
+    pub fn iface(&self, key: IFKey) -> Result<Interface> {
+        let this_key = NodeKey::this();
+        match &self.key {
+            this_key => self.item.get_interface(key).map(|i| i.reversed()),
+            _ => self.item.get_interface(key).clone(),
+        }
+    }
+
+    pub fn io<K>(&self, key: K) -> Result<NodeIFHandle>
+    where
+        K: TryInto<IFKey>,
+        <K as TryInto<IFKey>>::Error: Into<Error>,
+    {
+        let key = key.try_into().map_err(Into::into)?;
+        Ok(NodeIFHandle {
+            node: self.key(),
+            iface: key,
+        })
+    }
+
+    pub fn this(&self) -> NodeKey {
+        self.key.clone()
+    }
+
+    pub fn component(&self) -> Rc<dyn GenericComponent> {
+        self.item.clone()
+    }
 }
 
 pub struct ImplementationGraph {
@@ -38,16 +77,27 @@ impl ImplementationGraph {
     pub fn streamlet_key(&self) -> StreamletKey {
         self.streamlet.streamlet().clone()
     }
-    pub fn nodes(&self) -> impl Iterator<Item = (&NodeKey, &Node)> {
-        self.nodes.iter()
+    pub fn nodes(&self) -> impl Iterator<Item = &Node> {
+        self.nodes.iter().map(|(_, i)| i)
     }
     pub fn edges(&self) -> impl Iterator<Item = &Edge> {
         self.edges.iter()
     }
+    pub fn get_node(&self, key: NodeKey) -> Option<&Node> {
+        self.nodes.get(&key)
+    }
+    pub fn get_edge(&self, iface: NodeIFHandle) -> Option<&Edge> {
+        self.edges
+            .iter()
+            .find(|e| e.sink == iface || e.source == iface)
+    }
+    pub fn this(&self) -> &Node {
+        self.nodes.get(&NodeKey::this()).unwrap()
+    }
 }
 
 impl Debug for ImplementationGraph {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _f: &mut Formatter<'_>) -> std::fmt::Result {
         unimplemented!()
     }
 }

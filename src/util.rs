@@ -28,9 +28,69 @@ mod tests {
 ///
 /// When finish() is called, the names will be checked for uniqueness.
 #[derive(Debug)]
+pub struct UniqueKeyBuilder<T: Identify> {
+    /// Item storage.
+    items: Vec<T>,
+}
+
+/// A builder for lists of things requiring unique names.
+///
+/// When finish() is called, the names will be checked for uniqueness.
+#[derive(Debug)]
 pub struct UniquelyNamedBuilder<T: Identify> {
     /// Item storage.
     items: Vec<T>,
+}
+
+impl<T: Identify> UniqueKeyBuilder<T> {
+    /// Construct a new builder.
+    pub fn new() -> Self {
+        UniqueKeyBuilder::default()
+    }
+
+    /// Add an item to the builder.
+    pub fn add_item(&mut self, item: T) {
+        self.items.push(item);
+    }
+
+    /// Return this builder with the item appended.
+    pub fn with_item(mut self, item: T) -> Self {
+        self.add_item(item);
+        self
+    }
+
+    /// Return this builder with the items appended.
+    pub fn with_items(mut self, items: impl IntoIterator<Item = T>) -> Self {
+        items.into_iter().for_each(|item| {
+            self.add_item(item);
+        });
+        self
+    }
+
+    /// Finalize the builder, checking whether all names are unique.
+    /// Returns Ok() if names were unique and an Err() otherwise.
+    pub fn finish(self) -> Result<Vec<T>> {
+        let set: HashSet<&str> = self.items.iter().map(|item| item.identifier()).collect();
+        if self.items.len() != set.len() {
+            Err(Error::UnexpectedDuplicate)
+        } else {
+            Ok(self.items)
+        }
+    }
+}
+
+impl<T: Identify> FromIterator<T> for UniqueKeyBuilder<T> {
+    fn from_iter<U: IntoIterator<Item = T>>(iter: U) -> Self {
+        UniqueKeyBuilder {
+            items: iter.into_iter().collect(),
+        }
+    }
+}
+
+impl<T: Identify> Default for UniqueKeyBuilder<T> {
+    fn default() -> Self {
+        UniqueKeyBuilder { items: Vec::new() }
+    }
 }
 
 impl<T: Identify> UniquelyNamedBuilder<T> {

@@ -5,6 +5,7 @@ use std::path::Path;
 pub mod chisel;
 pub mod common;
 pub mod vhdl;
+pub mod dot;
 
 /// Concatenate stuff using format with an underscore in between.
 /// Useful if the separator ever changes.

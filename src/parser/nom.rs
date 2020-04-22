@@ -327,6 +327,7 @@ mod tests {
     use super::*;
     use crate::design::streamlet::tests::streamlets;
     use crate::util::UniquelyNamedBuilder;
+    use crate::UniqueKeyBuilder;
 
     #[test]
     fn parse_comment() {
@@ -519,7 +520,7 @@ mod tests {
                 "",
                 Streamlet::from_builder(
                     Name::try_new("test").unwrap(),
-                    UniquelyNamedBuilder::new()
+                    UniqueKeyBuilder::new()
                         .with_item(
                             Interface::try_new(
                                 "a",
@@ -559,7 +560,7 @@ mod tests {
                 "",
                 Streamlet::from_builder(
                     Name::try_new("x").unwrap(),
-                    UniquelyNamedBuilder::new().with_items(vec![
+                    UniqueKeyBuilder::new().with_items(vec![
                         Interface::try_new(
                             "a",
                             Mode::In,

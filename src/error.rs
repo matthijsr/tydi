@@ -30,6 +30,10 @@ pub enum Error {
     InterfaceError(String),
     /// Project error
     ProjectError(String),
+    /// Composer error
+    ComposerError(String),
+    /// Library error
+    LibraryError(String),
 }
 
 impl fmt::Display for Error {
@@ -46,6 +50,8 @@ impl fmt::Display for Error {
             Error::BackEndError(ref msg) => write!(f, "Back-end error: {}", msg),
             Error::InterfaceError(ref msg) => write!(f, "Interface error: {}", msg),
             Error::ProjectError(ref msg) => write!(f, "Project error: {}", msg),
+            Error::ComposerError(ref msg) => write!(f, "Composer error: {}", msg),
+            Error::LibraryError(ref msg) => write!(f, "Library error: {}", msg),
         }
     }
 }

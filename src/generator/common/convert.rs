@@ -4,6 +4,7 @@
 
 use crate::design::{Interface, Streamlet};
 use crate::generator::common::{Component, Mode, Package, Port, Project, Record, Type};
+use crate::design::composer::GenericComponent;
 use crate::logical::{Group, LogicalType, Stream, Union};
 use crate::physical::{Origin, Signal, Width};
 use crate::traits::Identify;
@@ -415,7 +416,7 @@ pub(crate) mod tests {
     use crate::generator::common::test::records;
     use crate::generator::vhdl::Declare;
     use crate::logical::tests::{elements, streams};
-    use crate::{Name, Positive, Result, UniquelyNamedBuilder};
+    use crate::{Name, Positive, Result, UniquelyNamedBuilder, UniqueKeyBuilder};
 
     #[test]
     fn test_cat() {
@@ -608,7 +609,7 @@ pub(crate) mod tests {
     pub(crate) fn simple_streamlet() -> Result<()> {
         let streamlet = Streamlet::from_builder(
             Name::try_new("test")?,
-            UniquelyNamedBuilder::new().with_items(vec![
+            UniqueKeyBuilder::new().with_items(vec![
                 Interface::try_new("x", crate::design::Mode::In, streams::prim(8), None)?,
                 Interface::try_new("y", crate::design::Mode::Out, streams::group(), None)?,
             ]),
@@ -628,7 +629,7 @@ pub(crate) mod tests {
     pub(crate) fn nested_streams_streamlet() -> Result<()> {
         let streamlet = Streamlet::from_builder(
             Name::try_new("test")?,
-            UniquelyNamedBuilder::new().with_items(vec![
+            UniqueKeyBuilder::new().with_items(vec![
                 Interface::try_new("x", crate::design::Mode::In, streams::prim(8), None)?,
                 Interface::try_new("y", crate::design::Mode::Out, streams::nested(), None)?,
             ]),

@@ -1,42 +1,31 @@
-use crate::design::composer::impl_graph::NodeKey;
-use crate::design::{IFKey, Interface, StreamletHandle};
-use crate::Name;
-use crate::{Error, Result};
+use crate::design::{IFKey, Interface, StreamletHandle, NodeKey, ComponentKey, Project, Mode};
+
+use crate::{Result};
 use std::fmt::Debug;
+use crate::design::composer::impl_graph::ImplementationGraph;
+use std::rc::Rc;
+use crate::generator::dot::DotStyle;
 
 pub mod impl_graph;
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct NodeIFHandle {
-    node: NodeKey,
-    iface: IFKey,
-}
-
-impl NodeIFHandle {
-    pub fn node(&self) -> NodeKey {
-        self.node.clone()
-    }
-    pub fn iface(&self) -> NodeKey {
-        self.iface.clone()
-    }
-}
 
 /// Traits for components in the implementation graph
 pub trait GenHDL {
     fn gen_hdl(&self) -> Result<String>;
 }
 
-pub trait GenDot {
-    fn gen_dot(&self) -> Result<String>;
+pub trait GenDot{
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str) -> String;
 }
 
-pub trait GenericNode {
-    fn interfaces(&self) -> Box<dyn Iterator<Item = &Interface>>;
-    fn get_interface(&self, key: IFKey) -> Result<&Interface>;
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct StreamletNode {
-    key: NodeKey,
-    streamlet: StreamletHandle,
+pub trait GenericComponent {
+    fn key(&self) -> ComponentKey;
+    fn interfaces<'a>(&'a self) -> Box<(dyn Iterator<Item = &'a Interface> + 'a)>;
+    fn inputs<'a>(&'a self) -> Box<(dyn Iterator<Item = &'a Interface> + 'a)> {
+        Box::new(self.interfaces().filter(|iface| iface.mode() == Mode::In))
+    }
+    fn outputs<'a>(&'a self) -> Box<(dyn Iterator<Item = &'a Interface> + 'a)> {
+        Box::new(self.interfaces().filter(|iface| iface.mode() == Mode::Out))
+    }
+    fn get_interface(&self, key: IFKey) -> Result<Interface>;
+    fn get_implementation(&self) -> Option<Rc<ImplementationGraph>>;
 }
