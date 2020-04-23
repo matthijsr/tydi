@@ -416,7 +416,7 @@ pub(crate) mod tests {
     use crate::generator::common::test::records;
     use crate::generator::vhdl::Declare;
     use crate::logical::tests::{elements, streams};
-    use crate::{Name, Positive, Result, UniquelyNamedBuilder, UniqueKeyBuilder};
+    use crate::{Name, Positive, Result, UniqueKeyBuilder};
 
     #[test]
     fn test_cat() {

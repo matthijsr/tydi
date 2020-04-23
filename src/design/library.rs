@@ -3,11 +3,11 @@
 //! This allows users to build up libraries of streamlets and helps to generate language-specific
 //! output (e.g. a package in VHDL).
 
-use crate::design::{LibKey, Streamlet, StreamletKey, StreamletHandle, ParamKey, ParamStoreKey};
+use crate::design::{LibKey, Streamlet, StreamletKey, StreamletHandle, ParamStoreKey};
 use crate::error::Error::{FileIOError, ParsingError};
-use crate::parser::nom::{list_of_streamlets, name};
+use crate::parser::nom::{list_of_streamlets};
 use crate::traits::Identify;
-use crate::{Error, Name, Result, UniquelyNamedBuilder, UniqueKeyBuilder};
+use crate::{Error, Name, Result, UniqueKeyBuilder};
 use log::debug;
 use std::collections::HashMap;
 use std::path::Path;

@@ -2,7 +2,7 @@ use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
 use crate::design::{NodeIFHandle, NodeKey, Project, StreamletHandle};
 use crate::{Error, Result};
 
-use std::borrow::Borrow;
+
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::rc::Rc;
@@ -89,10 +89,10 @@ pub(crate) mod tests {
     use super::*;
 
     use crate::design::composer::impl_graph::*;
-    use crate::design::composer::*;
+    
     use crate::design::*;
     use crate::logical::LogicalType;
-    use crate::{Error, Name, Result, UniqueKeyBuilder};
+    use crate::{Name, Result, UniqueKeyBuilder};
     use std::convert::TryFrom;
 
     pub(crate) fn composition_example() -> Result<Project> {
@@ -117,7 +117,7 @@ pub(crate) mod tests {
             )
             .unwrap();
 
-        let test2 = lib
+        let _test2 = lib
             .add_streamlet(
                 Streamlet::from_builder(
                     StreamletKey::try_from("Test2").unwrap(),
@@ -152,7 +152,7 @@ pub(crate) mod tests {
         let mut imp = GraphBuilder::try_new(&prj, top.clone()).unwrap();
 
         let this = imp.this();
-        let tet1inst = imp.instantiate(test1, "test1inst").unwrap();
+        let _tet1inst = imp.instantiate(test1, "test1inst").unwrap();
 
         imp.connect(this.io("e"), this.io("f"));
         let imp = imp.finish();

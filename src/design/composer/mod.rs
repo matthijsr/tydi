@@ -1,7 +1,7 @@
-use crate::design::{IFKey, Interface, StreamletHandle, NodeKey, ComponentKey, Project, Mode};
+use crate::design::{IFKey, Interface, ComponentKey, Project, Mode};
 
 use crate::{Result};
-use std::fmt::Debug;
+
 use crate::design::composer::impl_graph::ImplementationGraph;
 use std::rc::Rc;
 use crate::generator::dot::DotStyle;

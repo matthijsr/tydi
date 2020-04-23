@@ -1,8 +1,8 @@
 use crate::design::composer::GenericComponent;
 use crate::design::{
-    IFKey, Interface, NodeIFHandle, NodeKey, Project, StreamletHandle, StreamletKey,
+    IFKey, Interface, NodeIFHandle, NodeKey, StreamletHandle, StreamletKey,
 };
-use crate::{Error, Name, Result, Reversed};
+use crate::{Error, Result, Reversed};
 use nom::lib::std::fmt::Formatter;
 use std::collections::HashMap;
 use std::fmt::Debug;
@@ -39,9 +39,9 @@ impl Node {
     }
 
     pub fn iface(&self, key: IFKey) -> Result<Interface> {
-        let this_key = NodeKey::this();
+        let _this_key = NodeKey::this();
         match &self.key {
-            this_key => self.item.get_interface(key).map(|i| i.reversed()),
+            _this_key => self.item.get_interface(key).map(|i| i.reversed()),
             _ => self.item.get_interface(key).clone(),
         }
     }

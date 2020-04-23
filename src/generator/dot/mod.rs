@@ -1,12 +1,12 @@
 use crate::cat;
 use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
 use crate::design::composer::{GenDot, GenericComponent};
-use crate::design::{Interface, Library, Mode, Project, Streamlet, THIS_KEY};
+use crate::design::{Interface, Library, Mode, Project, THIS_KEY};
+
 use crate::generator::GenerateProject;
 use crate::{Identify, Result};
 use std::ops::Deref;
 use std::path::Path;
-use crate::generator::common::convert::Typify;
 
 // To be added later for Dot configuration from CLI:
 // #[cfg(feature = "cli")]
@@ -99,7 +99,7 @@ impl DotStyle {
         )
     }
 
-    pub fn io(&self, color: usize, mode: Mode) -> String {
+    pub fn io(&self, _color: usize, mode: Mode) -> String {
         match mode {
             Mode::In => format!("style=\"filled\", {}", self.node(5)),
             Mode::Out => format!("style=\"filled\", {}", self.node(6)),
@@ -108,15 +108,10 @@ impl DotStyle {
 }
 
 impl GenDot for Edge {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
+    fn gen_dot(&self, _style: &DotStyle, _project: &Project, l: usize, prefix: &str) -> String {
         let src = match self.source().node().deref() {
             THIS_KEY => cat!(prefix, self.source().iface()),
-            _ => cat!(
-                prefix,
-                "impl",
-                self.source().node(),
-                self.source().iface()
-            ),
+            _ => cat!(prefix, "impl", self.source().node(), self.source().iface()),
         };
         let snk = match self.sink().node().deref() {
             THIS_KEY => cat!(prefix, self.sink().iface()),
@@ -162,7 +157,7 @@ where
 }
 
 impl GenDot for Interface {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, _project: &Project, l: usize, prefix: &str) -> String {
         format!(
             "{}{} [label=\"{}\\n{:?}\", {}];",
             tab(l),
@@ -232,11 +227,15 @@ impl GenDot for dyn GenericComponent {
                 ),
                 // implementation
                 if self.get_implementation().is_some() {
-                    self.get_implementation().unwrap().gen_dot(style, project, l + 1, format!("{}_{}", prefix, self.key()).as_ref())
+                    self.get_implementation().unwrap().gen_dot(
+                        style,
+                        project,
+                        l + 1,
+                        format!("{}_{}", prefix, self.key()).as_ref(),
+                    )
                 } else {
                     String::new()
                 }
-
             ),
             tab(l),
         )
@@ -244,7 +243,7 @@ impl GenDot for dyn GenericComponent {
 }
 
 impl GenDot for Library {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, _prefix: &str) -> String {
         format!(
             "digraph  {{\n{}\n{}}}",
             format!(
@@ -252,8 +251,8 @@ impl GenDot for Library {
                 format!("{}rankdir=LR;\n", tab(l + 1)),
                 format!("{}splines=compound;\n", tab(l + 1)),
                 self.streamlets()
-                    .map(|s | s as &GenericComponent )
-                    .map(|s|s.gen_dot(style, project, l + 1, self.identifier()))
+                    .map(|s| s as &dyn GenericComponent)
+                    .map(|s| s.gen_dot(style, project, l + 1, self.identifier()))
                     .collect::<Vec<String>>()
                     .join("\n"),
             ),

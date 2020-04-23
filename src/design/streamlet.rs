@@ -3,10 +3,10 @@
 //! A streamlet is a component where every [Interface] has a [LogicalType].
 
 use crate::design::composer::impl_graph::ImplementationGraph;
-use crate::design::{IFKey, StreamletKey, ComponentKey};
+use crate::design::{IFKey, ComponentKey};
 use crate::logical::LogicalType;
 use crate::traits::Identify;
-use crate::util::UniquelyNamedBuilder;
+
 use crate::{Document, Error, Name, Result, UniqueKeyBuilder, Reverse, Reversed};
 use std::collections::HashMap;
 use std::convert::TryInto;
