@@ -96,10 +96,11 @@ pub(crate) mod tests {
     use std::convert::TryFrom;
 
     pub(crate) fn composition_example() -> Result<Project> {
-        let key = LibKey::try_new("primitives").unwrap();
-        let mut lib = Library::new(key.clone());
+        let key1 = LibKey::try_new("primitives").unwrap();
+        let key2 = LibKey::try_new("compositions").unwrap();
+        let mut lib = Library::new(key1.clone());
 
-        let mut lib_comp = Library::new(key.clone());
+        let mut lib_comp = Library::new(key2.clone());
 
         //Add streamlet
         let test1 = lib
@@ -151,9 +152,13 @@ pub(crate) mod tests {
         let mut imp = GraphBuilder::try_new(&prj, top.clone()).unwrap();
 
         let this = imp.this();
-        //let tet1inst = imp.instantiate(test1, "test1inst").unwrap();
+        let tet1inst = imp.instantiate(test1, "test1inst").unwrap();
 
         imp.connect(this.io("e"), this.io("f"));
+        let imp = imp.finish();
+
+        prj.add_streamlet_impl(top, imp);
+
         Ok(prj)
     }
 }

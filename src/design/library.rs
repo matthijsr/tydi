@@ -138,7 +138,20 @@ impl Library {
         })
     }
 
+    pub fn get_streamlet_mut(&mut self, streamlet: StreamletKey) -> Result<&mut Streamlet> {
+         match self.streamlets.get_mut(&streamlet) {
+             Some(s) => Ok(s),
+             None => Err(Error::ProjectError(format!(
+                 "Streamlet {} not found in library {}",
+                 streamlet,
+                 self.key
+             ))),
+         }
+    }
+
 }
+
+
 
 #[cfg(test)]
 pub mod tests {

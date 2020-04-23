@@ -1,8 +1,9 @@
-use crate::design::{LibKey, Library};
+use crate::design::{LibKey, Library, StreamletHandle, Streamlet};
 use crate::util::UniquelyNamedBuilder;
 use crate::{Error, Result};
 use crate::{Identify, Name};
 use std::collections::HashMap;
+use crate::design::composer::impl_graph::ImplementationGraph;
 
 /// A collection of Streamlets.
 pub struct Project {
@@ -60,6 +61,35 @@ impl Project {
                 lib
             ))
         })
+    }
+
+    pub fn get_lib_mut(&mut self, lib: LibKey) -> Result<&mut Library> {
+        self.libraries.get_mut(&lib).ok_or_else(|| {
+            Error::ProjectError(format!(
+                "Error while retrieving {:?}, it does not exist in project.",
+                lib
+            ))
+        })
+    }
+
+    pub fn get_streamlet(&self, streamlet: StreamletHandle) -> Result<&Streamlet> {
+        self.get_lib(streamlet.lib())?
+            .get_streamlet(streamlet.streamlet())
+    }
+
+    pub fn get_streamlet_mut(&mut self, streamlet: StreamletHandle) -> Result<&mut Streamlet> {
+        self.get_lib_mut(streamlet.lib())?
+            .get_streamlet_mut(streamlet.streamlet())
+    }
+
+    /// Add the implementation of a streamlet to the project.
+    pub fn add_streamlet_impl(
+        &mut self,
+        streamlet: StreamletHandle,
+        implementation: ImplementationGraph,
+    ) -> Result<()> {
+        self.get_streamlet_mut(streamlet)?
+            .attach_implementation(implementation)
     }
 }
 

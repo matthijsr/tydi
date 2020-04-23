@@ -6,6 +6,7 @@ use crate::generator::GenerateProject;
 use crate::{Identify, Result};
 use std::ops::Deref;
 use std::path::Path;
+use crate::generator::common::convert::Typify;
 
 // To be added later for Dot configuration from CLI:
 // #[cfg(feature = "cli")]
@@ -93,8 +94,8 @@ impl DotStyle {
         format!(
             "{}{}{}",
             format!("{}style=\"rounded\";\n", tab(l)),
-            format!("{} color=\"{}\" \n", tab(l), self.colors.0[color].d),
-            format!("{} bgcolor=\"{}\"\n", tab(l), self.colors.0[color].l),
+            format!("{}color=\"{}\" \n", tab(l), self.colors.0[color].d),
+            format!("{}bgcolor=\"{}\"\n", tab(l), self.colors.0[color].l),
         )
     }
 
@@ -163,22 +164,22 @@ where
 impl GenDot for Interface {
     fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
         format!(
-            "{}{} [label=\"{}\", {:?}]",
+            "{}{} [label=\"{}\\n{:?}\", {}];",
             tab(l),
+            format!("{}_{}", prefix, self.identifier()),
             self.identifier(),
-            self.identifier(),
-            self.mode()
+            self.typ(),
+            style.io(0, self.mode())
         )
     }
 }
 
 impl GenDot for ImplementationGraph {
     fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
-        let prefix = format!("{}_{}", prefix, "impl");
         format!(
             "{}subgraph cluster_{} {{\n{}\n{}}}",
             tab(l),
-            prefix,
+            format!("{}_{}", prefix, "impl"),
             format!(
                 "{}{}{}\n{}",
                 format!("{}label=\"Implementation\";\n", tab(l + 1)),
@@ -188,13 +189,13 @@ impl GenDot for ImplementationGraph {
                     style,
                     project,
                     l + 1,
-                    prefix.as_ref(),
+                    format!("{}_{}", prefix, "impl").as_ref(),
                     "nodes",
                     self.nodes().filter(|n| n.key().deref() != THIS_KEY)
                 ),
                 //edges
                 self.edges()
-                    .map(|e| e.gen_dot(style, project, l + 1, prefix.as_ref()))
+                    .map(|e| e.gen_dot(style, project, l + 1, prefix))
                     .collect::<Vec<String>>()
                     .join("\n"),
             ),
@@ -206,18 +207,18 @@ impl GenDot for ImplementationGraph {
 impl GenDot for dyn GenericComponent {
     fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
         format!(
-            "{} subgraph cluster_{} {{ \n {} }}",
+            "{}subgraph cluster_{} {{ \n {}{}}}",
             tab(l),
             self.key(),
             format!(
-                "\n {} {} {} {} {} \n",
-                format!("{} label = \"{}\";\n", tab(l + 1), self.key()),
+                "\n{}{}{}{}{}\n",
+                format!("{}label = \"{}\";\n", tab(l + 1), self.key()),
                 style.cluster(1, l + 1),
                 item_subgraph(
                     style,
                     project,
                     l + 1,
-                    self.key().as_ref(),
+                    format!("{}_{}", prefix, self.key()).as_ref(),
                     "inputs",
                     self.inputs()
                 ),
@@ -225,18 +226,19 @@ impl GenDot for dyn GenericComponent {
                     style,
                     project,
                     l + 1,
-                    self.key().as_ref(),
+                    format!("{}_{}", prefix, self.key()).as_ref(),
                     "outputs",
                     self.outputs()
                 ),
                 // implementation
                 if self.get_implementation().is_some() {
-                    self.get_implementation().unwrap().gen_dot(style, project, l + 1, prefix)
+                    self.get_implementation().unwrap().gen_dot(style, project, l + 1, format!("{}_{}", prefix, self.key()).as_ref())
                 } else {
                     String::new()
                 }
 
-            )
+            ),
+            tab(l),
         )
     }
 }
