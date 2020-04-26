@@ -35,7 +35,7 @@ StreamletInst		= { StreamletHandle ~ "(" ~ Connection* ~ ")" }
 
 GenericInst			= { Generic ~ "(" ~ (Connection | ident)* ~ ")" }
 
-Instantiation		= { ident ~ ":" ~ (GenericInst | StreamletInst)  }
+Instantiation		= { ident ~ ":" ~ (GenericInst | StreamletInst) ~ ";"? }
 
 Implementation      = { "impl" ~ StreamletHandle ~ "{" ~ Instantiation* ~ "}" }
 

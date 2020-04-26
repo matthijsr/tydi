@@ -242,6 +242,10 @@ impl Streamlet {
         })
     }
 
+    pub(crate) fn set_key(&mut self, key: ComponentKey) {
+        self.key = key;
+    }
+
     /// Return this streamlet with documentation added.
     pub fn with_doc(mut self, doc: impl Into<String>) -> Self {
         self.doc = Some(doc.into());

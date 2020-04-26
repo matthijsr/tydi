@@ -97,8 +97,8 @@ impl DotStyle {
 
     pub fn io(&self, _color: usize, mode: Mode) -> String {
         match mode {
-            Mode::In => format!("style=\"filled\", {}", self.node(5)),
-            Mode::Out => format!("style=\"filled\", {}", self.node(6)),
+            Mode::In => format!("style=\"filled\", {}", self.node(4)),
+            Mode::Out => format!("style=\"filled\", {}", self.node(5)),
         }
     }
 }
@@ -119,8 +119,7 @@ impl GenDot for Edge {
 
 impl GenDot for Node {
     fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
-        let prefix = format!("{}_{}", prefix, self.key());
-        self.component().gen_dot(style, project, l, prefix.as_ref())
+        self.component().gen_dot(style, project, l, prefix)
     }
 }
 
@@ -132,8 +131,8 @@ fn item_subgraph<'a, I: 'a>(
     suffix: &str,
     items: impl Iterator<Item = &'a I>,
 ) -> String
-where
-    I: GenDot,
+    where
+        I: GenDot,
 {
     format!(
         "{}subgraph cluster_{}_{} {{\n{}\n{}}}\n",
@@ -156,11 +155,11 @@ where
 impl GenDot for Interface {
     fn gen_dot(&self, style: &DotStyle, _project: &Project, l: usize, prefix: &str) -> String {
         format!(
-            "{}{} [label=\"{}\\n{:?}\", {}];",
+            "{}{} [label=\"{}\\n\", {}];",
             tab(l),
             format!("{}_{}", prefix, self.identifier()),
             self.identifier(),
-            self.typ(),
+            //self.typ(),
             style.io(0, self.mode())
         )
     }
@@ -175,7 +174,7 @@ impl GenDot for ImplementationGraph {
             format!(
                 "{}{}{}\n{}",
                 format!("{}label=\"Implementation\";\n", tab(l + 1)),
-                style.cluster(0, l + 1),
+                style.cluster(6, l + 1),
                 //nodes,
                 item_subgraph(
                     style,
@@ -210,8 +209,7 @@ impl GenDot for dyn GenericComponent {
                     style,
                     project,
                     l + 1,
-                    //format!("{}_{}", prefix, self.key()).as_ref(),
-                    prefix,
+                    format!("{}_{}", prefix, self.key()).as_ref(),
                     "inputs",
                     self.inputs()
                 ),
@@ -219,8 +217,7 @@ impl GenDot for dyn GenericComponent {
                     style,
                     project,
                     l + 1,
-                    //format!("{}_{}", prefix, self.key()).as_ref(),
-                    prefix,
+                    format!("{}_{}", prefix, self.key()).as_ref(),
                     "outputs",
                     self.outputs()
                 ),
@@ -230,8 +227,7 @@ impl GenDot for dyn GenericComponent {
                         style,
                         project,
                         l + 1,
-                        //format!("{}_{}", prefix, self.key()).as_ref(),
-                        prefix,
+                        format!("{}_{}", prefix, self.key()).as_ref(),
                     )
                 } else {
                     String::new()
@@ -247,8 +243,12 @@ impl GenDot for Library {
         format!(
             "digraph  {{\n{}\n{}}}",
             format!(
-                "{}{}{}",
-                format!("{}rankdir=LR;\n", tab(l + 1)),
+                "{}{}{}{}{}{}{}",
+                format!("{}rankdir=TB;\n", tab(l + 1)),
+                format!("{}graph [fontname=\"Bitstream Charter\"];\n", tab(l + 1)),
+                format!("{}node [fontname=\"Bitstream Charter\"];\n", tab(l + 1)),
+                format!("{}node [shape=box, style=\"rounded, filled\"]\n", tab(l + 1)),
+                format!("{}edge [fontname=\"Bitstream Charter\"];\n", tab(l + 1)),
                 format!("{}splines=compound;\n", tab(l + 1)),
                 self.streamlets()
                     .map(|s| s as &dyn GenericComponent)

@@ -42,7 +42,9 @@ impl Node {
 
     pub fn iface(&self, key: IFKey) -> Result<Interface> {
         match self.key().deref() {
-            THIS_KEY => self.item.get_interface(key).map(|i| i.reversed()),
+            THIS_KEY => {
+                self.item.get_interface(key).map(|i| i.reversed())
+            },
             _ => self.item.get_interface(key).clone(),
         }
     }
