@@ -1,0 +1,4 @@
+impl compositions.Top_level {
+   inst1 : primitives.Test1( ez => this.az, lol => this.lel)
+   mapinst : MapVec( ez => this.az, lol => this.lel, inst1)
+}

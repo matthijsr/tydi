@@ -1,0 +1,42 @@
+// Whitespace and comments.
+WHITESPACE 	        = _{ (" " | "\n") }
+COMMENT 	        = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
+
+// Identifiers
+//ident 		        = {ASCII_ALPHA{1} ~ (ASCII_ALPHANUMERIC | (ASCII_ALPHANUMERIC+ ~ "_"{1} ~ ASCII_ALPHANUMERIC+))*}
+ident               = {(ASCII_ALPHANUMERIC | "_")+}
+
+// Literals
+digit               = _{ '0'..'9' }
+uint                = { digit ~ (digit | "_")* }
+plus                = { "+" }
+minus               = { "-" }
+exp                 = { ^"e" ~ (plus | minus)? ~ uint }
+float               = {uint ~ "." ~ uint? ~ exp? |uint ~ exp}
+
+bool                = {"true" | "false" }
+
+NodeKey				= { ident }
+IFKey				= { ident }
+
+StreamletHandle		= { ident ~ "." ~ ident }
+
+NodeIFHandle		= { NodeKey ~ "." ~ IFKey }
+
+Connection			= { NodeKey ~ "=>" ~ NodeIFHandle ~ ","? }
+
+MapVec				= { "MapVec" }
+
+ReduceVec			= { "ReduceVec" }
+
+Generic 			= { MapVec | ReduceVec }
+
+StreamletInst		= { StreamletHandle ~ "(" ~ Connection* ~ ")" }
+
+GenericInst			= { Generic ~ "(" ~ (Connection | ident)* ~ ")" }
+
+Instantiation		= { ident ~ ":" ~ (GenericInst | StreamletInst)  }
+
+Implementation      = { "impl" ~ StreamletHandle ~ "{" ~ Instantiation* ~ "}" }
+
+

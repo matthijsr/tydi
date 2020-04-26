@@ -8,10 +8,6 @@ use crate::{Identify, Result};
 use std::ops::Deref;
 use std::path::Path;
 
-// To be added later for Dot configuration from CLI:
-// #[cfg(feature = "cli")]
-// use structopt::StructOpt;
-
 fn tab(n: usize) -> String {
     "\t".repeat(n)
 }
@@ -295,7 +291,7 @@ impl GenerateProject for DotBackend {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::design::composer::impl_graph::frontend::tests::composition_example;
+    use crate::design::composer::impl_graph::builder::tests::composition_example;
     /*
         #[test]
         fn dot() {

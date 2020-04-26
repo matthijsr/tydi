@@ -1,9 +1,9 @@
-use crate::design::{LibKey, Library, StreamletHandle, Streamlet};
+use crate::design::composer::impl_graph::ImplementationGraph;
+use crate::design::{LibKey, Library, Streamlet, StreamletHandle};
 use crate::util::UniquelyNamedBuilder;
 use crate::{Error, Result};
 use crate::{Identify, Name};
 use std::collections::HashMap;
-use crate::design::composer::impl_graph::ImplementationGraph;
 
 /// A collection of Streamlets.
 pub struct Project {
@@ -18,7 +18,6 @@ impl Identify for Project {
 }
 
 impl Project {
-
     pub fn new(name: Name) -> Project {
         Project {
             name,
@@ -46,8 +45,8 @@ impl Project {
     pub fn add_lib(&mut self, lib: Library) -> Result<LibKey> {
         let key = lib.key().clone();
         match self.libraries.insert(lib.key().clone(), lib) {
-            Some(_lib) => Ok(key),
-            None => Err(Error::ProjectError(format!(
+            None => Ok(key),
+            Some(_lib) => Err(Error::ProjectError(format!(
                 "Error while adding {} to the project",
                 key,
             ))),

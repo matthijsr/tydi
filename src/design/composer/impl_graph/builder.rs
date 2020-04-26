@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use std::convert::TryInto;
 use std::rc::Rc;
 
+
 pub struct GraphBuilder<'a> {
     project: &'a Project,
     imp: ImplementationGraph,
@@ -29,8 +30,8 @@ impl<'a> GraphBuilder<'a> {
                             item: Rc::new(s.clone()),
                         },
                     )]
-                    .into_iter()
-                    .collect::<HashMap<NodeKey, Node>>(),
+                        .into_iter()
+                        .collect::<HashMap<NodeKey, Node>>(),
                     edges: vec![],
                 },
             }),
@@ -47,9 +48,9 @@ impl<'a> GraphBuilder<'a> {
         streamlet_handle: StreamletHandle,
         instance: I,
     ) -> Result<Node>
-    where
-        I: TryInto<NodeKey>,
-        <I as TryInto<NodeKey>>::Error: Into<Error>,
+        where
+            I: TryInto<NodeKey>,
+            <I as TryInto<NodeKey>>::Error: Into<Error>,
     {
         let key = instance.try_into().map_err(Into::into).unwrap();
 
@@ -68,7 +69,6 @@ impl<'a> GraphBuilder<'a> {
             }
             Err(e) => Err(e),
         }
-
     }
 
     pub fn this(&self) -> Node {
@@ -84,12 +84,14 @@ impl<'a> GraphBuilder<'a> {
     }
 }
 
+
+
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
 
     use crate::design::composer::impl_graph::*;
-    
+
     use crate::design::*;
     use crate::logical::LogicalType;
     use crate::{Name, Result, UniqueKeyBuilder};
@@ -113,11 +115,11 @@ pub(crate) mod tests {
                     ]),
                     None,
                 )
-                .unwrap(),
+                    .unwrap(),
             )
             .unwrap();
 
-        let _test2 = lib
+        let test2 = lib
             .add_streamlet(
                 Streamlet::from_builder(
                     StreamletKey::try_from("Test2").unwrap(),
@@ -127,7 +129,7 @@ pub(crate) mod tests {
                     ]),
                     None,
                 )
-                .unwrap(),
+                    .unwrap(),
             )
             .unwrap();
 
@@ -141,20 +143,53 @@ pub(crate) mod tests {
                     ]),
                     None,
                 )
-                .unwrap(),
+                    .unwrap(),
             )
             .unwrap();
 
         let mut prj = Project::new(Name::try_new("TestProj").unwrap());
-        prj.add_lib(lib);
-        prj.add_lib(lib_comp);
+        prj.add_lib(lib)?;
+        prj.add_lib(lib_comp)?;
+
+
 
         let mut imp = GraphBuilder::try_new(&prj, top.clone()).unwrap();
-
         let this = imp.this();
         let _tet1inst = imp.instantiate(test1, "test1inst").unwrap();
 
-        imp.connect(this.io("e"), this.io("f"));
+        /*macro_rules! implement {
+            ($imp:expr => {*}) => (());
+
+            //Instantiation
+            ($($label:tt : $streamlet_name:tt($($src:tt => $dst:tt),*));*;) => {{
+                $(let $label = $imp.instantiate($streamlet_name, stringify!($label)).unwrap();)*
+            }};
+
+        }*/
+
+        /*macro_rules! implement {
+            //Instantiation
+            ($imp:expr => {$inner:tt};*) => {{
+                implement!($imp, ($($inner)*));
+                println!("fasz!");
+            }};
+
+            ($imp:expr, $label:tt : $streamlet_name:tt($($src:tt => $dst:tt),*)) => {{
+                $(let $label = $imp.instantiate($streamlet_name, stringify!($label)).unwrap();)*
+            }};
+
+
+
+        }*/
+
+        /*implement! {&mut imp => {
+            testinst : test1();
+            testinst2 : test2();
+
+            }
+        }*/
+
+        imp.connect(this.io("e"), this.io("f"))?;
         let imp = imp.finish();
 
         prj.add_streamlet_impl(top, imp);

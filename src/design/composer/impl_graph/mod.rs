@@ -1,6 +1,6 @@
 use crate::design::composer::GenericComponent;
 use crate::design::{
-    IFKey, Interface, NodeIFHandle, NodeKey, StreamletHandle, StreamletKey,
+    IFKey, Interface, NodeIFHandle, NodeKey, StreamletHandle, StreamletKey, THIS_KEY
 };
 use crate::{Error, Result, Reversed};
 use nom::lib::std::fmt::Formatter;
@@ -8,8 +8,10 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 use std::rc::Rc;
 use std::convert::TryInto;
+use std::ops::Deref;
 
-pub mod frontend;
+pub mod parser;
+pub mod builder;
 pub mod generic;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -39,9 +41,8 @@ impl Node {
     }
 
     pub fn iface(&self, key: IFKey) -> Result<Interface> {
-        let _this_key = NodeKey::this();
-        match &self.key {
-            _this_key => self.item.get_interface(key).map(|i| i.reversed()),
+        match self.key().deref() {
+            THIS_KEY => self.item.get_interface(key).map(|i| i.reversed()),
             _ => self.item.get_interface(key).clone(),
         }
     }
