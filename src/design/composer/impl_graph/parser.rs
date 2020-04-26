@@ -176,6 +176,7 @@ fn parse_Instantiation(
     match pair.as_rule() {
         Rule::StreamletInst => {
             let parsed = parse_StreamletInst(pair.into_inner())?;
+            println!("Inst: {:?}", nodekey);
             Ok((nodekey, parsed.0, parsed.1))
         }
         _ => {
@@ -197,7 +198,7 @@ pub(crate) mod tests {
     use std::convert::TryFrom;
     use std::fs;
 
-    #[test]
+    /*#[test]
     pub(crate) fn impl_parser_test() -> Result<Project> {
         /*let key1 = LibKey::try_new("primitives")?;
         let key2 = LibKey::try_new("compositions")?;
@@ -247,7 +248,7 @@ pub(crate) mod tests {
             )
             ?;*/
 
-        let mut prj = Project::new(Name::try_new("TestProj")?);
+        let mut prj = Project::new(Name::try_new("TestProj").unwrap());
         /*prj.add_lib(lib)?;
         prj.add_lib(lib_comp)?;
 
@@ -259,6 +260,72 @@ pub(crate) mod tests {
         let imp = builder.finish();
 
         prj.add_streamlet_impl(top, imp)?;*/
+        Ok(prj)
+    }*/
+
+    pub(crate) fn impl_parser_test() -> Result<Project> {
+        let key1 = LibKey::try_new("primitives").unwrap();
+        let key2 = LibKey::try_new("compositions").unwrap();
+        let mut lib = Library::new(key1.clone());
+
+        let mut lib_comp = Library::new(key2.clone());
+
+        //Add streamlet
+        let test1 = lib
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("Test1").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        Interface::try_new("a", Mode::In, LogicalType::Null, None).unwrap(),
+                        Interface::try_new("b", Mode::Out, LogicalType::Null, None).unwrap(),
+                    ]),
+                    None,
+                )
+                    .unwrap(),
+            )
+            .unwrap();
+
+        let _test2 = lib
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("Test2").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        Interface::try_new("c", Mode::In, LogicalType::Null, None).unwrap(),
+                        Interface::try_new("d", Mode::Out, LogicalType::Null, None).unwrap(),
+                    ]),
+                    None,
+                )
+                    .unwrap(),
+            )
+            .unwrap();
+
+        let top = lib_comp
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("Top_level").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        Interface::try_new("e", Mode::In, LogicalType::Null, None).unwrap(),
+                        Interface::try_new("f", Mode::Out, LogicalType::Null, None).unwrap(),
+                    ]),
+                    None,
+                )
+                    .unwrap(),
+            )
+            .unwrap();
+
+        let mut prj = Project::new(Name::try_new("TestProj").unwrap());
+        prj.add_lib(lib);
+        prj.add_lib(lib_comp);
+
+        let unparsed_file = include_str!("../../../../tests/test.imp");
+
+        let mut builder = ImplementationBuilder::new(&prj);
+        builder.parse_Implementation(&unparsed_file)?;
+
+        let imp = builder.finish();
+
+        prj.add_streamlet_impl(top, imp)?;
+
         Ok(prj)
     }
 }

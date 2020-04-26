@@ -119,7 +119,8 @@ impl GenDot for Edge {
 
 impl GenDot for Node {
     fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
-        self.component().gen_dot(style, project, l, prefix)
+        let prefix = format!("{}_{}", prefix, self.key());
+        self.component().gen_dot(style, project, l, prefix.as_ref())
     }
 }
 
@@ -209,7 +210,8 @@ impl GenDot for dyn GenericComponent {
                     style,
                     project,
                     l + 1,
-                    format!("{}_{}", prefix, self.key()).as_ref(),
+                    //format!("{}_{}", prefix, self.key()).as_ref(),
+                    prefix,
                     "inputs",
                     self.inputs()
                 ),
@@ -217,7 +219,8 @@ impl GenDot for dyn GenericComponent {
                     style,
                     project,
                     l + 1,
-                    format!("{}_{}", prefix, self.key()).as_ref(),
+                    //format!("{}_{}", prefix, self.key()).as_ref(),
+                    prefix,
                     "outputs",
                     self.outputs()
                 ),
@@ -227,7 +230,8 @@ impl GenDot for dyn GenericComponent {
                         style,
                         project,
                         l + 1,
-                        format!("{}_{}", prefix, self.key()).as_ref(),
+                        //format!("{}_{}", prefix, self.key()).as_ref(),
+                        prefix,
                     )
                 } else {
                     String::new()
@@ -291,7 +295,7 @@ impl GenerateProject for DotBackend {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::design::composer::impl_graph::builder::tests::composition_example;
+    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
     /*
         #[test]
         fn dot() {
@@ -308,7 +312,7 @@ mod tests {
     fn dot_impl() {
         let tmpdir = tempfile::tempdir().unwrap();
 
-        let prj = composition_example().unwrap();
+        let prj = impl_parser_test().unwrap();
         let dot = DotBackend {};
         // TODO: implement actual test.
 
