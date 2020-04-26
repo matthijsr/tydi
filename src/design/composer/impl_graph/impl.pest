@@ -21,9 +21,9 @@ IFKey				= { ident }
 
 StreamletHandle		= { ident ~ "." ~ ident }
 
-NodeIFHandle		= { NodeKey ~ "." ~ IFKey }
+NodeIFHandle		= { ident ~ "." ~ ident }
 
-Connection			= { NodeKey ~ "=>" ~ NodeIFHandle ~ ","? }
+Connection			= { IFKey ~ "=>" ~ NodeIFHandle ~ ","? }
 
 MapVec				= { "MapVec" }
 

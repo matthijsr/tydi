@@ -98,7 +98,7 @@ pub(crate) mod tests {
     use std::convert::TryFrom;
 
     pub(crate) fn composition_example() -> Result<Project> {
-        let key1 = LibKey::try_new("primitives").unwrap();
+        /*let key1 = LibKey::try_new("primitives").unwrap();
         let key2 = LibKey::try_new("compositions").unwrap();
         let mut lib = Library::new(key1.clone());
 
@@ -145,10 +145,10 @@ pub(crate) mod tests {
                 )
                     .unwrap(),
             )
-            .unwrap();
+            .unwrap();*/
 
-        let mut prj = Project::new(Name::try_new("TestProj").unwrap());
-        prj.add_lib(lib)?;
+        let mut prj = Project::new(Name::try_new("TestProj")?);
+       /* prj.add_lib(lib)?;
         prj.add_lib(lib_comp)?;
 
 
@@ -157,42 +157,11 @@ pub(crate) mod tests {
         let this = imp.this();
         let _tet1inst = imp.instantiate(test1, "test1inst").unwrap();
 
-        /*macro_rules! implement {
-            ($imp:expr => {*}) => (());
-
-            //Instantiation
-            ($($label:tt : $streamlet_name:tt($($src:tt => $dst:tt),*));*;) => {{
-                $(let $label = $imp.instantiate($streamlet_name, stringify!($label)).unwrap();)*
-            }};
-
-        }*/
-
-        /*macro_rules! implement {
-            //Instantiation
-            ($imp:expr => {$inner:tt};*) => {{
-                implement!($imp, ($($inner)*));
-                println!("fasz!");
-            }};
-
-            ($imp:expr, $label:tt : $streamlet_name:tt($($src:tt => $dst:tt),*)) => {{
-                $(let $label = $imp.instantiate($streamlet_name, stringify!($label)).unwrap();)*
-            }};
-
-
-
-        }*/
-
-        /*implement! {&mut imp => {
-            testinst : test1();
-            testinst2 : test2();
-
-            }
-        }*/
 
         imp.connect(this.io("e"), this.io("f"))?;
         let imp = imp.finish();
 
-        prj.add_streamlet_impl(top, imp);
+        prj.add_streamlet_impl(top, imp)?;*/
 
         Ok(prj)
     }
