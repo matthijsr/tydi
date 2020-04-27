@@ -18,51 +18,39 @@ pub struct Color {
     d: &'static str, //dark
 }
 
-pub struct Colors([Color; 10]);
+pub struct Colors([Color; 7]);
 
 impl Default for Colors {
     fn default() -> Self {
         Colors([
             Color {
                 l: "#ffffff",
-                d: "#c4c4c4",
+                d: "#f2f2f2",
             }, // 0 white
             Color {
-                l: "#c4c4c4",
-                d: "#808080",
+                l: "#F5F5F5",
+                d: "#607D8B",
             }, // 1 gray
             Color {
-                l: "#d65f5f",
-                d: "#8c0800",
-            }, // 2 red
+                l: "#ecd9c6",
+                d: "#82c6e2",
+            }, // 2 brown
             Color {
-                l: "#ee854a",
-                d: "#b1400d",
+                l: "#FFF9C4",
+                d: "#FBC02D",
             }, // 3 orange
             Color {
-                l: "#d5bb67",
-                d: "#b8850a",
+                l: "#FFC107",
+                d: "#FFEB3B",
             }, // 4 yellow
             Color {
-                l: "#6acc64",
-                d: "#12711c",
+                l: "#C8E6C9",
+                d: "#388E3C",
             }, // 5 green
             Color {
-                l: "#82c6e2",
-                d: "#006374",
+                l: "#BBDEFB",
+                d: "#536DFE",
             }, // 6 cyan
-            Color {
-                l: "#4878d0",
-                d: "#001c7f",
-            }, // 7 blue
-            Color {
-                l: "#956cb4",
-                d: "#591e71",
-            }, // 8 purple
-            Color {
-                l: "#dc7ec0",
-                d: "#a23582",
-            }, // 9 pink
         ])
     }
 }

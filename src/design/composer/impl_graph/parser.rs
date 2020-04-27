@@ -35,7 +35,7 @@ impl<'a> ImplementationBuilder<'a> {
         }
     }
 
-    pub fn parse_Implementation(&mut self, input: &str) -> Result<()> {
+    pub fn parse_implementation(&mut self, input: &str) -> Result<()> {
         let parsed = ImplParser::parse(Rule::Implementation, input)
             .expect("unsuccessful parse") // unwrap the parse result
             .next()
@@ -47,13 +47,13 @@ impl<'a> ImplementationBuilder<'a> {
             match elem.as_rule() {
                 //Streamlet identifier, builder can be crated now
                 Rule::StreamletHandle => {
-                    let handle = parse_StreamletHandle(elem.into_inner())?;
+                    let handle = parse_streamlet_handle(elem.into_inner())?;
                     let builder = GraphBuilder::try_new(self.project, handle)?;
                     self.imp = builder.finish();
                 }
                 Rule::Instantiation => {
                     println!("That's an Instantiation!");
-                    let parsed = parse_Instantiation(elem.into_inner())?;
+                    let parsed = parse_instantiation(elem.into_inner())?;
                     self.instantiate(parsed.1.clone(), parsed.0.clone())?;
                     let edges = parsed.2.clone().into_iter().map(|c| {
                         (
@@ -76,7 +76,7 @@ impl<'a> ImplementationBuilder<'a> {
         Ok(())
     }
 
-    fn parse_Instantiation(
+    fn parse_instantiation(
         mut pair: pest::iterators::Pairs<Rule>,
     ) -> Result<(NodeKey, StreamletHandle, Vec<(IFKey, NodeIFHandle)>)> {
         let nodekey = pair.next().unwrap().as_str();
@@ -85,7 +85,7 @@ impl<'a> ImplementationBuilder<'a> {
         let pair = pair.next().unwrap();
         match pair.as_rule() {
             Rule::StreamletInst => {
-                let parsed = parse_StreamletInst(pair.into_inner())?;
+                let parsed = parse_streamlet_inst(pair.into_inner())?;
                 println!("Inst: {:?}", nodekey);
                 Ok((nodekey, parsed.0, parsed.1))
             }
@@ -145,7 +145,7 @@ impl<'a> ImplementationBuilder<'a> {
     }
 }
 
-fn parse_StreamletHandle(mut pair: pest::iterators::Pairs<Rule>) -> Result<StreamletHandle> {
+fn parse_streamlet_handle(mut pair: pest::iterators::Pairs<Rule>) -> Result<StreamletHandle> {
     let lib = pair.next().unwrap().as_str();
     let streamlet = pair.next().unwrap().as_str();
     let lib_key = LibKey::try_from(lib)?;
@@ -157,7 +157,7 @@ fn parse_StreamletHandle(mut pair: pest::iterators::Pairs<Rule>) -> Result<Strea
     })
 }
 
-fn parse_NodeIFHandle(mut pair: pest::iterators::Pairs<Rule>) -> Result<NodeIFHandle> {
+fn parse_node_if_handle(mut pair: pest::iterators::Pairs<Rule>) -> Result<NodeIFHandle> {
     let node = pair.next().unwrap().as_str();
     let iface = pair.next().unwrap().as_str();
     let nodekey = LibKey::try_from(node)?;
@@ -169,7 +169,7 @@ fn parse_NodeIFHandle(mut pair: pest::iterators::Pairs<Rule>) -> Result<NodeIFHa
     })
 }
 
-fn parse_StreamletInst(
+fn parse_streamlet_inst(
     pairs: pest::iterators::Pairs<Rule>,
 ) -> Result<(StreamletHandle, Vec<(IFKey, NodeIFHandle)>)> {
     let mut edges = vec![];
@@ -177,12 +177,12 @@ fn parse_StreamletInst(
     for elem in pairs {
         match elem.as_rule() {
             Rule::StreamletHandle => {
-                let parsed = parse_StreamletHandle(elem.into_inner())?;
+                let parsed = parse_streamlet_handle(elem.into_inner())?;
                 println!("Lolza: {:?}", parsed);
                 handle = Option::from(parsed);
             }
             Rule::Connection => {
-                let connection = parse_Connection(elem.into_inner())?;
+                let connection = parse_connection(elem.into_inner())?;
                 edges.push(connection);
             }
             _ => {
@@ -193,11 +193,11 @@ fn parse_StreamletInst(
     Ok((handle.unwrap(), edges))
 }
 
-fn parse_GenericInst(_pair: pest::iterators::Pairs<Rule>) {}
+fn parse_generic_inst(_pair: pest::iterators::Pairs<Rule>) {}
 
-fn parse_Connection(mut pairs: pest::iterators::Pairs<Rule>) -> Result<(IFKey, NodeIFHandle)> {
+fn parse_connection(mut pairs: pest::iterators::Pairs<Rule>) -> Result<(IFKey, NodeIFHandle)> {
     let source = pairs.next().unwrap().as_str();
-    let sink = parse_NodeIFHandle(pairs.next().unwrap().into_inner())?;
+    let sink = parse_node_if_handle(pairs.next().unwrap().into_inner())?;
     println!("Connection: {} => {:?}", source, sink);
     let src = IFKey::try_from(source)?;
     let dst = sink;
@@ -205,7 +205,7 @@ fn parse_Connection(mut pairs: pest::iterators::Pairs<Rule>) -> Result<(IFKey, N
     Ok((src, dst))
 }
 
-fn parse_Instantiation(
+fn parse_instantiation(
     mut pair: pest::iterators::Pairs<Rule>,
 ) -> Result<(NodeKey, StreamletHandle, Vec<(IFKey, NodeIFHandle)>)> {
     let nodekey = pair.next().unwrap().as_str();
@@ -214,7 +214,7 @@ fn parse_Instantiation(
     let pair = pair.next().unwrap();
     match pair.as_rule() {
         Rule::StreamletInst => {
-            let parsed = parse_StreamletInst(pair.into_inner())?;
+            let parsed = parse_streamlet_inst(pair.into_inner())?;
             println!("Inst: {:?}", nodekey);
             Ok((nodekey, parsed.0, parsed.1))
         }
@@ -366,12 +366,12 @@ pub(crate) mod tests {
         let map_impl = include_str!("../../../../tests/map.impl");
 
         let mut builder = ImplementationBuilder::new(&prj);
-        builder.parse_Implementation(&top_impl)?;
+        builder.parse_implementation(&top_impl)?;
         let imp = builder.finish();
         prj.add_streamlet_impl(top, imp)?;
 
         let mut builder = ImplementationBuilder::new(&prj);
-        builder.parse_Implementation(&map_impl)?;
+        builder.parse_implementation(&map_impl)?;
         let imp = builder.finish();
         prj.add_streamlet_impl(map, imp)?;
 
