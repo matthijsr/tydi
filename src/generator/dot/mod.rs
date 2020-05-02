@@ -161,7 +161,7 @@ impl GenDot for ImplementationGraph {
             format!("{}_{}", prefix, "impl"),
             format!(
                 "{}{}{}\n{}",
-                format!("{}label=\"Implementation\";\n", tab(l + 1)),
+                format!("{}label=\"Arch\";\n", tab(l + 1)),
                 style.cluster(6, l + 1),
                 //nodes,
                 item_subgraph(
