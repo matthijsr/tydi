@@ -1,3 +1,4 @@
 impl compositions.Top_level {
-   map_i : compositions.Map( in=>this.data_in, out=>this.data_out);
+   inst1 : compositions.Map;
+
 }

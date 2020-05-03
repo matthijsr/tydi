@@ -12,31 +12,44 @@ uint                = { digit ~ (digit | "_")* }
 plus                = { "+" }
 minus               = { "-" }
 exp                 = { ^"e" ~ (plus | minus)? ~ uint }
-float               = {uint ~ "." ~ uint? ~ exp? |uint ~ exp}
+float                = {uint ~ "." ~ uint? ~ exp? |uint ~ exp}
 
 bool                = {"true" | "false" }
 
-NodeKey				= { ident }
-IFKey				= { ident }
+//Path into a hierarchy
+path 				= { ident ~ ("." ~ ident)* }
 
-StreamletHandle		= { ident ~ "." ~ ident }
+node_if_handle		= { ident ~ "." ~ ident }
+streamlet_handle	= { ident ~ "." ~ ident }
 
-NodeIFHandle		= { ident ~ "." ~ ident }
+//Assign parameter
+parameter_assign	= { ident ~ ":=" ~ path}
 
-Connection			= { IFKey ~ "=>" ~ NodeIFHandle ~ ","? }
+//Parallel patterns
+map					= { "map" ~ "(" ~ streamlet_inst ~ ")" }
+filter				 = { "filter" ~ "(" ~ streamlet_inst ~ ")" }
+reduce				= { "reduce" ~ "(" ~ streamlet_inst ~ ")" }
+pattern				= { map | filter | reduce }
+pattern_chain		= { pattern ~ ("." ~ pattern)* }
+pattern_node		= { node_if_handle ~ ("." ~ pattern_chain)+ }
 
-MapVec				= { "MapVec" }
+//Interface manipulation
+split				= { "split" }
+iface_manip			= { split }
 
-ReduceVec			= { "ReduceVec" }
+//Single point-to-point connection
+connection			= { node_if_handle ~ "=>" ~  node_if_handle }
 
-Generic 			= { MapVec | ReduceVec }
+//Bulk connection
+node_if_handle_list	= { "(" ~ node_if_handle ~ ("," ~ node_if_handle)* ~ (")") }
+bulk_connection		= { (ident | node_if_handle_list) ~ "<>" ~ (ident | node_if_handle_list) ~ ("." ~ pattern_chain)? }
 
-StreamletInst		= { StreamletHandle ~ "(" ~ Connection* ~ ")" }
+//Streamlet instantiation
+streamlet_inst		= { streamlet_handle ~ ("[" ~ (parameter_assign)+ ~ "]")? }
 
-GenericInst			= { Generic ~ "(" ~ (Connection | ident)* ~ ")" }
+//A node in the implementation graph
+node        		= { ident ~ ":" ~  (pattern_node | streamlet_inst) }
 
-Instantiation		= { ident ~ ":" ~ (GenericInst | StreamletInst) ~ ";"? }
-
-Implementation      = { "impl" ~ StreamletHandle ~ "{" ~ Instantiation* ~ "}" }
-
-
+//Implementation of a streamlet
+implementation_body = { (( connection | bulk_connection | node) ~ ";")* }
+implementation      = { "impl" ~ streamlet_handle ~ "{" ~ implementation_body ~ "}" }
