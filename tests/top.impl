@@ -1,4 +1,10 @@
 impl compositions.Top_level {
+   /*Instantiation example*/
    inst1 : compositions.Map;
-
+   /*Single connection example*/
+   inst1.in => this.in;
+   /*Bulk connection example*/
+   (this.out, inst1.in) <> inst1;
+   /*Pattern chain example*/
+   patterns_i : this.in.map(lib.streamlet[param := lib.param]);
 }

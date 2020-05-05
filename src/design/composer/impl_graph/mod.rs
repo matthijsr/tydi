@@ -12,7 +12,7 @@ use std::ops::Deref;
 
 pub mod parser;
 pub mod builder;
-pub mod generic;
+pub mod patterns;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Edge {
