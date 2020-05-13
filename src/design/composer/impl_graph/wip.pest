@@ -20,7 +20,7 @@ bool                = {"true" | "false" }
 path 				= { ident ~ ("." ~ ident)* }
 
 //Single point-to-point connection
-connection			= { path ~ "=>" ~  path }
+connection			= { path ~ "<=" ~  path }
 
 //Bulk connect all the identically named ports of two streamlets
 bulk_connection		= { ident ~ "<>" ~  ident }
