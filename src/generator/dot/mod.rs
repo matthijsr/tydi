@@ -92,7 +92,7 @@ impl DotStyle {
 }
 
 impl GenDot for Edge {
-    fn gen_dot(&self, _style: &DotStyle, _project: &Project, l: usize, prefix: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
         let src = match self.source().node().deref() {
             THIS_KEY => cat!(prefix, self.source().iface()),
             _ => cat!(prefix, "impl", self.source().node(), self.source().iface()),
@@ -106,8 +106,8 @@ impl GenDot for Edge {
 }
 
 impl GenDot for Node {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
-        self.component().gen_dot(style, project, l, prefix)
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
+        self.component().gen_dot(style, project, l, prefix, "")
     }
 }
 
@@ -132,7 +132,7 @@ fn item_subgraph<'a, I: 'a>(
             format!("{}label=\"\";\n", tab(l + 1)),
             format!("{}style=invis;\n", tab(l + 1)),
             items
-                .map(|i| i.gen_dot(style, project, l + 1, prefix))
+                .map(|i| i.gen_dot(style, project, l + 1, prefix, ""))
                 .collect::<Vec<String>>()
                 .join("\n")
         ),
@@ -141,20 +141,20 @@ fn item_subgraph<'a, I: 'a>(
 }
 
 impl GenDot for Interface {
-    fn gen_dot(&self, style: &DotStyle, _project: &Project, l: usize, prefix: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
         format!(
             "{}{} [label=\"{}\\n\", {}];",
             tab(l),
             format!("{}_{}", prefix, self.identifier()),
             self.identifier(),
             //self.typ(),
-            style.io(0, self.mode())
+            style.io(0, self.mode()),
         )
     }
 }
 
 impl GenDot for ImplementationGraph {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
         format!(
             "{}subgraph cluster_{} {{\n{}\n{}}}",
             tab(l),
@@ -174,7 +174,7 @@ impl GenDot for ImplementationGraph {
                 ),
                 //edges
                 self.edges()
-                    .map(|e| e.gen_dot(style, project, l + 1, prefix))
+                    .map(|e| e.gen_dot(style, project, l + 1, prefix, ""))
                     .collect::<Vec<String>>()
                     .join("\n"),
             ),
@@ -184,7 +184,7 @@ impl GenDot for ImplementationGraph {
 }
 
 impl GenDot for dyn GenericComponent {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, prefix: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
         format!(
             "{}subgraph cluster_{} {{ \n {}{}}}",
             tab(l),
@@ -216,6 +216,7 @@ impl GenDot for dyn GenericComponent {
                         project,
                         l + 1,
                         format!("{}_{}", prefix, self.key()).as_ref(),
+                        "",
                     )
                 } else {
                     String::new()
@@ -227,7 +228,7 @@ impl GenDot for dyn GenericComponent {
 }
 
 impl GenDot for Library {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l: usize, _prefix: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
         format!(
             "digraph  {{\n{}\n{}}}",
             format!(
@@ -240,7 +241,7 @@ impl GenDot for Library {
                 format!("{}splines=compound;\n", tab(l + 1)),
                 self.streamlets()
                     .map(|s| s as &dyn GenericComponent)
-                    .map(|s| s.gen_dot(style, project, l + 1, self.identifier()))
+                    .map(|s| s.gen_dot(style, project, l + 1, self.identifier(), ""))
                     .collect::<Vec<String>>()
                     .join("\n"),
             ),
@@ -269,7 +270,7 @@ impl GenerateProject for DotBackend {
             lib_path.push(lib.identifier());
             lib_path.set_extension("dot");
 
-            let dot = lib.gen_dot(&DotStyle::default(), project, 0, "");
+            let dot = lib.gen_dot(&DotStyle::default(), project, 0, "", "");
 
             // TODO: remove this
             println!("{}", dot);
@@ -283,7 +284,8 @@ impl GenerateProject for DotBackend {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
+    //use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
+    use crate::design::composer::impl_graph::builder::tests::composition_example;
     /*
         #[test]
         fn dot() {
@@ -300,7 +302,8 @@ mod tests {
     fn dot_impl() {
         let tmpdir = tempfile::tempdir().unwrap();
 
-        let prj = impl_parser_test().unwrap();
+        //let prj = impl_parser_test().unwrap();
+        let prj = composition_example().unwrap();
         let dot = DotBackend {};
         // TODO: implement actual test.
 

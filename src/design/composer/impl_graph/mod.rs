@@ -12,6 +12,7 @@ use std::ops::Deref;
 
 pub mod parser;
 pub mod builder;
+pub mod misc;
 pub mod patterns;
 
 #[derive(Clone, Debug, PartialEq)]

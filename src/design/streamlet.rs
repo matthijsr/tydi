@@ -173,6 +173,10 @@ impl GenericComponent for Streamlet {
         Box::new(self.interfaces.iter().map(|(_, i)| i))
     }
 
+    fn streamlet(&self) -> &Streamlet {
+        self
+    }
+
     fn get_interface(&self, key: IFKey) -> Result<Interface> {
         match self.interfaces.get(&key) {
             None => Err(Error::InterfaceError(format!(

@@ -4,6 +4,7 @@ use crate::design::{ComponentKey, IFKey, Interface, Project, Streamlet, Streamle
 use crate::{Error, Result};
 use std::rc::Rc;
 use crate::design::composer::impl_graph::builder::GraphBuilder;
+use std::borrow::Borrow;
 
 pub struct MapPattern {
     pub streamlet: Streamlet,
@@ -17,6 +18,9 @@ pub struct MapBuilder<'a> {
 impl GenericComponent for MapPattern {
     fn key(&self) -> ComponentKey {
         self.streamlet.key().clone()
+    }
+    fn streamlet(&self) -> &Streamlet {
+        self.streamlet.borrow()
     }
     fn interfaces<'a>(&'a self) -> Box<(dyn Iterator<Item = &'a Interface> + 'a)> {
         self.streamlet.interfaces()

@@ -157,8 +157,6 @@ impl<'i> ImplParser<'i> {
         Ok(())
     }
 
-
-
     pub fn connect(&mut self, edge: Edge) -> Result<()> {
         self.imp.edges.push(edge);
         Ok(())
