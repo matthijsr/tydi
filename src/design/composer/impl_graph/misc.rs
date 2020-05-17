@@ -52,16 +52,17 @@ impl GenericComponent for FlattenStream {
 
 impl FlattenStream {
     pub fn try_new(name: &str, input: Interface) -> Result<Self> {
-        let input_data_type = match input.typ() {
+        let input_data_type = match input.typ().clone() {
             LogicalType::Stream(s) => Ok(s),
             _ => Err(Error::ComposerError(format!(
-                "The data type for a FlattenSync streamlet required to be be Stream!",
+                "The data type for a FlattenStream streamlet required to be be Stream!",
             ))),
         }?;
 
         if input_data_type.dimensionality() < 1 {
             Err(Error::ComposerError(format!(
-                "The dimensionality of the input Stream must be grater than 1!",
+                "The dimensionality of the input Stream must be grater than 1! {:?}",
+                input_data_type
             )))?
         }
 
@@ -94,6 +95,58 @@ impl FlattenStream {
                 None,
             )
             .unwrap(),
+        })
+    }
+}
+
+pub struct SequenceStream {
+    pub streamlet: Streamlet,
+}
+
+impl GenericComponent for SequenceStream {
+    fn streamlet(&self) -> &Streamlet {
+        self.streamlet.borrow()
+    }
+}
+
+impl SequenceStream {
+    pub fn try_new(name: &str, input: Interface) -> Result<Self> {
+        let input_data_type = match input.typ() {
+            LogicalType::Stream(s) => Ok(s),
+            _ => Err(Error::ComposerError(format!(
+                "The data type for a SequenceStream streamlet required to be be Stream!",
+            ))),
+        }?;
+
+        let output_stream = Stream::new(
+            input_data_type.data().clone(),
+            input_data_type.throughput(),
+            input_data_type.dimensionality()+1,
+            input_data_type.synchronicity(),
+            Complexity::default(),
+            input_data_type.direction().reversed(),
+            //TODO: do we want to pass user signals?
+            None,
+            //TODO: ?
+            false,
+        );
+
+        Ok(SequenceStream {
+            streamlet: Streamlet::from_builder(
+                StreamletKey::try_from(name).unwrap(),
+                UniqueKeyBuilder::new().with_items(vec![
+                    Interface::try_new("element", Mode::In, input_data_type.reversed(), None)?,
+                    Interface::try_new("out", Mode::Out, output_stream, None)?,
+                    Interface::try_new(
+                        "count",
+                        Mode::In,
+                        Positive::new(ElementCountBits).unwrap(),
+                        None,
+                    )?,
+                ]),
+                None,
+            )
+                .unwrap(),
         })
     }
 }
@@ -274,6 +327,21 @@ mod tests {
         println!(
             "Flatten interface {:?}",
             test_flatten.inputs().next().unwrap().typ()
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_sequence() -> Result<()> {
+        let test_iface = interface("a: in Stream<Group<size: Bits<32>, elem: Stream<Bits<32>>>, d=0>")
+            .unwrap()
+            .1;
+        let test_flatten = SequenceStream::try_new("test", test_iface).unwrap();
+
+        println!(
+            "Sequence interface {:?}",
+            test_flatten.outputs().next().unwrap().typ()
         );
 
         Ok(())

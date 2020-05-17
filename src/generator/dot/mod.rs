@@ -285,7 +285,7 @@ impl GenerateProject for DotBackend {
 mod tests {
     use super::*;
     //use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
-    use crate::design::composer::impl_graph::builder::tests::composition_example;
+    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
     /*
         #[test]
         fn dot() {
@@ -298,12 +298,24 @@ mod tests {
             assert!(dot.generate(&prj, tmpdir).is_ok());
         }
     */
-    #[test]
+    /*#[test]
     fn dot_impl() {
         let tmpdir = tempfile::tempdir().unwrap();
 
         //let prj = impl_parser_test().unwrap();
         let prj = composition_example().unwrap();
+        let dot = DotBackend {};
+        // TODO: implement actual test.
+
+        assert!(dot.generate(&prj, tmpdir).is_ok());
+    }*/
+
+    #[test]
+    fn dot_impl() {
+        let tmpdir = tempfile::tempdir().unwrap();
+
+        //let prj = impl_parser_test().unwrap();
+        let prj = impl_parser_test().unwrap();
         let dot = DotBackend {};
         // TODO: implement actual test.
 

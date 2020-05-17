@@ -87,13 +87,27 @@ impl ImplementationGraph {
     pub fn edges(&self) -> impl Iterator<Item = &Edge> {
         self.edges.iter()
     }
-    pub fn get_node(&self, key: NodeKey) -> Option<&Node> {
-        self.nodes.get(&key)
+    pub fn get_node(&self, key: NodeKey) -> Result<&Node> {
+        let node = self.nodes.get(&key);
+        match node {
+            Some(n) => Ok(n),
+            None => Err(Error::ComposerError(format!(
+                "Error while retrieving node {:?}, it does not exist in design.",
+                key
+            )))
+        }
     }
-    pub fn get_edge(&self, iface: NodeIFHandle) -> Option<&Edge> {
-        self.edges
+    pub fn get_edge(&self, iface: NodeIFHandle) -> Result<&Edge> {
+        let edge = self.edges
             .iter()
-            .find(|e| e.sink == iface || e.source == iface)
+            .find(|e| e.sink == iface || e.source == iface);
+        match edge {
+            Some(e) => Ok(e),
+            None => Err(Error::ComposerError(format!(
+                "Error while retrieving connection for interface {:?}, it does not exist in design.",
+                iface
+            )))
+        }
     }
     pub fn this(&self) -> &Node {
         self.nodes.get(&NodeKey::this()).unwrap()

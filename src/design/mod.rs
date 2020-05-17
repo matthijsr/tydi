@@ -26,6 +26,8 @@ pub type ParamStoreKey = Name;
 pub type NodeKey = Name;
 
 pub const THIS_KEY: &str = "this";
+pub const GEN_LIB: &str = "gen";
+
 
 impl NodeKey {
     /// Returns the key that signifies the streamlet that is being implemented itself.

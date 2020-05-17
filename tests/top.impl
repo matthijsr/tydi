@@ -1,3 +1,8 @@
 impl compositions.Top_level {
-   map_i : compositions.Map( in=>this.data_in, out=>this.data_out);
+   /*Instantiation example*/
+   inst1 : compositions.Map[param := 5];
+   /*Single connection example*/
+   map_i : this.in.map(primitives.Sqrt).map(primitives.Sqrt);
+   inst1.in <= map_i.out;
+   this.out <= inst1.out;
 }

@@ -1,12 +1,10 @@
 use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
-use crate::design::{NodeIFHandle, NodeKey, Project, StreamletHandle};
+use crate::design::{NodeIFHandle, NodeKey, Project, Streamlet, StreamletHandle};
 use crate::{Error, Result};
-
 
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::rc::Rc;
-
 
 pub struct GraphBuilder<'a> {
     project: &'a Project,
@@ -30,8 +28,8 @@ impl<'a> GraphBuilder<'a> {
                             item: Rc::new(s.clone()),
                         },
                     )]
-                        .into_iter()
-                        .collect::<HashMap<NodeKey, Node>>(),
+                    .into_iter()
+                    .collect::<HashMap<NodeKey, Node>>(),
                     edges: vec![],
                 },
             }),
@@ -43,14 +41,10 @@ impl<'a> GraphBuilder<'a> {
         self.imp
     }
 
-    pub fn instantiate<I>(
-        &mut self,
-        streamlet_handle: StreamletHandle,
-        instance: I,
-    ) -> Result<Node>
-        where
-            I: TryInto<NodeKey>,
-            <I as TryInto<NodeKey>>::Error: Into<Error>,
+    pub fn instantiate<I>(&mut self, streamlet_handle: StreamletHandle, instance: I) -> Result<Node>
+    where
+        I: TryInto<NodeKey>,
+        <I as TryInto<NodeKey>>::Error: Into<Error>,
     {
         let key = instance.try_into().map_err(Into::into).unwrap();
 
@@ -76,7 +70,11 @@ impl<'a> GraphBuilder<'a> {
         self.imp.nodes.get(&NodeKey::this()).unwrap().clone()
     }
 
-    pub fn connect(&mut self, sink: Result<NodeIFHandle>, source: Result<NodeIFHandle>) -> Result<()> {
+    pub fn connect(
+        &mut self,
+        sink: Result<NodeIFHandle>,
+        source: Result<NodeIFHandle>,
+    ) -> Result<()> {
         let sink = sink?;
         let source = source?;
         self.imp.edges.push(Edge { source, sink });
@@ -84,7 +82,68 @@ impl<'a> GraphBuilder<'a> {
     }
 }
 
+pub struct BasicGraphBuilder {
+    imp: ImplementationGraph,
+}
 
+impl BasicGraphBuilder {
+    pub fn new(s: Streamlet, streamlet_handle: StreamletHandle) -> Self {
+        BasicGraphBuilder {
+            imp: ImplementationGraph {
+                streamlet: streamlet_handle.clone(),
+                nodes: vec![(
+                    NodeKey::this(),
+                    Node {
+                        key: NodeKey::this(),
+                        item: Rc::new(s.clone()),
+                    },
+                )]
+                .into_iter()
+                .collect::<HashMap<NodeKey, Node>>(),
+                edges: vec![],
+            },
+        }
+    }
+
+    pub fn finish(self) -> ImplementationGraph {
+        self.imp
+    }
+
+    pub fn instantiate<I>(&mut self, s: &Streamlet, instance: I) -> Node
+    where
+        I: TryInto<NodeKey>,
+        <I as TryInto<NodeKey>>::Error: Into<Error>,
+    {
+        let key = instance.try_into().map_err(Into::into).unwrap();
+
+        println!("Instantiation key: {:?}", key.clone());
+
+        let mut s_copy = s.clone();
+        s_copy.set_key(key.clone());
+        let node = Node {
+            key: key.clone(),
+            item: Rc::new(s_copy.clone()),
+        };
+        self.imp.nodes.insert(node.key().clone(), node.clone());
+        node
+    }
+
+    pub fn this(&self) -> Node {
+        // We can unwrap safely here because the "this" node should always exist.
+        self.imp.nodes.get(&NodeKey::this()).unwrap().clone()
+    }
+
+    pub fn connect(
+        &mut self,
+        source: Result<NodeIFHandle>,
+        sink: Result<NodeIFHandle>,
+    ) -> Result<()> {
+        let sink = sink?;
+        let source = source?;
+        self.imp.edges.push(Edge { source, sink });
+        Ok(())
+    }
+}
 
 #[cfg(test)]
 pub(crate) mod tests {
@@ -115,7 +174,7 @@ pub(crate) mod tests {
                     ]),
                     None,
                 )
-                    .unwrap(),
+                .unwrap(),
             )
             .unwrap();
 
@@ -129,7 +188,7 @@ pub(crate) mod tests {
                     ]),
                     None,
                 )
-                    .unwrap(),
+                .unwrap(),
             )
             .unwrap();
 
@@ -143,7 +202,7 @@ pub(crate) mod tests {
                     ]),
                     None,
                 )
-                    .unwrap(),
+                .unwrap(),
             )
             .unwrap();
 
