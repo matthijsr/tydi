@@ -143,6 +143,16 @@ impl BasicGraphBuilder {
         self.imp.edges.push(Edge { source, sink });
         Ok(())
     }
+
+    pub fn append_nodes(&mut self, nodes: Vec<Node>) {
+        for n in nodes.iter() {
+            self.imp.nodes.insert(n.key.clone(), n.clone());
+        }
+    }
+
+    pub fn append_edges(&mut self, edges: &mut Vec<Edge>) {
+        self.imp.edges.append(edges);
+    }
 }
 
 #[cfg(test)]
