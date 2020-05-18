@@ -371,10 +371,10 @@ pub(crate) mod tests {
             )
             .unwrap();
 
-        let map = lib_comp
+        let map = lib
             .add_streamlet(
                 Streamlet::from_builder(
-                    StreamletKey::try_from("Map").unwrap(),
+                    StreamletKey::try_from("Magic").unwrap(),
                     UniqueKeyBuilder::new().with_items(vec![
                         interface("in: in Stream<Group<size: Bits<32>, elem: Stream<Bits<32>>>>")
                             .unwrap()
@@ -470,7 +470,7 @@ pub(crate) mod tests {
         let mut lib_comp = Library::new(key2.clone());
 
         //Add streamlet
-        let _test1 = lib
+        let _test1 = lib_comp
             .add_streamlet(
                 Streamlet::from_builder(
                     StreamletKey::try_from("Magic").unwrap(),
@@ -515,7 +515,7 @@ pub(crate) mod tests {
         let map = lib_comp
             .add_streamlet(
                 Streamlet::from_builder(
-                    StreamletKey::try_from("Map").unwrap(),
+                    StreamletKey::try_from("Magic").unwrap(),
                     UniqueKeyBuilder::new().with_items(vec![
                         interface("in: in Stream<Group<size: Bits<32>, elem: Stream<Bits<32>>>>")
                             .unwrap()
