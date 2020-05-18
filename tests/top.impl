@@ -1,8 +1,9 @@
 impl compositions.Top_level {
    /*Instantiation example*/
-   inst1 : compositions.Map[param := 5];
+   inst1 : primitives.Magic[param := 5];
    /*Single connection example*/
-   map_i : this.in.map(primitives.Sqrt).map(primitives.Sqrt);
+   map_i1 : this.in.map(primitives.Sqrt);
    inst1.in <= map_i.out;
+   /*map_i2 : inst1.out.map(primitives.Sqrt);*/
    this.out <= inst1.out;
 }

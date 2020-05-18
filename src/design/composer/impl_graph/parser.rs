@@ -473,10 +473,10 @@ pub(crate) mod tests {
         let _test1 = lib
             .add_streamlet(
                 Streamlet::from_builder(
-                    StreamletKey::try_from("Test1").unwrap(),
+                    StreamletKey::try_from("Magic").unwrap(),
                     UniqueKeyBuilder::new().with_items(vec![
-                        Interface::try_new("a", Mode::In, LogicalType::Null, None).unwrap(),
-                        Interface::try_new("b", Mode::Out, LogicalType::Null, None).unwrap(),
+                        interface("in: in Stream<Bits<32>, d=1>").unwrap().1,
+                        interface("out: out Stream<Bits<32>, d=1>").unwrap().1,
                     ]),
                     None,
                 )
@@ -503,16 +503,8 @@ pub(crate) mod tests {
                 Streamlet::from_builder(
                     StreamletKey::try_from("Top_level").unwrap(),
                     UniqueKeyBuilder::new().with_items(vec![
-                        interface(
-                            "data_in: in Stream<Group<size: Bits<32>, elem: Stream<Bits<32>>>>",
-                        )
-                        .unwrap()
-                        .1,
-                        interface(
-                            "data_out: out Stream<Group<size: Bits<32>, elem: Stream<Bits<32>>>>",
-                        )
-                        .unwrap()
-                        .1,
+                        interface("in: in Stream<Bits<32>, d=1>").unwrap().1,
+                        interface("out: out Stream<Bits<32>, d=1>").unwrap().1,
                     ]),
                     None,
                 )
