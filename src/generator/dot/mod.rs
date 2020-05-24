@@ -233,7 +233,7 @@ impl GenDot for Library {
             "digraph  {{\n{}\n{}}}",
             format!(
                 "{}{}{}{}{}{}{}",
-                format!("{}rankdir=TB;\n", tab(l + 1)),
+                format!("{}rankdir=LR;\n", tab(l + 1)),
                 format!("{}graph [fontname=\"Bitstream Charter\"];\n", tab(l + 1)),
                 format!("{}node [fontname=\"Bitstream Charter\"];\n", tab(l + 1)),
                 format!("{}node [shape=box, style=\"rounded, filled\"]\n", tab(l + 1)),

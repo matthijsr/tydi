@@ -251,6 +251,10 @@ mod test {
     use crate::Reversed;
     use std::fs;
 
+    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
+    use std::fs::File;
+    use std::io::Write;
+
     #[test]
     fn split_primitive() {
         assert_eq!(Type::bitvec(3).split(), (Some(Type::bitvec(3)), None));
@@ -409,5 +413,19 @@ mod test {
         assert!(fs::metadata(&path.join("proj/lib_pkg.gen.vhd")).is_ok());
 
         Ok(())
+    }
+
+    #[test]
+    fn prj_impl() {
+        let tmpdir = tempfile::tempdir().unwrap();
+
+        //let prj = impl_parser_test().unwrap();
+        let prj = impl_parser_test().unwrap();
+        let vhdl = VHDLBackEnd::default();
+        // TODO: implement actual test.
+
+        let folder = fs::create_dir_all("output").unwrap();
+
+        assert!(vhdl.generate(&prj, "output").is_ok());
     }
 }

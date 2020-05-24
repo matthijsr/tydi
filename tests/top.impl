@@ -1,8 +1,12 @@
 impl compositions.Top_level {
    /*Instantiation example*/
    inst1 : primitives.Magic[param := 5];
-   /*Single connection example*/
-   map_i : this.in.map(primitives.Sqrt);
-   inst1.in <= map_i.out;
-   this.out <= inst1.out;
+   inst2 : primitives.Magic[param := 6];
+   inst3 : primitives.Magic[param := 7];
+   /*Bulk connection chain*/
+
+   inst1.in <= this.in;
+   inst2.in <= inst1.out;
+   inst3.in <= inst2.out;
+   this.out <= inst3.out;
 }

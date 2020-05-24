@@ -26,8 +26,8 @@ impl<'i, R: RuleType> LineNum for Pair<'i, R> {
     }
 }
 
-fn match_rule<'i, T>(
-    pair: Pair<'i, Rule>,
+fn match_rule<T>(
+    pair: Pair<Rule>,
     rule: Rule,
     mut f: impl FnMut(Pair<Rule>) -> Result<T>,
 ) -> Result<T> {
@@ -376,12 +376,8 @@ pub(crate) mod tests {
                 Streamlet::from_builder(
                     StreamletKey::try_from("Magic").unwrap(),
                     UniqueKeyBuilder::new().with_items(vec![
-                        interface("in: in Stream<Group<size: Bits<32>, elem: Stream<Bits<32>>>>")
-                            .unwrap()
-                            .1,
-                        interface("out: out Stream<Group<size: Bits<32>, elem: Stream<Bits<32>>>>")
-                            .unwrap()
-                            .1,
+                        interface("in: in Stream<Bits<32>, d=1>").unwrap().1,
+                        interface("out: out Stream<Bits<32>, d=1>").unwrap().1,
                     ]),
                     None,
                 )
@@ -402,39 +398,6 @@ pub(crate) mod tests {
         )
         .unwrap();
 
-        lib_comp
-            .add_streamlet(
-                Streamlet::from_builder(
-                    StreamletKey::try_from("Sequence").unwrap(),
-                    UniqueKeyBuilder::new().with_items(vec![
-                        interface("out: out Stream<Group<size: Bits<32>, elem: Stream<Bits<32>>>>")
-                            .unwrap()
-                            .1,
-                        interface("length: in Stream<Bits<32>>").unwrap().1,
-                        interface("elem: in Stream<Bits<32>>").unwrap().1,
-                    ]),
-                    None,
-                )
-                .unwrap(),
-            )
-            .unwrap();
-
-        lib_comp
-            .add_streamlet(
-                Streamlet::from_builder(
-                    StreamletKey::try_from("Split").unwrap(),
-                    UniqueKeyBuilder::new().with_items(vec![
-                        interface("in: in Stream<Group<size: Bits<32>, elem: Stream<Bits<32>>>>")
-                            .unwrap()
-                            .1,
-                        interface("length: out Stream<Bits<32>>").unwrap().1,
-                        interface("elem: out Stream<Bits<32>>").unwrap().1,
-                    ]),
-                    None,
-                )
-                .unwrap(),
-            )
-            .unwrap();
 
         let mut prj = Project::new(Name::try_new("TestProj").unwrap());
         prj.add_lib(lib);
