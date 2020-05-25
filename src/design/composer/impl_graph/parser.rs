@@ -12,8 +12,8 @@ use std::rc::Rc;
 use crate::design::composer::impl_graph::patterns::MapPattern;
 use crate::design::composer::GenericComponent;
 use crate::error::LineErr;
-use crate::logical::LogicalType;
-use pest::iterators::{Pair, Pairs};
+
+use pest::iterators::{Pair};
 use pest::{Parser, RuleType};
 use std::collections::HashMap;
 
@@ -71,7 +71,7 @@ impl<'i> ImplParser<'i> {
             .get_streamlet(streamlet_handle.streamlet())?
             .clone();
 
-        let mut gen_lib = Library::new(LibKey::try_new(GEN_LIB).unwrap());
+        let gen_lib = Library::new(LibKey::try_new(GEN_LIB).unwrap());
         project.add_lib(gen_lib);
 
         Ok(ImplParser {
@@ -152,7 +152,7 @@ impl<'i> ImplParser<'i> {
         let mut nodes: Vec<Node> = vec![];
         let mut edges: Vec<Edge> = vec![];
 
-        let instance_name =
+        let _instance_name =
             Name::try_from(format!("{}_{}_map", prev_output.node, prev_output.iface))?;
 
         //prinn!("Input iface: {:?}", input_iface.clone());
@@ -163,7 +163,7 @@ impl<'i> ImplParser<'i> {
             let input_iface = node.iface(prev_output.clone().iface)?;
             match pattern.as_rule() {
                 Rule::map => {
-                    let instance_name_str =
+                    let _instance_name_str =
                         format!("{}_{}_map", prev_output.clone().node, handle.clone().iface);
                     let instance_name =
                         Name::try_from(format!("{}_{}_map", prev_output.node, prev_output.iface))?;
@@ -211,7 +211,7 @@ impl<'i> ImplParser<'i> {
         }
 
         //Create the wrapper streamlet
-        let mut streamlet = Streamlet::from_builder(
+        let streamlet = Streamlet::from_builder(
             key.clone(),
             UniqueKeyBuilder::new().with_items(vec![
                 nodes
@@ -287,7 +287,7 @@ impl<'i> ImplParser<'i> {
                 }
                 Rule::node => {
                     println!("It's a instantiation! <3");
-                    let node = self.parse_node(pair)?;
+                    let _node = self.parse_node(pair)?;
                     //self.imp.nodes.insert(node.key().clone(), node);
                 }
                 _ => {
@@ -433,7 +433,7 @@ pub(crate) mod tests {
             )
             .unwrap();
 
-        let map = lib
+        let _map = lib
             .add_streamlet(
                 Streamlet::from_builder(
                     StreamletKey::try_from("Magic").unwrap(),
@@ -447,7 +447,7 @@ pub(crate) mod tests {
             )
             .unwrap();
 
-        let sqrt = lib
+        let _sqrt = lib
             .add_streamlet(
                 Streamlet::from_builder(
                     StreamletKey::try_from("Sqrt").unwrap(),
@@ -467,7 +467,7 @@ pub(crate) mod tests {
         prj.add_lib(lib_comp);
 
         let top_impl = include_str!("../../../../tests/top.impl");
-        let map_impl = include_str!("../../../../tests/map.impl");
+        let _map_impl = include_str!("../../../../tests/map.impl");
 
         /*let mut builder = ImplementationBuilder::new(&prj);
         builder.parse_implementation(&top_impl)?;
@@ -524,7 +524,7 @@ pub(crate) mod tests {
             )
             .unwrap();
 
-        let top = lib_comp
+        let _top = lib_comp
             .add_streamlet(
                 Streamlet::from_builder(
                     StreamletKey::try_from("Top_level").unwrap(),
@@ -538,7 +538,7 @@ pub(crate) mod tests {
             )
             .unwrap();
 
-        let map = lib_comp
+        let _map = lib_comp
             .add_streamlet(
                 Streamlet::from_builder(
                     StreamletKey::try_from("Magic").unwrap(),
@@ -609,7 +609,7 @@ pub(crate) mod tests {
         prj.add_lib(lib_comp);
 
         let top_impl = include_str!("../../../../tests/top.impl");
-        let map_impl = include_str!("../../../../tests/map.impl");
+        let _map_impl = include_str!("../../../../tests/map.impl");
 
         /*let mut builder = ImplementationBuilder::new(&prj);
         builder.parse_implementation(&top_impl)?;

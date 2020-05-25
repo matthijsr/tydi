@@ -1,14 +1,14 @@
-use crate::design::composer::impl_graph::builder::{BasicGraphBuilder, GraphBuilder};
+use crate::design::composer::impl_graph::builder::{BasicGraphBuilder};
 use crate::design::composer::impl_graph::misc::{FlattenStream, SequenceStream};
-use crate::design::composer::impl_graph::ImplementationGraph;
+
 use crate::design::composer::GenericComponent;
 use crate::design::{
     ComponentKey, IFKey, Interface, Project, Streamlet, StreamletHandle, StreamletKey,
 };
-use crate::{Error, Result, UniqueKeyBuilder};
+use crate::{Result, UniqueKeyBuilder};
 use std::borrow::Borrow;
 use std::convert::TryFrom;
-use std::rc::Rc;
+
 
 pub struct MapPattern {
     pub streamlet: Streamlet,
@@ -22,7 +22,7 @@ impl GenericComponent for MapPattern {
 
 impl MapPattern {
     pub fn try_new(name: &str, op: Streamlet, input: Interface, streamlet_handle: StreamletHandle) -> Result<Self> {
-        let op_input = op.inputs().next().unwrap().clone();
+        let _op_input = op.inputs().next().unwrap().clone();
         let op_output = op.outputs().next().unwrap().clone();
 
         println!("Inpuffff iface: {:?}", input.clone());
@@ -65,16 +65,16 @@ impl MapPattern {
 mod tests {
     use super::*;
 
-    use crate::design::composer::impl_graph::*;
+    
 
-    use crate::design::*;
+    
     use crate::design::{
-        ComponentKey, IFKey, Interface, Mode, Project, Streamlet, StreamletHandle, StreamletKey,
+        Streamlet, StreamletHandle, StreamletKey,
     };
-    use crate::logical::LogicalType;
+    
     use crate::parser::nom::interface;
     use crate::{Name, Result, UniqueKeyBuilder};
-    use std::convert::{TryFrom, TryInto};
+    use std::convert::{TryFrom};
 
     #[test]
     fn test_map() -> Result<()> {

@@ -1,15 +1,15 @@
-use crate::design::composer::impl_graph::builder::GraphBuilder;
-use crate::design::composer::impl_graph::ImplementationGraph;
+
+
 use crate::design::composer::GenericComponent;
 use crate::design::{
     ComponentKey, IFKey, Interface, Mode, Project, Streamlet, StreamletHandle, StreamletKey,
 };
 use crate::logical::{LogicalSplitItem, LogicalType, Stream};
 use crate::physical::Complexity;
-use crate::{Error, Name, NonNegative, PathName, Positive, Result, Reversed, UniqueKeyBuilder};
+use crate::{Error, NonNegative, PathName, Positive, Result, Reversed, UniqueKeyBuilder};
 use std::borrow::Borrow;
 use std::convert::TryFrom;
-use std::rc::Rc;
+
 
 pub type FIFODepth = NonNegative;
 pub const ElementCountBits: u32 = 16;
@@ -25,7 +25,7 @@ impl GenericComponent for StreamFIFO {
 }
 
 impl StreamFIFO {
-    pub fn try_new(name: &str, data_type: LogicalType, depth: FIFODepth) -> Result<Self> {
+    pub fn try_new(name: &str, data_type: LogicalType, _depth: FIFODepth) -> Result<Self> {
         Ok(StreamFIFO {
             streamlet: Streamlet::from_builder(
                 StreamletKey::try_from(name).unwrap(),
@@ -198,7 +198,7 @@ impl GenericComponent for GroupSplit {
 
 impl GroupSplit {
     pub fn try_new(name: &str, input: Interface, split_interfaces: Vec<PathName>) -> Result<Self> {
-        let haystack: LogicalType = input.typ().clone();
+        let _haystack: LogicalType = input.typ().clone();
         let mut ifaces: Vec<Interface> =
             vec![Interface::try_new("in", Mode::In, input.typ().clone(), None).unwrap()];
 
@@ -245,15 +245,15 @@ impl GroupSplit {
 mod tests {
     use super::*;
 
-    use crate::design::composer::impl_graph::*;
+    
 
-    use crate::design::*;
+    
     use crate::design::{
         ComponentKey, IFKey, Interface, Mode, Project, Streamlet, StreamletHandle, StreamletKey,
     };
     use crate::logical::LogicalType;
     use crate::parser::nom::interface;
-    use crate::{Name, Result, UniqueKeyBuilder};
+    use crate::{Result, UniqueKeyBuilder};
     use std::convert::{TryFrom, TryInto};
     /*
         #[test]

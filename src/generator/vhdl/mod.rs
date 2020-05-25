@@ -252,8 +252,8 @@ mod test {
     use std::fs;
 
     use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
-    use std::fs::File;
-    use std::io::Write;
+    
+    
 
     #[test]
     fn split_primitive() {
@@ -417,14 +417,14 @@ mod test {
 
     #[test]
     fn prj_impl() {
-        let tmpdir = tempfile::tempdir().unwrap();
+        let _tmpdir = tempfile::tempdir().unwrap();
 
         //let prj = impl_parser_test().unwrap();
         let prj = impl_parser_test().unwrap();
         let vhdl = VHDLBackEnd::default();
         // TODO: implement actual test.
 
-        let folder = fs::create_dir_all("output").unwrap();
+        let _folder = fs::create_dir_all("output").unwrap();
 
         assert!(vhdl.generate(&prj, "output").is_ok());
     }

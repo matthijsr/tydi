@@ -1,7 +1,7 @@
 //! Error variants.
 use log::SetLoggerError;
 use std::{error, fmt, result};
-use failure_derive::*;
+
 
 /// Result type with [`Error`] variants.
 ///

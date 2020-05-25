@@ -3,17 +3,17 @@
 use crate::design::Project;
 use crate::generator::common::*;
 use crate::generator::GenerateProject;
-use crate::{Error, Result, Reversed};
+use crate::{Error, Result};
 use log::debug;
 use std::path::Path;
 
-use crate::cat;
+
 use crate::generator::common::convert::Packify;
 use crate::traits::Identify;
 use std::str::FromStr;
 #[cfg(feature = "cli")]
 use structopt::StructOpt;
-use crate::logical::Direction;
+
 
 mod impls;
 
@@ -189,24 +189,24 @@ impl GenerateProject for ChiselBackEnd {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::Reversed;
+    
     use std::fs;
 
     use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
-    use std::fs::File;
-    use std::io::Write;
+    
+    
 
 
     #[test]
     fn prj_impl() {
-        let tmpdir = tempfile::tempdir().unwrap();
+        let _tmpdir = tempfile::tempdir().unwrap();
 
         //let prj = impl_parser_test().unwrap();
         let prj = impl_parser_test().unwrap();
         let vhdl = ChiselBackEnd::default();
         // TODO: implement actual test.
 
-        let folder = fs::create_dir_all("output").unwrap();
+        let _folder = fs::create_dir_all("output").unwrap();
 
         assert!(vhdl.generate(&prj, "output").is_ok());
     }

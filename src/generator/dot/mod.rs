@@ -92,7 +92,7 @@ impl DotStyle {
 }
 
 impl GenDot for Edge {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
+    fn gen_dot(&self, _style: &DotStyle, _project: &Project, l:usize, prefix: &str, _label: &str) -> String {
         let src = match self.source().node().deref() {
             THIS_KEY => cat!(prefix, self.source().iface()),
             _ => cat!(prefix, "impl", self.source().node(), self.source().iface()),
@@ -106,7 +106,7 @@ impl GenDot for Edge {
 }
 
 impl GenDot for Node {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, _label: &str) -> String {
         self.component().gen_dot(style, project, l, prefix, "")
     }
 }
@@ -141,7 +141,7 @@ fn item_subgraph<'a, I: 'a>(
 }
 
 impl GenDot for Interface {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, _project: &Project, l:usize, prefix: &str, _label: &str) -> String {
         format!(
             "{}{} [label=\"{}\\n\", {}];",
             tab(l),
@@ -154,7 +154,7 @@ impl GenDot for Interface {
 }
 
 impl GenDot for ImplementationGraph {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, _label: &str) -> String {
         format!(
             "{}subgraph cluster_{} {{\n{}\n{}}}",
             tab(l),
@@ -184,7 +184,7 @@ impl GenDot for ImplementationGraph {
 }
 
 impl GenDot for dyn GenericComponent {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, _label: &str) -> String {
         format!(
             "{}subgraph cluster_{} {{ \n {}{}}}",
             tab(l),
@@ -228,7 +228,7 @@ impl GenDot for dyn GenericComponent {
 }
 
 impl GenDot for Library {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, _prefix: &str, _label: &str) -> String {
         format!(
             "digraph  {{\n{}\n{}}}",
             format!(

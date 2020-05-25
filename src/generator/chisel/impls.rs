@@ -291,7 +291,7 @@ impl DeclareChisel for Package {
 }
 
 impl DeclareChiselType for Record {
-    fn declare(&self, is_root_type: bool) -> Result<String> {
+    fn declare(&self, _is_root_type: bool) -> Result<String> {
         let mut result = String::new();
         result.push_str(declare_rec(&self)?.as_str());
         Ok(result)
