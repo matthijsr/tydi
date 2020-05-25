@@ -1,12 +1,16 @@
 use crate::design::composer::impl_graph::builder::*;
 use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
-use crate::design::{IFKey, Interface, LibKey, Mode, NodeIFHandle, NodeKey, Project, Streamlet, StreamletHandle, StreamletKey, GEN_LIB, Library};
+use crate::design::{
+    IFKey, Interface, LibKey, Library, Mode, NodeIFHandle, NodeKey, Project, Streamlet,
+    StreamletHandle, StreamletKey, GEN_LIB,
+};
 use crate::{Error, Name, Result, UniqueKeyBuilder};
 
 use std::convert::{TryFrom, TryInto};
 use std::rc::Rc;
 
 use crate::design::composer::impl_graph::patterns::MapPattern;
+use crate::design::composer::GenericComponent;
 use crate::error::LineErr;
 use crate::logical::LogicalType;
 use pest::iterators::{Pair, Pairs};
@@ -143,10 +147,15 @@ impl<'i> ImplParser<'i> {
         let handle = NodeIFHandle::try_from(handle_pair)?;
         let pattern_chain = pairs.next().unwrap();
         let patterns = pattern_chain.into_inner();
-
         let mut prev_output = handle.clone();
 
-        //println!("Input iface: {:?}", input_iface.clone());
+        let mut nodes: Vec<Node> = vec![];
+        let mut edges: Vec<Edge> = vec![];
+
+        let instance_name =
+            Name::try_from(format!("{}_{}_map", prev_output.node, prev_output.iface))?;
+
+        //prinn!("Input iface: {:?}", input_iface.clone());
 
         for p in patterns {
             let pattern = p.into_inner().next().unwrap();
@@ -156,8 +165,9 @@ impl<'i> ImplParser<'i> {
                 Rule::map => {
                     let instance_name_str =
                         format!("{}_{}_map", prev_output.clone().node, handle.clone().iface);
-                    //let instance_name = Name::try_from(instance_name_str.clone())?;
-                    let instance_name = key.clone();
+                    let instance_name =
+                        Name::try_from(format!("{}_{}_map", prev_output.node, prev_output.iface))?;
+                    //let instance_name = key.clone();
                     let op_streamlet_handle = StreamletHandle::try_from(
                         pattern
                             .into_inner()
@@ -182,11 +192,15 @@ impl<'i> ImplParser<'i> {
                         item: Rc::new(map),
                     };
 
-                    self.imp.nodes.insert(node.key().clone(), node.clone());
-                    self.connect(Edge{source:prev_output, sink:node.io("in")?});
+                    nodes.push(node.clone());
+                    edges.push(Edge {
+                        source: prev_output,
+                        sink: node.io("in")?,
+                    });
                     self.project
                         .get_lib_mut(Name::try_from(GEN_LIB).unwrap())?
                         .add_streamlet(node.item.streamlet().clone());
+                    println!("Streamlet stored: {:?}", node.item.streamlet().key().clone());
                     prev_output = node.io("out")?;
                 }
                 _ => {
@@ -194,7 +208,55 @@ impl<'i> ImplParser<'i> {
                     unimplemented!();
                 }
             }
-        };
+        }
+
+        //Create the wrapper streamlet
+        let mut streamlet = Streamlet::from_builder(
+            key.clone(),
+            UniqueKeyBuilder::new().with_items(vec![
+                nodes
+                    .first()
+                    .unwrap()
+                    .item
+                    .streamlet()
+                    .inputs()
+                    .next()
+                    .unwrap()
+                    .clone(),
+                nodes
+                    .last()
+                    .unwrap()
+                    .item
+                    .streamlet()
+                    .outputs()
+                    .next()
+                    .unwrap()
+                    .clone(),
+            ]),
+            None,
+        )
+        .unwrap();
+
+        self.project
+            .get_lib_mut(Name::try_from(GEN_LIB).unwrap())?
+            .add_streamlet(streamlet.clone());
+        let mut impl_builder = BasicGraphBuilder::new(
+            streamlet.clone(),
+            StreamletHandle {
+                lib: Name::try_from(GEN_LIB)?,
+                streamlet: key.clone(),
+            },
+        );
+        impl_builder.append_nodes(nodes);
+        impl_builder.append_edges(&mut edges);
+        let implementation = impl_builder.finish();
+        self.project
+            .get_lib_mut(Name::try_from(GEN_LIB)?)
+            .unwrap()
+            .get_streamlet_mut(key)
+            .unwrap()
+            .attach_implementation(implementation);
+
         Ok(())
         //println!("Iffffffhandle: {:?}", handle);
         //unimplemented!()
@@ -385,18 +447,19 @@ pub(crate) mod tests {
             )
             .unwrap();
 
-        let sqrt = lib.add_streamlet(
-            Streamlet::from_builder(
-                StreamletKey::try_from("Sqrt").unwrap(),
-                UniqueKeyBuilder::new().with_items(vec![
-                    interface("in: in Stream<Bits<32>>").unwrap().1,
-                    interface("out: out Stream<Bits<32>>").unwrap().1,
-                ]),
-                None,
+        let sqrt = lib
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("Sqrt").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        interface("in: in Stream<Bits<32>>").unwrap().1,
+                        interface("out: out Stream<Bits<32>>").unwrap().1,
+                    ]),
+                    None,
+                )
+                .unwrap(),
             )
-            .unwrap(),
-        )
-        .unwrap();
+            .unwrap();
 
 
         let mut prj = Project::new(Name::try_new("TestProj").unwrap());
