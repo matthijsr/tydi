@@ -1,0 +1,5 @@
+impl compositions.Top_level {
+   /*Map pattern*/
+   map_i1 : this.in.map(primitives.Pow2);
+   this.out <= map_i1.out;
+}

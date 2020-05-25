@@ -625,4 +625,63 @@ pub(crate) mod tests {
         builder.parse_body().unwrap();
         //let imp = builder.finish();
     }
+
+    pub(crate) fn pow2_example() -> Result<Project> {
+        let key1 = LibKey::try_new("primitives").unwrap();
+        let key2 = LibKey::try_new("compositions").unwrap();
+        let mut lib = Library::new(key1.clone());
+
+        let mut lib_comp = Library::new(key2.clone());
+
+        let top = lib_comp
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("Top_level").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        interface("in: in Stream<Bits<32>, d=1>").unwrap().1,
+                        interface("out: out Stream<Bits<32>, d=1>").unwrap().1,
+                    ]),
+                    None,
+                )
+                    .unwrap(),
+            )
+            .unwrap();
+
+        let _sqrt = lib
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("Pow2").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        interface("in: in Stream<Bits<32>>").unwrap().1,
+                        interface("out: out Stream<Bits<32>>").unwrap().1,
+                    ]),
+                    None,
+                )
+                    .unwrap(),
+            )
+            .unwrap();
+
+
+        let mut prj = Project::new(Name::try_new("TestProj").unwrap());
+        prj.add_lib(lib);
+        prj.add_lib(lib_comp);
+
+        let top_impl = include_str!("../../../../tests/pow2.impl");
+        /*let mut builder = ImplementationBuilder::new(&prj);
+        builder.parse_implementation(&top_impl)?;
+        let imp = builder.finish();
+        prj.add_streamlet_impl(top, imp)?;*/
+
+        /*let mut builder = ImplementationBuilder::new(&prj);
+        builder.parse_implementation(&map_impl)?;
+        let imp = builder.finish();
+        prj.add_streamlet_impl(map, imp)?;*/
+
+        let mut builder = ImplParser::try_new(&mut prj, &top_impl)?;
+        builder.parse_body().unwrap();
+        let imp = builder.finish();
+        prj.add_streamlet_impl(top, imp)?;
+
+        Ok(prj)
+    }
 }
