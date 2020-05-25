@@ -1,14 +1,12 @@
 //! Implementations of Chisel traits for common representation.
 
 use crate::error::Error::BackEndError;
-use crate::generator::chisel::{DeclareChiselType, ChiselMode, IsDecoupled};
 use crate::generator::chisel::{Analyze, ChiselIdentifier, DeclareChisel, FieldMode};
+use crate::generator::chisel::{ChiselMode, DeclareChiselType, IsDecoupled};
 use crate::generator::common::{Component, Field, Mode, Package, Port, Record, Type};
 use crate::traits::Identify;
 use crate::{cat, Document, Result};
 use std::collections::HashMap;
-
-
 
 impl ChiselIdentifier for Mode {
     fn chisel_identifier(&self) -> Result<String> {
@@ -35,15 +33,9 @@ impl ChiselIdentifier for Type {
         // Records and arrays use type definitions.
         // Any other types are used directly.
         match self {
-            Type::Record(rec) =>  {
-                match rec.is_decupled() {
-                    true => {
-                        Ok(format!("Decoupled(new {})", rec.chisel_identifier()?))
-                    },
-                    false => {
-                        Ok(format!("new {}", rec.chisel_identifier()?))
-                    }
-                }
+            Type::Record(rec) => match rec.is_decupled() {
+                true => Ok(format!("Decoupled(new {})", rec.chisel_identifier()?)),
+                false => Ok(format!("new {}", rec.chisel_identifier()?)),
             },
             _ => self.declare(true),
         }
@@ -60,7 +52,7 @@ impl ChiselIdentifier for Record {
 //Chisel Decoupled is particularly nasty,
 //proper implementation would require some
 //refactoring in common.
-impl IsDecoupled for Record{
+impl IsDecoupled for Record {
     fn is_decupled(&self) -> bool {
         for f in self.fields() {
             if f.identifier() == "ready" {
@@ -80,7 +72,7 @@ impl IsDecoupled for Type {
                 } else {
                     return false;
                 }
-            } ,
+            }
             _ => {
                 return false;
             }
@@ -112,26 +104,14 @@ impl FieldMode for Field {
 impl FieldMode for Port {
     fn field_mode(&self) -> Result<ChiselMode> {
         match self.typ() {
-            Type::Record(_r) => {
-                match self.mode() {
-                    Mode::In => {
-                        Ok(ChiselMode::Forward)
-                    },
-                    Mode::Out => {
-                        Ok(ChiselMode::Reverse)
-                    }
-                }
-            }
-            _ => {
-                match self.mode() {
-                    Mode::In => {
-                        Ok(ChiselMode::In)
-                    },
-                    Mode::Out => {
-                        Ok(ChiselMode::Out)
-                    }
-                }
-            }
+            Type::Record(_r) => match self.mode() {
+                Mode::In => Ok(ChiselMode::Forward),
+                Mode::Out => Ok(ChiselMode::Reverse),
+            },
+            _ => match self.mode() {
+                Mode::In => Ok(ChiselMode::In),
+                Mode::Out => Ok(ChiselMode::Out),
+            },
         }
     }
 }
@@ -159,7 +139,7 @@ fn declare_rec(rec: &Record) -> Result<String> {
                     field.field_mode()?.chisel_identifier()?,
                     field.typ().chisel_identifier()?
                 )
-                    .as_str(),
+                .as_str(),
             );
         }
     }
@@ -201,12 +181,12 @@ impl DeclareChisel for Port {
 
         result.push_str(
             format!(
-                "val {} = {}({})",
+                "val {} = {}({})\n",
                 self.identifier(),
                 self.field_mode()?.chisel_identifier()?,
                 self.typ().chisel_identifier()?
             )
-                .as_str(),
+            .as_str(),
         );
 
         Ok(result)
@@ -226,14 +206,17 @@ impl DeclareChisel for Component {
             let mut ports = self.ports().iter().peekable();
             result.push_str(" val io =  IO(new Bundle{\n");
             while let Some(p) = ports.next() {
-                result.push_str("    ");
-                result.push_str(p.declare()?.to_string().as_str());
+                if p.identifier() != "clk" && p.identifier() != "rst" {
+                    result.push_str("    ");
+                    result.push_str(p.declare()?.to_string().as_str());
+                }
 
-                if ports.peek().is_some() {
+                /*if ports.peek().is_some() {
                     result.push_str(";\n");
                 } else {
                     result.push_str("\n");
-                }
+                }*/
+                //result.push_str("\n");
             }
             result.push_str("  })\n")
         }
