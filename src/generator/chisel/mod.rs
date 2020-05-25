@@ -60,6 +60,12 @@ pub trait FieldMode {
     fn field_mode(&self) -> Result<ChiselMode>;
 }
 
+/// Checks if a record has ready-valid signals, so it could be wrapped in DecoupledIO
+pub trait IsDecoupled {
+    fn is_decupled(&self) -> bool;
+}
+
+
 /// Analyze trait for Chisel objects.
 pub trait Analyze {
     /// List all record types used.
@@ -159,22 +165,51 @@ impl GenerateProject for ChiselBackEnd {
 
         for lib in project.libraries() {
             let mut pkg = dir.clone();
-            pkg.push(format!("{}_pkg", lib.identifier()));
+            pkg.push(lib.identifier().clone());
+            std::fs::create_dir_all(pkg.as_path())?;
+            pkg.push(lib.identifier().clone());
             pkg.set_extension(match self.config.suffix.clone() {
-                None => "vhd".to_string(),
-                Some(s) => format!("{}.vhd", s),
+                None => "scala".to_string(),
+                Some(s) => format!("{}.scala", s),
             });
-            /*std::fs::write(
+            std::fs::write(
                 pkg.as_path(),
                 match self.config().abstraction() {
                     AbstractionLevel::Canonical => lib.canonical(),
                     AbstractionLevel::Fancy => lib.fancy(),
                 }
                     .declare()?,
-            )?;*/
+            )?;
             debug!("Wrote {}.", pkg.as_path().to_str().unwrap_or(""));
         }
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::Reversed;
+    use std::fs;
+
+    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
+    use std::fs::File;
+    use std::io::Write;
+
+
+    #[test]
+    fn prj_impl() {
+        let tmpdir = tempfile::tempdir().unwrap();
+
+        //let prj = impl_parser_test().unwrap();
+        let prj = impl_parser_test().unwrap();
+        let vhdl = ChiselBackEnd::default();
+        // TODO: implement actual test.
+
+        let folder = fs::create_dir_all("output").unwrap();
+
+        assert!(vhdl.generate(&prj, "output").is_ok());
+    }
+}
+
 

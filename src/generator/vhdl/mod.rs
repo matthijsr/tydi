@@ -104,7 +104,7 @@ impl Default for VHDLConfig {
     fn default() -> Self {
         VHDLConfig {
             suffix: Some("gen".to_string()),
-            abstraction: Some(AbstractionLevel::Canonical),
+            abstraction: Some(AbstractionLevel::Fancy),
         }
     }
 }

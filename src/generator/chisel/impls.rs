@@ -1,7 +1,7 @@
 //! Implementations of Chisel traits for common representation.
 
 use crate::error::Error::BackEndError;
-use crate::generator::chisel::{DeclareChiselType, ChiselMode};
+use crate::generator::chisel::{DeclareChiselType, ChiselMode, IsDecoupled};
 use crate::generator::chisel::{Analyze, ChiselIdentifier, DeclareChisel, FieldMode};
 use crate::generator::common::{Component, Field, Mode, Package, Port, Record, Type};
 use crate::traits::Identify;
@@ -35,7 +35,16 @@ impl ChiselIdentifier for Type {
         // Records and arrays use type definitions.
         // Any other types are used directly.
         match self {
-            Type::Record(rec) =>  Ok(format!("new {}", rec.chisel_identifier()?)),
+            Type::Record(rec) =>  {
+                match rec.is_decupled() {
+                    true => {
+                        Ok(format!("Decoupled(new {})", rec.chisel_identifier()?))
+                    },
+                    false => {
+                        Ok(format!("new {}", rec.chisel_identifier()?))
+                    }
+                }
+            },
             _ => self.declare(true),
         }
     }
@@ -44,6 +53,38 @@ impl ChiselIdentifier for Type {
 impl ChiselIdentifier for Record {
     fn chisel_identifier(&self) -> Result<String> {
         Ok(cat!(self.identifier().to_string(), "type"))
+    }
+}
+
+//Detecting and dealing with
+//Chisel Decoupled is particularly nasty,
+//proper implementation would require some
+//refactoring in common.
+impl IsDecoupled for Record{
+    fn is_decupled(&self) -> bool {
+        for f in self.fields() {
+            if f.identifier() == "ready" {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+impl IsDecoupled for Type {
+    fn is_decupled(&self) -> bool {
+        match self {
+            Type::Record(r) => {
+                if r.is_decupled() {
+                    return true;
+                } else {
+                    return false;
+                }
+            } ,
+            _ => {
+                return false;
+            }
+        }
     }
 }
 
@@ -109,16 +150,18 @@ fn declare_rec(rec: &Record) -> Result<String> {
             children.push_str("\n\n");
         };
 
-        // Declare this record.
-        this.push_str(
-            format!(
-                "   val {} = {}({})\n",
-                field.identifier(),
-                field.field_mode()?.chisel_identifier()?,
-                field.typ().chisel_identifier()?
-            )
-            .as_str(),
-        );
+        if field.identifier() != "ready" && field.identifier() != "valid" {
+            // Declare this record.
+            this.push_str(
+                format!(
+                    "   val {} = {}({})\n",
+                    field.identifier(),
+                    field.field_mode()?.chisel_identifier()?,
+                    field.typ().chisel_identifier()?
+                )
+                    .as_str(),
+            );
+        }
     }
     this.push_str("}");
     if !children.is_empty() {
