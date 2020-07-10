@@ -4,7 +4,7 @@ COMMENT 	        = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
 // Identifiers
 //ident 		        = {ASCII_ALPHA{1} ~ (ASCII_ALPHANUMERIC | (ASCII_ALPHANUMERIC+ ~ "_"{1} ~ ASCII_ALPHANUMERIC+))*}
-ident               = {(ASCII_ALPHANUMERIC | "_")+}
+ident               = @{(ASCII_ALPHANUMERIC | "_")+}
 
 // Literals
 digit               = _{ '0'..'9' }
@@ -16,40 +16,33 @@ float                = {uint ~ "." ~ uint? ~ exp? |uint ~ exp}
 
 bool                = {"true" | "false" }
 
-//Path into a hierarchy
-path 				= { ident ~ ("." ~ ident)* }
-
-node_if_handle		= { ident ~ "." ~ ident }
-streamlet_handle	= { ident ~ "." ~ ident }
+node_if_handle		= { (ident ~ "." ~ ident) }
+streamlet_handle	= { (ident ~ "." ~ ident) }
 
 //Assign parameter
-parameter_assign	= { ident ~ ":=" ~ path}
+parameter_assign	= { ident ~ ":=" ~ ident}
 
 //Parallel patterns
-map					= { "map" ~ "(" ~ streamlet_inst ~ ")" }
-filter				 = { "filter" ~ "(" ~ streamlet_inst ~ ")" }
-reduce				= { "reduce" ~ "(" ~ streamlet_inst ~ ")" }
-pattern				= { map | filter | reduce }
-pattern_chain		= { pattern ~ ("." ~ pattern)* }
-pattern_node		= { node_if_handle ~ ("." ~ pattern_chain)+ }
-
-//Interface manipulation
-split				= { "split" }
-iface_manip			= { split }
+map_stream			= { "MapStream" ~ "(" ~ node ~ ")" }
+filter_stream		 = { "FilterStream" ~ "(" ~ node_if_handle ~ ")" }
+reduce_stream		= { "ReduceStream" ~ "(" ~ node ~ ")" }
+pattern				= { map_stream | filter_stream | reduce_stream }
 
 //Single point-to-point connection
 connection			= { node_if_handle ~ "<=" ~  node_if_handle }
 
 //Bulk connection
 node_if_handle_list	= { "(" ~ node_if_handle ~ ("," ~ node_if_handle)* ~ (")") }
-bulk_connection		= { (ident | node_if_handle_list) ~ "<=>" ~ (ident | node_if_handle_list) ~ ("." ~ pattern_chain)? }
+bulk_connection		= { (ident | node_if_handle_list) ~ "<=>" ~ (ident | node_if_handle_list) }
 
 //Streamlet instantiation
 streamlet_inst		= { streamlet_handle ~ ("[" ~ (parameter_assign)+ ~ "]")? }
 
 //A node in the implementation graph
-node        		= { ident ~ ":" ~  (pattern_node | streamlet_inst) }
+node        		= { ident ~ ":" ~  (pattern | streamlet_inst) }
 
 //Implementation of a streamlet
-implementation_body = { (( connection | bulk_connection | node) ~ ";")* }
-implementation      = { "impl" ~ streamlet_handle ~ "{" ~ implementation_body ~ "}" }
+structural_body = { (( connection | bulk_connection | node) ~ ";")* }
+structural			= { "structural" ~ "{" ~ structural_body ~ "}"}
+implementation      = { "impl" ~ streamlet_handle ~ structural }
+//implementation      = { "implementation of" ~ streamlet_handle ~ "is" ~ connection }

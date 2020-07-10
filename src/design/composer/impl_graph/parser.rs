@@ -47,7 +47,7 @@ fn match_rule<T>(
 
 pub struct ImplParser<'i> {
     project: &'i mut Project,
-    body: String,
+    //body: String,
     imp: ImplementationGraph,
 }
 
@@ -76,7 +76,7 @@ impl<'i> ImplParser<'i> {
 
         Ok(ImplParser {
             project,
-            body: pairs.next().unwrap().as_str().to_string(),
+            //body: pairs.next().unwrap().as_str().to_string(),
             imp: ImplementationGraph {
                 streamlet: streamlet_handle,
                 edges: vec![],
@@ -93,7 +93,7 @@ impl<'i> ImplParser<'i> {
         })
     }
 
-    pub fn parse_node(&mut self, pair: Pair<Rule>) -> Result<()> {
+    /*pub fn parse_node(&mut self, pair: Pair<Rule>) -> Result<()> {
         match_rule(pair, Rule::node, |pair| {
             let mut pairs = pair.into_inner();
             let name_pair = pairs.next().unwrap().as_str();
@@ -135,13 +135,13 @@ impl<'i> ImplParser<'i> {
             };
             Ok(())
         })
-    }
+    }*/
 
     /*pub fn parse_streamlet_inst(&self, pair: Pair<Rule>) -> Result<Node> {
 
     }*/
 
-    pub fn parse_pattern_node(&mut self, key: Name, pair: Pair<Rule>) -> Result<()> {
+    /*pub fn parse_pattern_node(&mut self, key: Name, pair: Pair<Rule>) -> Result<()> {
         let mut pairs = pair.into_inner();
         let handle_pair = pairs.next().unwrap().clone();
         let handle = NodeIFHandle::try_from(handle_pair)?;
@@ -260,15 +260,15 @@ impl<'i> ImplParser<'i> {
         Ok(())
         //println!("Iffffffhandle: {:?}", handle);
         //unimplemented!()
-    }
+    }*/
 
     /*pub fn parse_pattern_chain(&self, pair: Pair<Rule>) -> Result<Node> {
 
     }*/
 
-    pub fn parse_body(&mut self) -> Result<()> {
+    pub fn transform_impl(&mut self) -> Result<()> {
         let body = self.body.clone();
-        let pair = ImplDef::parse(Rule::implementation_body, body.as_str())
+        /*let pair = ImplDef::parse(Rule::implementation, body.as_str())
             .map_err(|e| {
                 Error::ImplParsingError(LineErr::new(
                     0,
@@ -276,25 +276,37 @@ impl<'i> ImplParser<'i> {
                 ))
             })?
             .next()
-            .unwrap();
+            .unwrap();*/
 
-        for pair in pair.into_inner() {
+        //let pairs = pair.into_inner();
+
+        match_rule(pair, Rule::streamlet_handle, |pair| {
+            let mut pairs = pair.into_inner();
+            println!("Structural!");
+            Ok(())
+        });
+
+
+
+        //let streamlet_handle_p = pairs
+
+        /*for pair in pair.into_inner() {
             match pair.as_rule() {
-                Rule::connection => {
+                Rule::structural => {
                     println!("It's a connection! <3");
-                    let edge = Edge::try_from(pair)?;
-                    self.connect(edge);
+                    //let edge = Edge::try_from(pair)?;
+                    //self.connect(edge);
                 }
                 Rule::node => {
                     println!("It's a instantiation! <3");
-                    let _node = self.parse_node(pair)?;
+                    //let _node = self.parse_node(pair)?;
                     //self.imp.nodes.insert(node.key().clone(), node);
                 }
                 _ => {
                     println!("Not implemented yet :( : {:?}", pair);
                 }
             }
-        }
+        }*/
 
         Ok(())
     }
@@ -447,6 +459,20 @@ pub(crate) mod tests {
             )
             .unwrap();
 
+        let _map = lib
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("Magic2").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        interface("in: in Stream<Group<a: Bits<32>, b: Stream<Bits<32>,d=1>>, d=1>").unwrap().1,
+                        interface("out: out Stream<Bits<32>, d=1>").unwrap().1,
+                    ]),
+                    None,
+                )
+                    .unwrap(),
+            )
+            .unwrap();
+
         let _sqrt = lib
             .add_streamlet(
                 Streamlet::from_builder(
@@ -480,7 +506,7 @@ pub(crate) mod tests {
         prj.add_streamlet_impl(map, imp)?;*/
 
         let mut builder = ImplParser::try_new(&mut prj, &top_impl)?;
-        builder.parse_body().unwrap();
+        builder.transform_impl().unwrap();
         let imp = builder.finish();
         prj.add_streamlet_impl(top, imp)?;
 
@@ -496,7 +522,7 @@ pub(crate) mod tests {
         let mut lib_comp = Library::new(key2.clone());
 
         //Add streamlet
-        let _test1 = lib_comp
+        let _test1 = lib
             .add_streamlet(
                 Streamlet::from_builder(
                     StreamletKey::try_from("Magic").unwrap(),
@@ -622,7 +648,7 @@ pub(crate) mod tests {
         prj.add_streamlet_impl(map, imp)?;*/
 
         let mut builder = ImplParser::try_new(&mut prj, &top_impl).unwrap();
-        builder.parse_body().unwrap();
+        builder.transform_impl().unwrap();
         //let imp = builder.finish();
     }
 
@@ -662,6 +688,8 @@ pub(crate) mod tests {
             .unwrap();
 
 
+
+
         let mut prj = Project::new(Name::try_new("TestProj").unwrap());
         prj.add_lib(lib);
         prj.add_lib(lib_comp);
@@ -678,7 +706,7 @@ pub(crate) mod tests {
         prj.add_streamlet_impl(map, imp)?;*/
 
         let mut builder = ImplParser::try_new(&mut prj, &top_impl)?;
-        builder.parse_body().unwrap();
+        builder.transform_impl().unwrap();
         let imp = builder.finish();
         prj.add_streamlet_impl(top, imp)?;
 
