@@ -4,6 +4,7 @@ use crate::util::UniquelyNamedBuilder;
 use crate::{Error, Result};
 use crate::{Identify, Name};
 use std::collections::HashMap;
+use crate::design::implementation::Implementation;
 
 /// A collection of Streamlets.
 pub struct Project {
@@ -85,7 +86,7 @@ impl Project {
     pub fn add_streamlet_impl(
         &mut self,
         streamlet: StreamletHandle,
-        implementation: ImplementationGraph,
+        implementation: Implementation,
     ) -> Result<()> {
         self.get_streamlet_mut(streamlet)?
             .attach_implementation(implementation)
@@ -99,6 +100,10 @@ pub mod tests {
     /// Some projects that can be used throughout the crate for testing.
     pub mod proj {
         use super::*;
+        use crate::UniqueKeyBuilder;
+        use crate::design::{Interface, Mode};
+        use crate::logical::LogicalType;
+        use crate::parser::nom::interface;
 
         pub(crate) fn empty_proj() -> Project {
             Project {
@@ -106,5 +111,8 @@ pub mod tests {
                 libraries: HashMap::new(),
             }
         }
+
     }
+
+
 }

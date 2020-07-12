@@ -33,7 +33,7 @@ connection			= { node_if_handle ~ "<=" ~  node_if_handle }
 
 //Bulk connection
 node_if_handle_list	= { "(" ~ node_if_handle ~ ("," ~ node_if_handle)* ~ (")") }
-bulk_connection		= { (ident | node_if_handle_list) ~ "<=>" ~ (ident | node_if_handle_list) }
+bulk_connection		= { (ident) ~ ("<=>" ~ (ident))+ }
 
 //Streamlet instantiation
 streamlet_inst		= { streamlet_handle ~ ("[" ~ (parameter_assign)+ ~ "]")? }

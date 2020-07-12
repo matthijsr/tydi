@@ -165,6 +165,7 @@ pub(crate) mod tests {
     use crate::logical::LogicalType;
     use crate::{Name, Result, UniqueKeyBuilder};
     use std::convert::TryFrom;
+    use crate::design::implementation::Implementation;
 
     pub(crate) fn composition_example() -> Result<Project> {
         let key1 = LibKey::try_new("primitives").unwrap();
@@ -228,7 +229,7 @@ pub(crate) mod tests {
         imp.connect(this.io("e"), this.io("f"));
         let imp = imp.finish();
 
-        prj.add_streamlet_impl(top, imp);
+        prj.add_streamlet_impl(top, Implementation::Structural(imp));
 
         Ok(prj)
     }

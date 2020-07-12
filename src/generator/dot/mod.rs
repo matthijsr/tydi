@@ -7,6 +7,8 @@ use crate::generator::GenerateProject;
 use crate::{Identify, Result};
 use std::ops::Deref;
 use std::path::Path;
+use crate::design::implementation::Implementation;
+use std::borrow::Borrow;
 
 fn tab(n: usize) -> String {
     "\t".repeat(n)
@@ -143,7 +145,7 @@ fn item_subgraph<'a, I: 'a>(
 impl GenDot for Interface {
     fn gen_dot(&self, style: &DotStyle, _project: &Project, l:usize, prefix: &str, _label: &str) -> String {
         format!(
-            "{}{} [label=\"{}\\n\", {}];",
+            "{}{} [label=\"{}\", {}];",
             tab(l),
             format!("{}_{}", prefix, self.identifier()),
             self.identifier(),
@@ -183,12 +185,23 @@ impl GenDot for ImplementationGraph {
     }
 }
 
+impl GenDot for Implementation {
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, _label: &str) -> String {
+        match self {
+            Implementation::Structural(s) => s.gen_dot(style, project, l, prefix, ""),
+            _ => String::new(),
+        }
+    }
+}
+
 impl GenDot for dyn GenericComponent {
     fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, _label: &str) -> String {
+        let p = format!("{}_{}", prefix, self.key());
         format!(
             "{}subgraph cluster_{} {{ \n {}{}}}",
             tab(l),
-            self.key(),
+            p,
+            //self.key(),
             format!(
                 "\n{}{}{}{}{}\n",
                 format!("{}label = \"{}\";\n", tab(l + 1), self.key()),
@@ -285,6 +298,8 @@ impl GenerateProject for DotBackend {
 mod tests {
     use super::*;
     use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
+    use crate::design::composer::impl_graph::builder::tests::composition_example;
+
     //use crate::design::composer::impl_graph::parser::tests::{impl_parser_test, pow2_example};
     /*
         #[test]

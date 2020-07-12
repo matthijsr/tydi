@@ -5,6 +5,7 @@ use crate::Result;
 use crate::design::composer::impl_graph::ImplementationGraph;
 use crate::generator::dot::DotStyle;
 use std::rc::Rc;
+use crate::design::implementation::Implementation;
 
 pub mod impl_graph;
 
@@ -41,7 +42,7 @@ pub trait GenericComponent {
     fn get_interface(&self, key: IFKey) -> Result<Interface> {
         self.streamlet().get_interface(key)
     }
-    fn get_implementation(&self) -> Option<Rc<ImplementationGraph>> {
+    fn get_implementation(&self) -> Option<Rc<Implementation>> {
         self.streamlet().get_implementation()
     }
 }

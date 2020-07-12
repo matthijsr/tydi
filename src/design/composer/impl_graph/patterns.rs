@@ -1,108 +1,113 @@
-use crate::design::composer::impl_graph::builder::{BasicGraphBuilder};
-use crate::design::composer::impl_graph::misc::{FlattenStream, SequenceStream};
-
-use crate::design::composer::GenericComponent;
-use crate::design::{
-    ComponentKey, IFKey, Interface, Project, Streamlet, StreamletHandle, StreamletKey,
-};
-use crate::{Result, UniqueKeyBuilder};
 use std::borrow::Borrow;
 use std::convert::TryFrom;
 
+use crate::{Error, Name, Result, Reversed, UniqueKeyBuilder};
+use crate::design::{ComponentKey, IFKey, Interface, Mode, Project, Streamlet, StreamletHandle, StreamletKey};
+use crate::design::composer::GenericComponent;
+use crate::design::composer::impl_graph::builder::BasicGraphBuilder;
+use crate::design::composer::impl_graph::misc::{FlattenStream, SequenceStream};
+use crate::logical::{LogicalType, Stream};
+use crate::physical::Complexity;
+use crate::design::implementation::ImplementationBackend;
 
-pub struct MapPattern {
-    pub streamlet: Streamlet,
+pub struct MapStream {
+    streamlet: Streamlet,
+    backend: Option<MapStreamBackend>
 }
 
-impl GenericComponent for MapPattern {
+impl GenericComponent for MapStream {
     fn streamlet(&self) -> &Streamlet {
         self.streamlet.borrow()
     }
 }
 
-impl MapPattern {
-    pub fn try_new(name: &str, op: Streamlet, input: Interface, streamlet_handle: StreamletHandle) -> Result<Self> {
-        let _op_input = op.inputs().next().unwrap().clone();
-        let op_output = op.outputs().next().unwrap().clone();
+impl MapStream {
+    pub fn try_new(project: &Project, name: Name, op: StreamletHandle) -> Result<Self> {
+        let op = project
+            .get_lib(op.lib())?
+            .get_streamlet(op.streamlet())?;
 
-        println!("Inpuffff iface: {:?}", input.clone());
+        let op_input_data_type = match op.inputs().next().unwrap().typ() {
+            LogicalType::Stream(s) => Ok(s),
+            _ => Err(Error::ComposerError(format!(
+                "The data type for a MapStream streamlet required to be be Stream!",
+            ))),
+        }?;
 
-        let flatten =
-            FlattenStream::try_new(format!("{}_flatten", name).as_str(), input.clone())?;
-
-        let sequence =
-            SequenceStream::try_new(format!("{}_sequence", name).as_str(), op_output.clone())?;
-
-        let mut streamlet = Streamlet::from_builder(
-            StreamletKey::try_from(name).unwrap(),
-            UniqueKeyBuilder::new().with_items(vec![
-                flatten.inputs().next().unwrap().clone(),
-                sequence.outputs().next().unwrap().clone(),
-            ]),
+        let advanced_stream = Stream::new(
+            op_input_data_type.data().clone(),
+            op_input_data_type.throughput(),
+            op_input_data_type.dimensionality() + 1,
+            op_input_data_type.synchronicity(),
+            Complexity::default(),
+            op_input_data_type.direction(),
+            //TODO: do we want to pass user signals?
             None,
-        )
-        .unwrap();
+            //TODO: ?
+            false,
+        );
 
-        let mut impl_builder = BasicGraphBuilder::new(streamlet.clone(), streamlet_handle);
-        let op = impl_builder.instantiate(&op, format!("{}_op", name).as_str());
-        let flatten = impl_builder.instantiate(flatten.streamlet(), format!("{}_flatten", name).as_str());
-        let sequence = impl_builder.instantiate(sequence.streamlet(), format!("{}_sequence", name).as_str());
-        let this = impl_builder.this();
-        impl_builder.connect(this.io("in"), flatten.io("in"));
-        impl_builder.connect(flatten.io("count"), sequence.io("count"));
-        impl_builder.connect(flatten.io("element"), op.io("in"));
-        impl_builder.connect(op.io("out"), sequence.io("element"));
-        impl_builder.connect(sequence.io("out"), this.io("out"));
-        let implementation = impl_builder.finish();
+        let mut ifaces: Vec<Interface> = vec![];
+        ifaces.push(Interface::try_new("in", Mode::In, advanced_stream.clone(), None)?);
+        ifaces.push(Interface::try_new("out", Mode::Out, advanced_stream.clone(), None)?);
 
-        streamlet.attach_implementation(implementation);
+        Ok(MapStream {
+            streamlet: Streamlet::from_builder(
+                StreamletKey::try_from(name).unwrap(),
+                UniqueKeyBuilder::new().with_items(ifaces),
+                None,
+            ).unwrap(),
+            backend: None,
+        })
+    }
 
-        Ok(MapPattern { streamlet: streamlet })
+    pub fn with_backend(&mut self, name: Name, streamlet_handle: StreamletHandle) -> Result<()> {
+        self.backend = Option::from(MapStreamBackend { name, streamlet_handle });
+        Ok(())
+    }
+
+    pub fn finish(self) -> Streamlet {
+        self.streamlet
+    }
+}
+
+pub struct MapStreamBackend {
+    name: Name,
+    streamlet_handle: StreamletHandle
+}
+
+impl ImplementationBackend for MapStreamBackend {
+    fn name(&self) -> Name {
+        self.name.clone()
+    }
+
+    fn streamlet_handle(&self) -> StreamletHandle {
+        self.streamlet_handle.clone()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use std::convert::TryFrom;
 
-    
-
-    
+    use crate::{Name, Result, UniqueKeyBuilder};
     use crate::design::{
         Streamlet, StreamletHandle, StreamletKey,
     };
-    
+    use crate::design::composer::impl_graph::parser::tests::composition_test_proj;
     use crate::parser::nom::interface;
-    use crate::{Name, Result, UniqueKeyBuilder};
-    use std::convert::{TryFrom};
+
+    use super::*;
 
     #[test]
     fn test_map() -> Result<()> {
+        let mut prj = composition_test_proj();
 
-        let input = interface("in: in Stream<Bits<32>, d=1>")
-            .unwrap()
-            .1;
-
-        println!("IUnput: {:?}", input.typ());
-
-        let test_op = Streamlet::from_builder(
-            StreamletKey::try_from("Top_level").unwrap(),
-            UniqueKeyBuilder::new().with_items(vec![
-                interface("in: in Stream<Bits<32>, d=0>")
-                .unwrap()
-                .1,
-                interface("out: out Stream<Bits<32>, d=0>")
-                    .unwrap()
-                    .1
-            ]),
-            None,
-        )
-            .unwrap();
-
-        let test_map = MapPattern::try_new("test", test_op, input,StreamletHandle{
-            lib: Name::try_new("test")?,
-            streamlet: Name::try_new("test")?
-        })?;
+        let test_map = MapStream::try_new(&prj, Name::try_from("test")?,
+            StreamletHandle {
+                lib: Name::try_from("primitives")?,
+                streamlet: Name::try_from("test_op")? },
+            )?;
         println!(
             "Map interface {:?}",
             test_map.streamlet().outputs().next().unwrap().typ()

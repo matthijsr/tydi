@@ -71,6 +71,7 @@ impl Node {
     }
 }
 
+#[derive(Clone)]
 pub struct ImplementationGraph {
     streamlet: StreamletHandle,
     edges: Vec<Edge>,

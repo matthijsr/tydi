@@ -9,6 +9,7 @@ pub mod library;
 pub mod project;
 pub mod streamlet;
 pub mod param;
+pub mod implementation;
 
 pub use library::Library;
 pub use project::Project;

@@ -13,6 +13,7 @@ use std::convert::TryInto;
 use std::rc::Rc;
 use std::str::FromStr;
 use crate::design::composer::GenericComponent;
+use crate::design::implementation::Implementation;
 
 /// Streamlet interface mode.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -159,7 +160,7 @@ pub struct Streamlet {
     /// An optional documentation string for the streamlet to be used by back-ends.
     doc: Option<String>,
     /// Placeholder for future implementation of the streamlet. If this is None, it is a primitive.
-    implementation: Option<Rc<ImplementationGraph>>,
+    implementation: Option<Rc<Implementation>>,
 }
 
 impl GenericComponent for Streamlet {
@@ -188,15 +189,15 @@ impl GenericComponent for Streamlet {
         }
     }
 
-    fn get_implementation(&self) -> Option<Rc<ImplementationGraph>> {
+    fn get_implementation(&self) -> Option<Rc<Implementation>> {
         self.implementation.clone()
     }
 }
 
 impl Streamlet {
 
-    pub fn attach_implementation(&mut self, impl_graph: ImplementationGraph) -> Result<()> {
-        self.implementation = Some(Rc::new(impl_graph));
+    pub fn attach_implementation(&mut self, impl_graph: Implementation) -> Result<()> {
+        self.implementation = Some(Rc::from(impl_graph));
         Ok(())
     }
 

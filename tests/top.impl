@@ -1,3 +1,8 @@
 impl compositions.Top_level structural {
    inst1: primitives.Magic;
+   /*inst1.in <= this.in;*/
+   inst2: MapStream(op_inst: MapStream(op_inst2: primitives.test_op));
+   /*inst2.in <= inst1.out;
+   this.out <= inst2.out;*/
+   this <=> inst1 <=> inst2 <=> this;
 }
