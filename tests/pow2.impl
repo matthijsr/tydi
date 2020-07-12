@@ -1,5 +1,0 @@
-impl compositions.Top_level structural {
-   /*Map pattern*/
-   /*map_i1 : MapStream(primitives.Pow2);*/
-   inst1: primitives.Magic;
-}

@@ -1,5 +1,0 @@
-impl compositions.Map {
-   split_i  : compositions.Split(in=>this.in);
-   sqrt_i   : compositions.Sqrt(in=>split_i.elem);
-   seq_i    : compositions.Sequence(elem=>sqrt_i.out, length=>split_i.length, out=>this.out);
-}

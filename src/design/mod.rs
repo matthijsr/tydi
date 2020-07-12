@@ -39,8 +39,8 @@ impl NodeKey {
 /// Handles for objects inside a project, through project hierarchy
 #[derive(Clone, Debug, PartialEq)]
 pub struct StreamletHandle {
-    lib: Name,
-    streamlet: Name,
+    pub lib: Name,
+    pub streamlet: Name,
 }
 
 impl StreamletHandle {

@@ -297,7 +297,7 @@ impl ImplementationBackend for FilterStreamBackend {
 mod tests {
     use std::convert::TryFrom;
 
-    use crate::design::composer::impl_graph::parser::tests::composition_test_proj;
+    use crate::tests::*;
     use crate::design::StreamletHandle;
     use crate::{Name, Result};
 

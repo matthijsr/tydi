@@ -10,7 +10,6 @@ use crate::design::composer::GenericComponent;
 use crate::design::{IFKey, Interface, NodeIFHandle, NodeKey, StreamletHandle, StreamletKey};
 use crate::{Error, Result};
 
-pub mod builder;
 pub mod misc;
 pub mod parser;
 pub mod patterns;
@@ -141,3 +140,5 @@ impl PartialEq for ImplementationGraph {
         self.streamlet.streamlet() == other.streamlet_key()
     }
 }
+
+

@@ -1,4 +1,0 @@
-impl compositions.Top_level {
-   inst1 : primitives.Test1( a=>this.e, b=>this.f)
-   /*mapinst : MapVec( wut => this.az, lol => this.lel, inst1)*/
-}
