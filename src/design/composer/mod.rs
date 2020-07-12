@@ -4,7 +4,7 @@ use std::rc::Rc;
 use crate::design::{ComponentKey, IFKey, Interface, Mode, Project, Streamlet};
 use crate::design::implementation::Implementation;
 use crate::generator::dot::DotStyle;
-use crate::Result;
+use crate::{Result, Error};
 
 pub mod impl_graph;
 
@@ -31,6 +31,9 @@ pub trait GenericComponent {
     fn interfaces<'a>(&'a self) -> Box<(dyn Iterator<Item = Ref<Interface>> + 'a)> {
         self.streamlet().interfaces()
     }
+    fn interfaces_mut<'a>(&'a self) -> Box<(dyn Iterator<Item = RefMut<Interface>> + 'a)> {
+        unimplemented!()
+    }
     fn streamlet(&self) -> &Streamlet;
     fn inputs<'a>(&'a self) -> Box<(dyn Iterator<Item = Ref<Interface>> + 'a)> {
         Box::new(self.interfaces().filter(|iface| iface.mode() == Mode::In))
@@ -48,12 +51,6 @@ pub trait GenericComponent {
         self.streamlet().get_implementation()
     }
     fn connect_action(&self) -> Result<()> {
-       match self.streamlet().get_implementation() {
-           Some(i) => match i.as_ref() {
-               Implementation::Backend(b) => b.connect_action(),
-               _ => Ok(())
-           }
-           _ => Ok(())
-       }
+        Ok(())
     }
 }

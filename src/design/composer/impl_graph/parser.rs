@@ -5,18 +5,16 @@ use std::rc::Rc;
 use pest::{Parser, RuleType};
 use pest::iterators::Pair;
 
-use crate::{Error, Name, Result};
-use crate::design::{
-    GEN_LIB, LibKey, Library, NodeIFHandle, NodeKey, Project,
-    StreamletHandle, StreamletKey,
-};
+use crate::{Error, Name, Result, Reverse, UniqueKeyBuilder, Reversed};
+use crate::design::{GEN_LIB, LibKey, Library, NodeIFHandle, NodeKey, Project, StreamletHandle, StreamletKey, Streamlet};
 use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
-use crate::design::composer::impl_graph::patterns::MapStream;
+use crate::design::composer::impl_graph::patterns::{MapStream, ReduceStream};
 use crate::design::implementation::Implementation;
 use crate::design::implementation::Implementation::Structural;
 use crate::error::LineErr;
 use std::borrow::BorrowMut;
 use std::ops::Deref;
+use crate::design::composer::GenericComponent;
 
 #[derive(Parser)]
 #[grammar = "design/composer/impl_graph/impl.pest"]
@@ -69,13 +67,19 @@ impl<'i> ImplParser<'i> {
 
         //let pair = pairs.next().unwrap();
 
-        let s = project
+        let mut s = project
             .get_lib(streamlet_handle.lib())?
             .get_streamlet(streamlet_handle.streamlet())?
             .clone();
 
         let gen_lib = Library::new(LibKey::try_new(GEN_LIB).unwrap());
         project.add_lib(gen_lib)?;
+
+        let this_streamlet = Streamlet::from_builder(
+            StreamletKey::try_from(s.key()).unwrap(),
+            UniqueKeyBuilder::new().with_items(s.interfaces().map(|i| i.deref().reversed())),
+            None,
+        )?;
 
 
         Ok(ImplParser {
@@ -89,7 +93,7 @@ impl<'i> ImplParser<'i> {
                     NodeKey::this(),
                     Node {
                         key: NodeKey::this(),
-                        item: Rc::new(s.clone()),
+                        item: Rc::new(this_streamlet.clone()),
                     },
                 )]
                     .into_iter()
@@ -116,16 +120,8 @@ impl<'i> ImplParser<'i> {
             match &pair.as_rule() {
                 Rule::node => {
                     println!("Node!");
-                    let node_p = self.transform_node(pair)?;
-                    let streamlet = self.project
-                        .get_lib(node_p.1.lib())?
-                        .get_streamlet(node_p.1.streamlet())?;
-                    let mut s_copy = streamlet.clone();
-                    s_copy.set_key(node_p.0.clone());
-                    let node = Node {
-                        key: node_p.0.clone(),
-                        item: Rc::new(s_copy.clone()),
-                    };
+                    let node_tuple = self.transform_node(pair)?;
+                    let node = node_tuple.1;
                     match &mut self.imp {
                         Structural(ref mut s) => {
                             println!("Insert node: {:?}", node.key);
@@ -133,7 +129,7 @@ impl<'i> ImplParser<'i> {
                                 None => Ok(()),
                                 Some(_lib) => Err(Error::ComposerError(format!(
                                     "Instance {} already exists in implementation of {:?}",
-                                    node_p.0, node_p.1
+                                    node_tuple.0, node_tuple.2
                                 ))),
                             }?
                         },
@@ -155,7 +151,7 @@ impl<'i> ImplParser<'i> {
         Ok(())
     }
 
-    pub fn transform_node(&mut self,pair: Pair<Rule>) -> Result<(Name, StreamletHandle)> {
+    pub fn transform_node(&mut self,pair: Pair<Rule>) -> Result<(Name, Node, StreamletHandle)> {
         //{ ident ~ ":" ~  (pattern | streamlet_inst) }
         let mut pairs = pair.into_inner();
         //ident
@@ -166,41 +162,42 @@ impl<'i> ImplParser<'i> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
             Rule::streamlet_inst => {
-                let handle = self.transform_streamlet_inst(pair, key.clone())?;
-                Ok((key.clone(), handle))
+                let node_tuple = self.transform_streamlet_inst(pair, key.clone())?;
+                let node = Node {
+                    key: key.clone(),
+                    item: node_tuple.0
+                };
+                Ok((key.clone(), node, node_tuple.1))
             },
             Rule::pattern => {
                 println!("Pattern! FInally!");
-                let handle = self.transform_pattern(pair, key.clone())?;
-                Ok((key.clone(), handle))
+                let node_tuple = self.transform_pattern(pair, key.clone())?;
+                let node = Node {
+                    key: key.clone(),
+                    item: node_tuple.0
+                };
+                Ok((key.clone(), node, node_tuple.1))
             }
-            _ => {
-                println!("Az baj2! {:?}", pair);
-                Ok( (key.clone(),
-                     StreamletHandle{
-                         lib: Name::try_from("")?,
-                         streamlet: Name::try_from("")?
-                     }))
-            }
+            _ => unreachable!()
         }
 
     }
 
-    pub fn transform_streamlet_inst(&mut self, pair: Pair<Rule>, _key: Name) -> Result<StreamletHandle> {
+    pub fn transform_streamlet_inst(&mut self, pair: Pair<Rule>, _key: Name) -> Result<(Rc<dyn GenericComponent>, StreamletHandle)> {
         //{ streamlet_handle ~ ("[" ~ (parameter_assign)+ ~ "]")? }
         let mut pairs = pair.into_inner();
 
         //streamlet_handle
         let streamlet_handle_pair = pairs.next().unwrap();
         let streamlet_handle = StreamletHandle::try_from(streamlet_handle_pair)?;
-        self
+        let streamlet = self
             .project
             .get_lib(streamlet_handle.lib())?
             .get_streamlet(streamlet_handle.streamlet())?;
-        Ok(streamlet_handle)
+        Ok((Rc::new(streamlet.clone()), streamlet_handle))
     }
 
-    pub fn transform_pattern(&mut self, pair: Pair<Rule>, key: Name) -> Result<StreamletHandle> {
+    pub fn transform_pattern(&mut self, pair: Pair<Rule>, key: Name) -> Result<(Rc<dyn GenericComponent>, StreamletHandle)> {
         //{ map_stream | filter_stream | reduce_stream }
         let pair = pair.into_inner().next().unwrap();
         match pair.as_rule() {
@@ -208,27 +205,38 @@ impl<'i> ImplParser<'i> {
                 println!("Map <3");
                 self.transform_map_stream(pair, key)
             },
-            _ => {
-                println!("Different pattern {:?}", pair);
-                Ok(StreamletHandle{
-                    lib: Name::try_new("")?,
-                    streamlet: Name::try_new("")?
-                })
-            }
+            Rule::reduce_stream => {
+                println!("Reduce <3");
+                self.transform_reduce_stream(pair, key)
+            },
+            _ => unreachable!()
         }
     }
 
-    pub fn transform_map_stream(&mut self, pair: Pair<Rule>, key: Name) -> Result<StreamletHandle> {
+    pub fn transform_map_stream(&mut self, pair: Pair<Rule>, key: Name) -> Result<(Rc<dyn GenericComponent>, StreamletHandle)> {
         let op = self.transform_node(pair.into_inner().next().unwrap())?;
-        println!("{:?}", op);
 
         let name = Name::try_from(format!("{}_gen", key.to_string()))?;
-        let mut component = MapStream::try_new(self.project, name.clone(), op.1)?;
+        let mut component = MapStream::try_new(self.project, name.clone(), op.2)?;
         component.with_backend(name.clone(), StreamletHandle{ lib: Name::try_new(GEN_LIB)?, streamlet: name.clone() })?;
-        let streamlet = component.finish();
-        self.project
+        let object = component.finish();
+        let handle = self.project
             .get_lib_mut(Name::try_from(GEN_LIB).unwrap())?
-            .add_streamlet(streamlet.clone())
+            .add_streamlet(object.streamlet().clone())?;
+        Ok((Rc::new(object), handle))
+    }
+
+    pub fn transform_reduce_stream(&mut self, pair: Pair<Rule>, key: Name) -> Result<(Rc<dyn GenericComponent>, StreamletHandle)> {
+        let op = self.transform_node(pair.into_inner().next().unwrap())?;
+
+        let name = Name::try_from(format!("{}_gen", key.to_string()))?;
+        let mut component = ReduceStream::try_new(self.project, name.clone(), op.2)?;
+        component.with_backend(name.clone(), StreamletHandle{ lib: Name::try_new(GEN_LIB)?, streamlet: name.clone() })?;
+        let object = component.finish();
+        let handle = self.project
+            .get_lib_mut(Name::try_from(GEN_LIB).unwrap())?
+            .add_streamlet(object.streamlet().clone())?;
+        Ok((Rc::new(object), handle))
     }
 
     pub fn transform_bulk_connection(&mut self, pair: Pair<Rule>) -> Result<()> {
@@ -291,12 +299,14 @@ impl<'i> ImplParser<'i> {
     pub fn connect(&mut self, edge: Edge) -> Result<()> {
         match &mut self.imp {
             Structural(ref mut s) => {
-
                 //Deal with type inferences
                 let src_type = s.clone().get_node(edge.clone().source().node)?.iface(edge.clone().source().iface)?.typ().clone();
                 let dst_type = s.clone().get_node(edge.clone().sink().node)?.iface(edge.clone().sink().iface)?.typ().clone();
                 s.get_node(edge.clone().source().node)?.iface_mut(edge.clone().source().iface)?.infer_type(dst_type)?;
                 s.get_node(edge.clone().sink().node)?.iface_mut(edge.clone().sink().iface)?.infer_type(src_type)?;
+
+                s.get_node(edge.clone().source().node)?.component().connect_action()?;
+                s.get_node(edge.clone().sink().node)?.component().connect_action()?;
 
                 s.edges.push(edge)
             },
@@ -583,9 +593,6 @@ pub(crate) mod tests {
                     .unwrap(),
             )
             .unwrap();
-
-
-
 
         let mut prj = Project::new(Name::try_new("TestProj").unwrap());
         prj.add_lib(lib)?;

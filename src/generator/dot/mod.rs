@@ -109,7 +109,7 @@ impl GenDot for Edge {
 
 impl GenDot for Node {
     fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, _label: &str) -> String {
-        self.component().gen_dot(style, project, l, prefix, "")
+        self.component().gen_dot(style, project, l, prefix, self.key().as_ref())
     }
 }
 
@@ -224,8 +224,11 @@ impl GenDot for Implementation {
 }
 
 impl GenDot for dyn GenericComponent {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, _label: &str) -> String {
-        let p = format!("{}_{}", prefix, self.key());
+    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
+        let p = match label.is_empty() {
+            true => format!("{}_{}", prefix, self.key()),
+            false => format!("{}_{}", prefix, label),
+        };
         format!(
             "{}subgraph cluster_{} {{ \n {}{}}}",
             tab(l),
@@ -233,13 +236,13 @@ impl GenDot for dyn GenericComponent {
             //self.key(),
             format!(
                 "\n{}{}{}{}{}\n",
-                format!("{}label = \"{}\";\n", tab(l + 1), self.key()),
+                format!("{}label = \"{}\\n{}\";\n", tab(l + 1), self.key(), label),
                 style.cluster(1, l + 1),
                 if_subgraph(
                     style,
                     project,
                     l + 1,
-                    format!("{}_{}", prefix, self.key()).as_ref(),
+                    p.as_str(),
                     "inputs",
                     self.inputs()
                 ),
@@ -247,7 +250,7 @@ impl GenDot for dyn GenericComponent {
                     style,
                     project,
                     l + 1,
-                    format!("{}_{}", prefix, self.key()).as_ref(),
+                    p.as_str(),
                     "outputs",
                     self.outputs()
                 ),

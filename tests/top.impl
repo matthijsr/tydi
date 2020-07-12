@@ -4,5 +4,6 @@ impl compositions.Top_level structural {
    inst2: MapStream(op_inst: MapStream(op_inst2: primitives.test_op));
    /*inst2.in <= inst1.out;
    this.out <= inst2.out;*/
-   this <=> inst1 <=> inst2 <=> this;
+   inst3: ReduceStream(op_inst: primitives.test_op);
+   this <=> inst1 <=> inst2 <=> inst3 <=> this;
 }

@@ -200,6 +200,11 @@ impl GenericComponent for Streamlet {
         Box::new(self.interfaces.iter().map(|(_, i)| i.borrow()))
     }
 
+    /// Return an iterator over the interfaces of this Streamlet.
+    fn interfaces_mut<'a>(&'a self) -> Box<(dyn Iterator<Item = RefMut<Interface>> +'a)> {
+        Box::new(self.interfaces.iter().map(|(_, i)| i.borrow_mut()))
+    }
+
     fn streamlet(&self) -> &Streamlet {
         self
     }
