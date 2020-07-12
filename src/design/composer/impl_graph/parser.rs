@@ -6,7 +6,7 @@ use pest::{Parser, RuleType};
 use pest::iterators::Pair;
 
 use crate::{Error, Name, Result, Reverse, UniqueKeyBuilder, Reversed};
-use crate::design::{GEN_LIB, LibKey, Library, NodeIFHandle, NodeKey, Project, StreamletHandle, StreamletKey, Streamlet};
+use crate::design::{GEN_LIB, LibKey, Library, NodeIFHandle, NodeKey, Project, StreamletHandle, StreamletKey, Streamlet, Mode};
 use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
 use crate::design::composer::impl_graph::patterns::{MapStream, ReduceStream};
 use crate::design::implementation::Implementation;
@@ -67,7 +67,7 @@ impl<'i> ImplParser<'i> {
 
         //let pair = pairs.next().unwrap();
 
-        let mut s = project
+        let s = project
             .get_lib(streamlet_handle.lib())?
             .get_streamlet(streamlet_handle.streamlet())?
             .clone();
@@ -75,6 +75,7 @@ impl<'i> ImplParser<'i> {
         let gen_lib = Library::new(LibKey::try_new(GEN_LIB).unwrap());
         project.add_lib(gen_lib)?;
 
+        //Create a streamlet with reversed interfaces
         let this_streamlet = Streamlet::from_builder(
             StreamletKey::try_from(s.key()).unwrap(),
             UniqueKeyBuilder::new().with_items(s.interfaces().map(|i| i.deref().reversed())),
@@ -300,15 +301,57 @@ impl<'i> ImplParser<'i> {
         match &mut self.imp {
             Structural(ref mut s) => {
                 //Deal with type inferences
-                let src_type = s.clone().get_node(edge.clone().source().node)?.iface(edge.clone().source().iface)?.typ().clone();
-                let dst_type = s.clone().get_node(edge.clone().sink().node)?.iface(edge.clone().sink().iface)?.typ().clone();
-                s.get_node(edge.clone().source().node)?.iface_mut(edge.clone().source().iface)?.infer_type(dst_type)?;
-                s.get_node(edge.clone().sink().node)?.iface_mut(edge.clone().sink().iface)?.infer_type(src_type)?;
+                let src_if = s.get_node(edge.clone().source().node)?.iface(edge.clone().source().iface)?.deref().clone();
+                let dst_if = s.get_node(edge.clone().sink().node)?.iface(edge.clone().sink().iface)?.deref().clone();
+                let src_type = src_if.typ().clone();
+                let dst_type = dst_if.typ().clone();
 
+                s.get_node(edge.clone().source().node)?.iface_mut(edge.clone().source().iface)?.infer_type(dst_type.clone())?;
+                s.get_node(edge.clone().sink().node)?.iface_mut(edge.clone().sink().iface)?.infer_type(src_type.clone())?;
+
+                //Run action handlers for connection
                 s.get_node(edge.clone().source().node)?.component().connect_action()?;
                 s.get_node(edge.clone().sink().node)?.component().connect_action()?;
 
-                s.edges.push(edge)
+                //Refresh the data types afgter propagation for checks
+                let src_if = s.get_node(edge.clone().source().node)?.iface(edge.clone().source().iface)?.deref().clone();
+                let dst_if = s.get_node(edge.clone().sink().node)?.iface(edge.clone().sink().iface)?.deref().clone();
+
+                if src_if.mode() != Mode::Out {
+                    Err(Error::ComposerError(format!(
+                        "Interface {:?} is not an output.",
+                        edge.clone().source
+                    )))
+                } else if dst_if.mode() != Mode::In {
+                    Err(Error::ComposerError(format!(
+                        "Interface {:?} is not an input.",
+                        edge.clone().source
+                    )))
+                } else if s.get_edge(edge.clone().source).is_ok() {
+                    Err(Error::ComposerError(format!(
+                        "Cannot connect {:?} to {:?}, source is already connected.",
+                        edge.clone().sink,  edge.clone().source
+                    )))
+                } else if s.get_edge(edge.clone().sink).is_ok() {
+                    Err(Error::ComposerError(format!(
+                        "Cannot connect {:?} to {:?}, sink is already connected.",
+                        edge.clone().sink,  edge.clone().source
+                    )))
+                } else if src_if.typ() != dst_if.typ() {
+                    Err(Error::ComposerError(format!(
+                        "Type incompatibility between sink {:?} : {:?}, and source {:?} : {:?}.",
+                        edge.clone().sink,
+                        dst_type,
+                        edge.clone().source,
+                        src_type
+                    )))
+                } else {
+                    s.edges.push(edge);
+                    Ok(())
+                }?;
+
+
+
             },
             _ => unreachable!()
         }
@@ -442,7 +485,7 @@ pub(crate) mod tests {
                     StreamletKey::try_from("Top_level").unwrap(),
                     UniqueKeyBuilder::new().with_items(vec![
                         interface("in: in Stream<Bits<32>, d=1>").unwrap().1,
-                        interface("out: out Stream<Bits<32>, d=1>").unwrap().1,
+                        interface("out: out Stream<Bits<32>, d=0>").unwrap().1,
                     ]),
                     None,
                 )
@@ -464,33 +507,6 @@ pub(crate) mod tests {
             )
             .unwrap();
 
-        let _map = lib
-            .add_streamlet(
-                Streamlet::from_builder(
-                    StreamletKey::try_from("Test3").unwrap(),
-                    UniqueKeyBuilder::new().with_items(vec![
-                        interface("in: in Stream<Group<a: Bits<32>, b: Stream<Bits<32>,d=1>>, d=1>").unwrap().1,
-                        interface("out: out Stream<Bits<32>, d=1>").unwrap().1,
-                    ]),
-                    None,
-                )
-                    .unwrap(),
-            )
-            .unwrap();
-
-        let _sqrt = lib
-            .add_streamlet(
-                Streamlet::from_builder(
-                    StreamletKey::try_from("Test4").unwrap(),
-                    UniqueKeyBuilder::new().with_items(vec![
-                        interface("in: in Stream<Bits<32>>").unwrap().1,
-                        interface("out: out Stream<Bits<32>>").unwrap().1,
-                    ]),
-                    None,
-                )
-                    .unwrap(),
-            )
-            .unwrap();
 
         let _test_op = lib.add_streamlet(Streamlet::from_builder(
             StreamletKey::try_from("test_op").unwrap(),
@@ -559,61 +575,5 @@ pub(crate) mod tests {
         Ok(())
     }
 
-    pub(crate) fn pow2_example() -> Result<Project> {
-        let key1 = LibKey::try_new("primitives").unwrap();
-        let key2 = LibKey::try_new("compositions").unwrap();
-        let mut lib = Library::new(key1.clone());
 
-        let mut lib_comp = Library::new(key2.clone());
-
-        let top = lib_comp
-            .add_streamlet(
-                Streamlet::from_builder(
-                    StreamletKey::try_from("Top_level").unwrap(),
-                    UniqueKeyBuilder::new().with_items(vec![
-                        interface("in: in Stream<Bits<32>, d=1>").unwrap().1,
-                        interface("out: out Stream<Bits<32>, d=1>").unwrap().1,
-                    ]),
-                    None,
-                )
-                    .unwrap(),
-            )
-            .unwrap();
-
-        let _sqrt = lib
-            .add_streamlet(
-                Streamlet::from_builder(
-                    StreamletKey::try_from("Pow2").unwrap(),
-                    UniqueKeyBuilder::new().with_items(vec![
-                        interface("in: in Stream<Bits<32>>").unwrap().1,
-                        interface("out: out Stream<Bits<32>>").unwrap().1,
-                    ]),
-                    None,
-                )
-                    .unwrap(),
-            )
-            .unwrap();
-
-        let mut prj = Project::new(Name::try_new("TestProj").unwrap());
-        prj.add_lib(lib)?;
-        prj.add_lib(lib_comp)?;
-
-        let top_impl = include_str!("../../../../tests/pow2.impl");
-        /*let mut builder = ImplementationBuilder::new(&prj);
-        builder.parse_implementation(&top_impl)?;
-        let imp = builder.finish();
-        prj.add_streamlet_impl(top, imp)?;*/
-
-        /*let mut builder = ImplementationBuilder::new(&prj);
-        builder.parse_implementation(&map_impl)?;
-        let imp = builder.finish();
-        prj.add_streamlet_impl(map, imp)?;*/
-
-        let mut builder = ImplParser::try_new(&mut prj, &top_impl)?;
-        builder.transform_body().unwrap();
-        let imp = builder.finish();
-        prj.add_streamlet_impl(top, imp)?;
-
-        Ok(prj)
-    }
 }

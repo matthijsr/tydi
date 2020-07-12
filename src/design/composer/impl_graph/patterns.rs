@@ -31,6 +31,8 @@ impl MapStream {
             ))),
         }?;
 
+        println!("Map input: {:?}", op_input_data_type);
+
         let advanced_stream = Stream::new(
             op_input_data_type.data().clone(),
             op_input_data_type.throughput(),
@@ -119,7 +121,7 @@ impl GenericComponent for ReduceStream {
         let output_stream = Stream::new(
             input_stream.data().clone(),
             input_stream.throughput(),
-            input_stream.dimensionality() + 1,
+            input_stream.dimensionality() - 1,
             input_stream.synchronicity(),
             Complexity::default(),
             input_stream.direction(),
@@ -129,16 +131,13 @@ impl GenericComponent for ReduceStream {
             false,
         );
 
-        println!("Reduce stream type inference!");
-
+        self.streamlet.get_interface_mut(IFKey::try_from("in")?)?.infer_type(LogicalType::from(input_stream))?;
         self.streamlet.get_interface_mut(IFKey::try_from("out")?)?.infer_type(LogicalType::from(output_stream))
     }
 }
 
 impl ReduceStream {
     pub fn try_new(project: &Project, name: Name, op: StreamletHandle) -> Result<Self> {
-
-        println!("Reduce stream instantiation!");
 
         let input_if = Interface::try_new(
             "in",
@@ -160,7 +159,9 @@ impl ReduceStream {
             Mode::Out,
             LogicalType::Null,
             None,
-        )?;
+        )?.with_type_inference(|i| {
+            Ok(i)
+        });
 
         let mut ifaces: Vec<Interface> = vec![];
         ifaces.push(input_if);
@@ -181,7 +182,7 @@ impl ReduceStream {
     pub fn with_backend(&mut self, name: Name, streamlet_handle: StreamletHandle) -> Result<()> {
         //self.backend = Option::from(MapStreamBackend { name, streamlet_handle });
         self.streamlet
-            .attach_implementation(Implementation::Backend(Box::new(MapStreamBackend {
+            .attach_implementation(Implementation::Backend(Box::new(ReduceStreamBackend {
                 name,
                 streamlet_handle,
             })))?;
@@ -199,6 +200,105 @@ pub struct ReduceStreamBackend {
 }
 
 impl ImplementationBackend for ReduceStreamBackend {
+    fn name(&self) -> Name {
+        self.name.clone()
+    }
+
+    fn streamlet_handle(&self) -> StreamletHandle {
+        self.streamlet_handle.clone()
+    }
+}
+
+///! FilterStream construct
+#[derive(Clone, Debug)]
+pub struct FilterStream {
+    streamlet: Streamlet,
+}
+
+impl GenericComponent for FilterStream {
+    fn streamlet(&self) -> &Streamlet {
+        self.streamlet.borrow()
+    }
+    fn connect_action(&self) -> Result<()> {
+        let input_stream = match self.streamlet.get_interface(IFKey::try_from("in")?)?.typ().clone() {
+            LogicalType::Stream(s) => Ok(s),
+            _ => Err(Error::ComposerError(format!(
+                "The data type for the ReduceStream pattern required to be be Stream!",
+            )))
+        }?;
+
+        self.streamlet.get_interface_mut(IFKey::try_from("out")?)?.infer_type(LogicalType::from(input_stream))
+    }
+}
+
+impl FilterStream {
+    pub fn try_new(project: &Project, name: Name, op: StreamletHandle) -> Result<Self> {
+
+        let input_if = Interface::try_new(
+            "in",
+            Mode::In,
+            LogicalType::Null,
+            None,
+        )?.with_type_inference(|i| {
+            match i.clone() {
+                LogicalType::Stream(s) => Ok(s),
+                _ => Err(Error::ComposerError(format!(
+                    "The data type for the FilterStream pattern required to be be Stream!",
+                ))),
+            }?;
+            Ok(i)
+        });
+
+        let output_if = Interface::try_new(
+            "out",
+            Mode::Out,
+            LogicalType::Null,
+            None,
+        )?;
+
+        let predicate_if = Interface::try_new(
+            "pred",
+            Mode::In,
+            LogicalType::Null,
+            None,
+        )?;
+
+        let mut ifaces: Vec<Interface> = vec![];
+        ifaces.push(input_if);
+        ifaces.push(output_if);
+        ifaces.push(predicate_if);
+
+        Ok(FilterStream {
+            streamlet: Streamlet::from_builder(
+                StreamletKey::try_from(name).unwrap(),
+                UniqueKeyBuilder::new().with_items(ifaces),
+                None,
+            )
+                .unwrap(),
+        })
+    }
+
+    pub fn with_backend(&mut self, name: Name, streamlet_handle: StreamletHandle) -> Result<()> {
+        //self.backend = Option::from(MapStreamBackend { name, streamlet_handle });
+        self.streamlet
+            .attach_implementation(Implementation::Backend(Box::new(FilterStreamBackend {
+                name,
+                streamlet_handle,
+            })))?;
+        Ok(())
+    }
+
+    pub fn finish(self) -> FilterStream {
+        self
+    }
+}
+
+pub struct FilterStreamBackend {
+    name: Name,
+    streamlet_handle: StreamletHandle,
+}
+
+impl ImplementationBackend for FilterStreamBackend {
     fn name(&self) -> Name {
         self.name.clone()
     }
