@@ -8,11 +8,11 @@ use std::path::{Path, PathBuf};
 use log::{debug, info, LevelFilter};
 use structopt::StructOpt;
 
-use tydi::{Logger, Result};
 use tydi::design::{Library, Project};
-use tydi::generator::GenerateProject;
 use tydi::generator::vhdl::{VHDLBackEnd, VHDLConfig};
+use tydi::generator::GenerateProject;
 use tydi::UniquelyNamedBuilder;
+use tydi::{Logger, Result};
 
 static LOGGER: Logger = Logger;
 

@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
+use crate::design::implementation::Implementation;
+use crate::design::{LibKey, Library, Streamlet, StreamletHandle};
+use crate::util::UniquelyNamedBuilder;
 use crate::{Error, Result};
 use crate::{Identify, Name};
-use crate::design::{LibKey, Library, Streamlet, StreamletHandle};
-use crate::design::implementation::Implementation;
-use crate::util::UniquelyNamedBuilder;
 
 /// A collection of Streamlets.
 pub struct Project {
@@ -107,8 +107,5 @@ pub mod tests {
                 libraries: HashMap::new(),
             }
         }
-
     }
-
-
 }

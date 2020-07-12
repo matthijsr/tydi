@@ -3,9 +3,9 @@
 //! The goal of this module is to define some common constructs seen in structural hardware
 //! generation that back-ends may or may not use.
 
+use crate::traits::Identify;
 use crate::{cat, Document};
 use crate::{NonNegative, Reversed};
-use crate::traits::Identify;
 
 pub mod convert;
 

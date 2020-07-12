@@ -4,13 +4,13 @@
 
 use std::borrow::Borrow;
 
-use crate::{cat, Document};
-use crate::design::{Interface, Streamlet};
 use crate::design::composer::GenericComponent;
+use crate::design::{Interface, Streamlet};
 use crate::generator::common::{Component, Mode, Package, Port, Project, Record, Type};
 use crate::logical::{Group, LogicalType, Stream, Union};
 use crate::physical::{Origin, Signal, Width};
 use crate::traits::Identify;
+use crate::{cat, Document};
 
 // Generator-global constants:
 
@@ -413,11 +413,11 @@ impl Projectify for crate::design::Project {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use crate::{Name, Positive, Result, UniqueKeyBuilder};
     use crate::design::{Interface, Streamlet};
     use crate::generator::common::test::records;
     use crate::generator::vhdl::Declare;
     use crate::logical::tests::{elements, streams};
+    use crate::{Name, Positive, Result, UniqueKeyBuilder};
 
     use super::*;
 

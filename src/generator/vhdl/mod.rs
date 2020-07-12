@@ -10,13 +10,13 @@ use log::debug;
 #[cfg(feature = "cli")]
 use structopt::StructOpt;
 
-use crate::{Error, Result, Reversed};
 use crate::cat;
 use crate::design::Project;
-use crate::generator::common::*;
 use crate::generator::common::convert::Packify;
+use crate::generator::common::*;
 use crate::generator::GenerateProject;
 use crate::traits::Identify;
+use crate::{Error, Result, Reversed};
 
 mod impls;
 

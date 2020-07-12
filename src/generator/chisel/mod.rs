@@ -7,12 +7,12 @@ use log::debug;
 #[cfg(feature = "cli")]
 use structopt::StructOpt;
 
-use crate::{Error, Result};
 use crate::design::Project;
-use crate::generator::common::*;
 use crate::generator::common::convert::Packify;
+use crate::generator::common::*;
 use crate::generator::GenerateProject;
 use crate::traits::Identify;
+use crate::{Error, Result};
 
 mod impls;
 
@@ -63,7 +63,6 @@ pub trait FieldMode {
 pub trait IsDecoupled {
     fn is_decupled(&self) -> bool;
 }
-
 
 /// Analyze trait for Chisel objects.
 pub trait Analyze {
@@ -130,7 +129,7 @@ impl Default for ChiselConfig {
     fn default() -> Self {
         ChiselConfig {
             abstraction: None,
-            suffix: None
+            suffix: None,
         }
     }
 }
@@ -177,7 +176,7 @@ impl GenerateProject for ChiselBackEnd {
                     AbstractionLevel::Canonical => lib.canonical(),
                     AbstractionLevel::Fancy => lib.fancy(),
                 }
-                    .declare()?,
+                .declare()?,
             )?;
             debug!("Wrote {}.", pkg.as_path().to_str().unwrap_or(""));
         }
@@ -207,5 +206,3 @@ mod test {
         assert!(vhdl.generate(&prj, "output").is_ok());
     }
 }
-
-

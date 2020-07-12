@@ -2,13 +2,13 @@ use std::cell::Ref;
 use std::ops::Deref;
 use std::path::Path;
 
-use crate::{Identify, Result};
 use crate::cat;
-use crate::design::{Interface, Library, Mode, Project, THIS_KEY};
-use crate::design::composer::{GenDot, GenericComponent};
 use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
+use crate::design::composer::{GenDot, GenericComponent};
 use crate::design::implementation::Implementation;
+use crate::design::{Interface, Library, Mode, Project, THIS_KEY};
 use crate::generator::GenerateProject;
+use crate::{Identify, Result};
 
 fn tab(n: usize) -> String {
     "\t".repeat(n)
@@ -94,7 +94,14 @@ impl DotStyle {
 }
 
 impl GenDot for Edge {
-    fn gen_dot(&self, _style: &DotStyle, _project: &Project, l:usize, prefix: &str, _label: &str) -> String {
+    fn gen_dot(
+        &self,
+        _style: &DotStyle,
+        _project: &Project,
+        l: usize,
+        prefix: &str,
+        _label: &str,
+    ) -> String {
         let src = match self.source().node().deref() {
             THIS_KEY => cat!(prefix, self.source().iface()),
             _ => cat!(prefix, "impl", self.source().node(), self.source().iface()),
@@ -108,8 +115,16 @@ impl GenDot for Edge {
 }
 
 impl GenDot for Node {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, _label: &str) -> String {
-        self.component().gen_dot(style, project, l, prefix, self.key().as_ref())
+    fn gen_dot(
+        &self,
+        style: &DotStyle,
+        project: &Project,
+        l: usize,
+        prefix: &str,
+        _label: &str,
+    ) -> String {
+        self.component()
+            .gen_dot(style, project, l, prefix, self.key().as_ref())
     }
 }
 
@@ -121,8 +136,8 @@ fn if_subgraph<'a, I: 'a>(
     suffix: &str,
     items: impl Iterator<Item = Ref<'a, I>>,
 ) -> String
-    where
-        I: GenDot,
+where
+    I: GenDot,
 {
     format!(
         "{}subgraph cluster_{}_{} {{\n{}\n{}}}\n",
@@ -150,8 +165,8 @@ fn node_subgraph<'a, I: 'a>(
     suffix: &str,
     items: impl Iterator<Item = &'a I>,
 ) -> String
-    where
-        I: GenDot,
+where
+    I: GenDot,
 {
     format!(
         "{}subgraph cluster_{}_{} {{\n{}\n{}}}\n",
@@ -172,7 +187,14 @@ fn node_subgraph<'a, I: 'a>(
 }
 
 impl GenDot for Interface {
-    fn gen_dot(&self, style: &DotStyle, _project: &Project, l:usize, prefix: &str, _label: &str) -> String {
+    fn gen_dot(
+        &self,
+        style: &DotStyle,
+        _project: &Project,
+        l: usize,
+        prefix: &str,
+        _label: &str,
+    ) -> String {
         format!(
             "{}{} [label=\"{}\", {}];",
             tab(l),
@@ -185,7 +207,14 @@ impl GenDot for Interface {
 }
 
 impl GenDot for ImplementationGraph {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, _label: &str) -> String {
+    fn gen_dot(
+        &self,
+        style: &DotStyle,
+        project: &Project,
+        l: usize,
+        prefix: &str,
+        _label: &str,
+    ) -> String {
         format!(
             "{}subgraph cluster_{} {{\n{}\n{}}}",
             tab(l),
@@ -215,7 +244,14 @@ impl GenDot for ImplementationGraph {
 }
 
 impl GenDot for Implementation {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, _label: &str) -> String {
+    fn gen_dot(
+        &self,
+        style: &DotStyle,
+        project: &Project,
+        l: usize,
+        prefix: &str,
+        _label: &str,
+    ) -> String {
         match self {
             Implementation::Structural(s) => s.gen_dot(style, project, l, prefix, ""),
             _ => String::new(),
@@ -224,7 +260,14 @@ impl GenDot for Implementation {
 }
 
 impl GenDot for dyn GenericComponent {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, prefix: &str, label: &str) -> String {
+    fn gen_dot(
+        &self,
+        style: &DotStyle,
+        project: &Project,
+        l: usize,
+        prefix: &str,
+        label: &str,
+    ) -> String {
         let p = match label.is_empty() {
             true => format!("{}_{}", prefix, self.key()),
             false => format!("{}_{}", prefix, label),
@@ -238,22 +281,8 @@ impl GenDot for dyn GenericComponent {
                 "\n{}{}{}{}{}\n",
                 format!("{}label = \"{}\\n{}\";\n", tab(l + 1), self.key(), label),
                 style.cluster(1, l + 1),
-                if_subgraph(
-                    style,
-                    project,
-                    l + 1,
-                    p.as_str(),
-                    "inputs",
-                    self.inputs()
-                ),
-                if_subgraph(
-                    style,
-                    project,
-                    l + 1,
-                    p.as_str(),
-                    "outputs",
-                    self.outputs()
-                ),
+                if_subgraph(style, project, l + 1, p.as_str(), "inputs", self.inputs()),
+                if_subgraph(style, project, l + 1, p.as_str(), "outputs", self.outputs()),
                 // implementation
                 if self.get_implementation().is_some() {
                     self.get_implementation().unwrap().gen_dot(
@@ -273,7 +302,14 @@ impl GenDot for dyn GenericComponent {
 }
 
 impl GenDot for Library {
-    fn gen_dot(&self, style: &DotStyle, project: &Project, l:usize, _prefix: &str, _label: &str) -> String {
+    fn gen_dot(
+        &self,
+        style: &DotStyle,
+        project: &Project,
+        l: usize,
+        _prefix: &str,
+        _label: &str,
+    ) -> String {
         format!(
             "digraph  {{\n{}\n{}}}",
             format!(
@@ -281,7 +317,10 @@ impl GenDot for Library {
                 format!("{}rankdir=LR;\n", tab(l + 1)),
                 format!("{}graph [fontname=\"Bitstream Charter\"];\n", tab(l + 1)),
                 format!("{}node [fontname=\"Bitstream Charter\"];\n", tab(l + 1)),
-                format!("{}node [shape=box, style=\"rounded, filled\"]\n", tab(l + 1)),
+                format!(
+                    "{}node [shape=box, style=\"rounded, filled\"]\n",
+                    tab(l + 1)
+                ),
                 format!("{}edge [fontname=\"Bitstream Charter\"];\n", tab(l + 1)),
                 format!("{}splines=compound;\n", tab(l + 1)),
                 self.streamlets()
@@ -332,7 +371,7 @@ mod tests {
 
     use super::*;
 
-//use crate::design::composer::impl_graph::parser::tests::{impl_parser_test, pow2_example};
+    //use crate::design::composer::impl_graph::parser::tests::{impl_parser_test, pow2_example};
     /*
         #[test]
         fn dot() {

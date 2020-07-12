@@ -8,11 +8,11 @@ pub use streamlet::{Interface, Mode, Streamlet};
 use crate::Name;
 
 pub mod composer;
+pub mod implementation;
 pub mod library;
+pub mod param;
 pub mod project;
 pub mod streamlet;
-pub mod param;
-pub mod implementation;
 
 /// Index types
 pub type LibKey = Name;
@@ -22,12 +22,10 @@ pub type ComponentKey = Name;
 pub type ParamKey = Name;
 pub type ParamStoreKey = Name;
 
-
 pub type NodeKey = Name;
 
 pub const THIS_KEY: &str = "this";
 pub const GEN_LIB: &str = "gen";
-
 
 impl NodeKey {
     /// Returns the key that signifies the streamlet that is being implemented itself.

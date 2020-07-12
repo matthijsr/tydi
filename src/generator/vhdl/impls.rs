@@ -2,11 +2,11 @@
 
 use std::collections::HashMap;
 
-use crate::{cat, Document, Result};
 use crate::error::Error::BackEndError;
 use crate::generator::common::{Component, Mode, Package, Port, Record, Type};
 use crate::generator::vhdl::{Analyze, Declare, DeclareType, Split, VHDLIdentifier};
 use crate::traits::Identify;
+use crate::{cat, Document, Result};
 
 impl VHDLIdentifier for Mode {
     fn vhdl_identifier(&self) -> Result<String> {

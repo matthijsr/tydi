@@ -1,13 +1,3 @@
-
-
-
-
-
-
-
-
-
-
 /*
 pub type FIFODepth = NonNegative;
 pub const ElementCountBits: u32 = 16;
@@ -243,9 +233,9 @@ impl GroupSplit {
 mod tests {
     use super::*;
 
-    
 
-    
+
+
     use crate::design::{
         ComponentKey, IFKey, Interface, Mode, Project, Streamlet, StreamletHandle, StreamletKey,
     };

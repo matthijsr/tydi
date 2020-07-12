@@ -30,7 +30,7 @@ impl PartialEq for Implementation {
 #[derive(Debug)]
 pub enum Implementation {
     Structural(ImplementationGraph),
-    Backend(Box<dyn ImplementationBackend>)
+    Backend(Box<dyn ImplementationBackend>),
 }
 
 impl Implementation {
@@ -38,8 +38,7 @@ impl Implementation {
     pub fn streamlet_handle(&self) -> StreamletHandle {
         match &self {
             Implementation::Structural(s) => s.clone().streamlet(),
-            Implementation::Backend(b) => b.streamlet_handle()
+            Implementation::Backend(b) => b.streamlet_handle(),
         }
     }
 }
-

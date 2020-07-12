@@ -8,13 +8,13 @@ use std::path::Path;
 
 use log::debug;
 
-use crate::{Error, Name, Result, UniqueKeyBuilder};
-use crate::design::{LibKey, ParamStoreKey, Streamlet, StreamletHandle, StreamletKey};
 use crate::design::composer::GenericComponent;
 use crate::design::param::ParameterStore;
+use crate::design::{LibKey, ParamStoreKey, Streamlet, StreamletHandle, StreamletKey};
 use crate::error::Error::{FileIOError, ParsingError};
 use crate::parser::nom::list_of_streamlets;
 use crate::traits::Identify;
+use crate::{Error, Name, Result, UniqueKeyBuilder};
 
 /// A collection of Streamlets.
 #[derive(PartialEq, Debug)]
@@ -122,7 +122,10 @@ impl Library {
     pub fn add_streamlet(&mut self, streamlet: Streamlet) -> Result<StreamletHandle> {
         let key = streamlet.key().clone();
         match self.streamlets.insert(streamlet.key().clone(), streamlet) {
-            None => Ok(StreamletHandle{lib: self.key.clone(), streamlet: key.clone()}),
+            None => Ok(StreamletHandle {
+                lib: self.key.clone(),
+                streamlet: key.clone(),
+            }),
             Some(_lib) => Err(Error::ProjectError(format!(
                 "Error while adding {} to the library",
                 key,
@@ -140,19 +143,15 @@ impl Library {
     }
 
     pub fn get_streamlet_mut(&mut self, streamlet: StreamletKey) -> Result<&mut Streamlet> {
-         match self.streamlets.get_mut(&streamlet) {
-             Some(s) => Ok(s),
-             None => Err(Error::ProjectError(format!(
-                 "Streamlet {} not found in library {}",
-                 streamlet,
-                 self.key
-             ))),
-         }
+        match self.streamlets.get_mut(&streamlet) {
+            Some(s) => Ok(s),
+            None => Err(Error::ProjectError(format!(
+                "Streamlet {} not found in library {}",
+                streamlet, self.key
+            ))),
+        }
     }
-
 }
-
-
 
 #[cfg(test)]
 pub mod tests {
@@ -165,7 +164,11 @@ pub mod tests {
         std::fs::write(path.as_path(), "").map_err(|e| FileIOError(e.to_string()))?;
         assert_eq!(
             Library::from_file(path.as_path()),
-            Library::from_builder(Name::try_new("test")?, UniqueKeyBuilder::new(),UniqueKeyBuilder::new()),
+            Library::from_builder(
+                Name::try_new("test")?,
+                UniqueKeyBuilder::new(),
+                UniqueKeyBuilder::new()
+            ),
         );
         Ok(())
     }

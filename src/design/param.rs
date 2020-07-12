@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 use std::convert::TryInto;
 
-use crate::{Document, Error, Identify, Result, UniqueKeyBuilder};
 ///! Generic parameter type
-
 use crate::design::{ParamHandle, ParamKey, ParamStoreKey};
 use crate::logical::LogicalType;
+use crate::{Document, Error, Identify, Result, UniqueKeyBuilder};
 
 #[derive(Debug, PartialEq)]
 pub enum ParameterVariant {
@@ -29,7 +28,7 @@ impl NamedParameter {
         doc: Option<&str>,
     ) -> Result<Self> {
         let key = key.try_into().map_err(Into::into)?;
-        Ok( NamedParameter {
+        Ok(NamedParameter {
             key,
             item,
             doc: doc.map(|s| s.to_string()),
@@ -44,7 +43,6 @@ impl NamedParameter {
     }
 }
 
-
 impl Identify for NamedParameter {
     fn identifier(&self) -> &str {
         self.key.as_ref()
@@ -58,9 +56,9 @@ impl Document for NamedParameter {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct ParameterStore{
+pub struct ParameterStore {
     key: ParamStoreKey,
-    params: HashMap<ParamKey, NamedParameter>
+    params: HashMap<ParamKey, NamedParameter>,
 }
 
 impl Identify for ParameterStore {
@@ -72,7 +70,8 @@ impl Identify for ParameterStore {
 impl ParameterStore {
     pub fn from_builder(
         key: ParamStoreKey,
-        builder: UniqueKeyBuilder<NamedParameter>) -> Result<Self> {
+        builder: UniqueKeyBuilder<NamedParameter>,
+    ) -> Result<Self> {
         Ok(ParameterStore {
             key,
             params: builder
@@ -86,8 +85,10 @@ impl ParameterStore {
     pub fn add(&mut self, param: NamedParameter) -> Result<ParamHandle> {
         let key = param.key().clone();
         match self.params.insert(param.key().clone(), param) {
-
-            None => Ok(ParamHandle{lib: self.key.clone(), param: key.clone()}),
+            None => Ok(ParamHandle {
+                lib: self.key.clone(),
+                param: key.clone(),
+            }),
             Some(_lib) => Err(Error::ProjectError(format!(
                 "Error while adding {} to the library",
                 key,
@@ -108,5 +109,4 @@ impl ParameterStore {
     pub fn key(&self) -> &ParamStoreKey {
         &self.key
     }
-
 }

@@ -49,17 +49,17 @@
 //! [`SignalMap`]: ./struct.SignalMap.html
 //! [Tydi specification]: https://abs-tudelft.github.io/tydi/specification/physical.html
 
+use std::str::FromStr;
 use std::{
     cmp::Ordering,
     convert::{TryFrom, TryInto},
     fmt,
 };
-use std::str::FromStr;
 
 use indexmap::IndexMap;
 
-use crate::{Error, NonNegative, PathName, Positive, Result, util::log2_ceil};
 use crate::traits::Identify;
+use crate::{util::log2_ceil, Error, NonNegative, PathName, Positive, Result};
 
 /// Positive number of bits.
 pub type BitCount = Positive;

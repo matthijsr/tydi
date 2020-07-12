@@ -2,9 +2,9 @@ use std::collections::HashMap;
 use std::convert::TryInto;
 use std::rc::Rc;
 
-use crate::{Error, Result};
-use crate::design::{NodeIFHandle, NodeKey, Project, Streamlet, StreamletHandle};
 use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
+use crate::design::{NodeIFHandle, NodeKey, Project, Streamlet, StreamletHandle};
+use crate::{Error, Result};
 
 pub struct GraphBuilder<'a> {
     project: &'a Project,
@@ -159,10 +159,10 @@ impl BasicGraphBuilder {
 pub(crate) mod tests {
     use std::convert::TryFrom;
 
-    use crate::{Name, Result, UniqueKeyBuilder};
-    use crate::design::*;
     use crate::design::implementation::Implementation;
+    use crate::design::*;
     use crate::logical::LogicalType;
+    use crate::{Name, Result, UniqueKeyBuilder};
 
     use super::*;
 

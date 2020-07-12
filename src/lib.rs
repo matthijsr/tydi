@@ -191,7 +191,11 @@ impl Name {
             .all(|c| c.is_ascii_alphanumeric() || c.eq(&'_'))
         {
             Err(Error::InvalidArgument(
-                format!("name must consist of letters, numbers, and/or underscores {}", name).to_string(),
+                format!(
+                    "name must consist of letters, numbers, and/or underscores {}",
+                    name
+                )
+                .to_string(),
             ))
         } else {
             Ok(Name(name))
@@ -382,4 +386,3 @@ impl TryFrom<&str> for PathName {
         Ok(PathName::from(name))
     }
 }
-

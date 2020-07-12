@@ -1,12 +1,12 @@
-use std::borrow::{Borrow, BorrowMut};
+use std::borrow::{Borrow};
 use std::convert::TryFrom;
 
-use crate::{Error, Name, Result, UniqueKeyBuilder};
-use crate::design::{Interface, Mode, Project, Streamlet, StreamletHandle, StreamletKey, IFKey};
 use crate::design::composer::GenericComponent;
 use crate::design::implementation::{Implementation, ImplementationBackend};
+use crate::design::{IFKey, Interface, Mode, Project, Streamlet, StreamletHandle, StreamletKey};
 use crate::logical::{LogicalType, Stream};
 use crate::physical::Complexity;
+use crate::{Error, Name, Result, UniqueKeyBuilder};
 
 ///! MapStream construct
 #[derive(Clone, Debug)]
@@ -111,11 +111,16 @@ impl GenericComponent for ReduceStream {
         self.streamlet.borrow()
     }
     fn connect_action(&self) -> Result<()> {
-        let input_stream = match self.streamlet.get_interface(IFKey::try_from("in")?)?.typ().clone() {
+        let input_stream = match self
+            .streamlet
+            .get_interface(IFKey::try_from("in")?)?
+            .typ()
+            .clone()
+        {
             LogicalType::Stream(s) => Ok(s),
             _ => Err(Error::ComposerError(format!(
                 "The data type for the ReduceStream pattern required to be be Stream!",
-            )))
+            ))),
         }?;
 
         let output_stream = Stream::new(
@@ -131,43 +136,31 @@ impl GenericComponent for ReduceStream {
             false,
         );
 
-        self.streamlet.get_interface_mut(IFKey::try_from("in")?)?.infer_type(LogicalType::from(input_stream))?;
-        self.streamlet.get_interface_mut(IFKey::try_from("out")?)?.infer_type(LogicalType::from(output_stream))
+        self.streamlet
+            .get_interface_mut(IFKey::try_from("out")?)?
+            .infer_type(LogicalType::from(output_stream))
     }
 }
 
 impl ReduceStream {
-    pub fn try_new(project: &Project, name: Name, op: StreamletHandle) -> Result<Self> {
+    pub fn try_new(_project: &Project, name: Name, _op: StreamletHandle) -> Result<Self> {
+        let input_if = Interface::try_new("in", Mode::In, LogicalType::Null, None)?
+            .with_type_inference(|i| {
+                match i.clone() {
+                    LogicalType::Stream(s) => Ok(s),
+                    _ => Err(Error::ComposerError(format!(
+                        "The data type for the ReduceStream pattern required to be be Stream!",
+                    ))),
+                }?;
+                Ok(i)
+            });
 
-        let input_if = Interface::try_new(
-            "in",
-            Mode::In,
-            LogicalType::Null,
-            None,
-        )?.with_type_inference(|i| {
-            match i.clone() {
-                LogicalType::Stream(s) => Ok(s),
-                _ => Err(Error::ComposerError(format!(
-                    "The data type for the ReduceStream pattern required to be be Stream!",
-                ))),
-            }?;
-            Ok(i)
-        });
-
-        let output_if = Interface::try_new(
-            "out",
-            Mode::Out,
-            LogicalType::Null,
-            None,
-        )?.with_type_inference(|i| {
-            Ok(i)
-        });
+        let output_if = Interface::try_new("out", Mode::Out, LogicalType::Null, None)?
+            .with_type_inference(|i| Ok(i));
 
         let mut ifaces: Vec<Interface> = vec![];
         ifaces.push(input_if);
         ifaces.push(output_if);
-
-
 
         Ok(ReduceStream {
             streamlet: Streamlet::from_builder(
@@ -220,48 +213,40 @@ impl GenericComponent for FilterStream {
         self.streamlet.borrow()
     }
     fn connect_action(&self) -> Result<()> {
-        let input_stream = match self.streamlet.get_interface(IFKey::try_from("in")?)?.typ().clone() {
+        let input_stream = match self
+            .streamlet
+            .get_interface(IFKey::try_from("in")?)?
+            .typ()
+            .clone()
+        {
             LogicalType::Stream(s) => Ok(s),
             _ => Err(Error::ComposerError(format!(
                 "The data type for the ReduceStream pattern required to be be Stream!",
-            )))
+            ))),
         }?;
 
-        self.streamlet.get_interface_mut(IFKey::try_from("out")?)?.infer_type(LogicalType::from(input_stream))
+        self.streamlet
+            .get_interface_mut(IFKey::try_from("out")?)?
+            .infer_type(LogicalType::from(input_stream))
     }
 }
 
 impl FilterStream {
-    pub fn try_new(project: &Project, name: Name, op: StreamletHandle) -> Result<Self> {
+    pub fn try_new(_project: &Project, name: Name, _op: StreamletHandle) -> Result<Self> {
+        let input_if = Interface::try_new("in", Mode::In, LogicalType::Null, None)?
+            .with_type_inference(|i| {
+                match i.clone() {
+                    LogicalType::Stream(s) => Ok(s),
+                    _ => Err(Error::ComposerError(format!(
+                        "The data type for the FilterStream pattern required to be be Stream!",
+                    ))),
+                }?;
+                Ok(i)
+            });
 
-        let input_if = Interface::try_new(
-            "in",
-            Mode::In,
-            LogicalType::Null,
-            None,
-        )?.with_type_inference(|i| {
-            match i.clone() {
-                LogicalType::Stream(s) => Ok(s),
-                _ => Err(Error::ComposerError(format!(
-                    "The data type for the FilterStream pattern required to be be Stream!",
-                ))),
-            }?;
-            Ok(i)
-        });
+        let output_if = Interface::try_new("out", Mode::Out, LogicalType::Null, None)?;
 
-        let output_if = Interface::try_new(
-            "out",
-            Mode::Out,
-            LogicalType::Null,
-            None,
-        )?;
-
-        let predicate_if = Interface::try_new(
-            "pred",
-            Mode::In,
-            LogicalType::Null,
-            None,
-        )?;
+        let predicate_if = Interface::try_new("pred", Mode::In, LogicalType::Null, None)?;
 
         let mut ifaces: Vec<Interface> = vec![];
         ifaces.push(input_if);
@@ -274,7 +259,7 @@ impl FilterStream {
                 UniqueKeyBuilder::new().with_items(ifaces),
                 None,
             )
-                .unwrap(),
+            .unwrap(),
         })
     }
 
@@ -312,9 +297,9 @@ impl ImplementationBackend for FilterStreamBackend {
 mod tests {
     use std::convert::TryFrom;
 
-    use crate::{Name, Result};
-    use crate::design::{StreamletHandle};
     use crate::design::composer::impl_graph::parser::tests::composition_test_proj;
+    use crate::design::StreamletHandle;
+    use crate::{Name, Result};
 
     use super::*;
 

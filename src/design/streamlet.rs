@@ -2,7 +2,6 @@
 //!
 //! A streamlet is a component where every [Interface] has a [LogicalType].
 
-
 use std::cell::{Ref, RefCell, RefMut};
 use std::collections::HashMap;
 use std::convert::TryInto;
@@ -10,12 +9,12 @@ use std::fmt::Debug;
 use std::rc::Rc;
 use std::str::FromStr;
 
-use crate::{Document, Error, Name, Result, Reverse, Reversed, UniqueKeyBuilder};
-use crate::design::{ComponentKey, IFKey};
 use crate::design::composer::GenericComponent;
 use crate::design::implementation::Implementation;
+use crate::design::{ComponentKey, IFKey};
 use crate::logical::LogicalType;
 use crate::traits::Identify;
+use crate::{Document, Error, Name, Result, Reverse, Reversed, UniqueKeyBuilder};
 
 /// Streamlet interface mode.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -66,7 +65,6 @@ pub struct Interface {
     /// The documentation string of the interface, if any.
     doc: Option<String>,
 }
-
 
 impl Identify for Interface {
     fn identifier(&self) -> &str {
@@ -143,8 +141,8 @@ impl Interface {
                 self.typ = f(typ)?;
                 println!("Self type: {:?}->{:?}", self.key(), self.typ());
                 Ok(())
-            },
-            None => Ok(())
+            }
+            None => Ok(()),
         }
     }
 
@@ -152,16 +150,15 @@ impl Interface {
         &self.key
     }
 
+    /// Return the [Mode] of the interface.
+    pub fn mode(&self) -> Mode {
+        self.mode
+    }
 
-        /// Return the [Mode] of the interface.
-        pub fn mode(&self) -> Mode {
-            self.mode
-        }
-
-        /// Return the [LogicalStreamType] of the interface.
-        pub fn typ(&self) -> LogicalType {
-            self.typ.clone()
-        }
+    /// Return the [LogicalStreamType] of the interface.
+    pub fn typ(&self) -> LogicalType {
+        self.typ.clone()
+    }
 }
 
 impl Reverse for Interface {
@@ -169,8 +166,6 @@ impl Reverse for Interface {
         self.mode = self.mode.reversed()
     }
 }
-
-
 
 /// Streamlet interface definition.
 #[derive(Clone, Debug)]
@@ -192,18 +187,17 @@ impl PartialEq for Streamlet {
 }
 
 impl GenericComponent for Streamlet {
-
     fn key(&self) -> ComponentKey {
         self.key.clone()
     }
 
     /// Return an iterator over the interfaces of this Streamlet.
-    fn interfaces<'a>(&'a self) -> Box<(dyn Iterator<Item = Ref<Interface>> +'a)> {
+    fn interfaces<'a>(&'a self) -> Box<(dyn Iterator<Item = Ref<Interface>> + 'a)> {
         Box::new(self.interfaces.iter().map(|(_, i)| i.borrow()))
     }
 
     /// Return an iterator over the interfaces of this Streamlet.
-    fn interfaces_mut<'a>(&'a self) -> Box<(dyn Iterator<Item = RefMut<Interface>> +'a)> {
+    fn interfaces_mut<'a>(&'a self) -> Box<(dyn Iterator<Item = RefMut<Interface>> + 'a)> {
         Box::new(self.interfaces.iter().map(|(_, i)| i.borrow_mut()))
     }
 
@@ -239,7 +233,6 @@ impl GenericComponent for Streamlet {
 }
 
 impl Streamlet {
-
     pub fn attach_implementation(&mut self, implementation: Implementation) -> Result<()> {
         self.implementation = Some(Rc::from(implementation));
         Ok(())

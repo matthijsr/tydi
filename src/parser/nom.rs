@@ -12,10 +12,10 @@ use nom::{
     sequence::{delimited, preceded, separated_pair, terminated, tuple},
 };
 
-use crate::{Name, PositiveReal};
 use crate::design::{Interface, Mode, Streamlet};
 use crate::logical::{Direction, Group, LogicalType, Stream, Synchronicity, Union};
 use crate::physical::Complexity;
+use crate::{Name, PositiveReal};
 
 // #[derive(Debug, PartialEq)]
 // pub struct ParserError<I> {
@@ -326,8 +326,8 @@ pub fn list_of_streamlets(input: &str) -> Result<&str, Vec<Streamlet>> {
 #[cfg(test)]
 mod tests {
     use crate::design::streamlet::tests::streamlets;
-    use crate::UniqueKeyBuilder;
     use crate::util::UniquelyNamedBuilder;
+    use crate::UniqueKeyBuilder;
 
     use super::*;
 

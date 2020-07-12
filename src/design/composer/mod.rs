@@ -1,10 +1,10 @@
 use std::cell::{Ref, RefMut};
 use std::rc::Rc;
 
-use crate::design::{ComponentKey, IFKey, Interface, Mode, Project, Streamlet};
 use crate::design::implementation::Implementation;
+use crate::design::{ComponentKey, IFKey, Interface, Mode, Project, Streamlet};
 use crate::generator::dot::DotStyle;
-use crate::{Result, Error};
+use crate::{Result};
 
 pub mod impl_graph;
 

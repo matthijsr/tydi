@@ -6,15 +6,13 @@ use std::rc::Rc;
 
 use nom::lib::std::fmt::Formatter;
 
-use crate::{Error, Result};
-use crate::design::{
-    IFKey, Interface, NodeIFHandle, NodeKey, StreamletHandle, StreamletKey
-};
 use crate::design::composer::GenericComponent;
+use crate::design::{IFKey, Interface, NodeIFHandle, NodeKey, StreamletHandle, StreamletKey};
+use crate::{Error, Result};
 
-pub mod parser;
 pub mod builder;
 pub mod misc;
+pub mod parser;
 pub mod patterns;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -108,11 +106,12 @@ impl ImplementationGraph {
             None => Err(Error::ComposerError(format!(
                 "Error while retrieving node {:?}, it does not exist in design.",
                 key
-            )))
+            ))),
         }
     }
     pub fn get_edge(&self, iface: NodeIFHandle) -> Result<&Edge> {
-        let edge = self.edges
+        let edge = self
+            .edges
             .iter()
             .find(|e| e.sink == iface || e.source == iface);
         match edge {

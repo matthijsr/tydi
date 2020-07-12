@@ -2,12 +2,12 @@
 
 use std::collections::HashMap;
 
-use crate::{cat, Document, Result};
 use crate::error::Error::BackEndError;
 use crate::generator::chisel::{Analyze, ChiselIdentifier, DeclareChisel, FieldMode};
 use crate::generator::chisel::{ChiselMode, DeclareChiselType, IsDecoupled};
 use crate::generator::common::{Component, Field, Mode, Package, Port, Record, Type};
 use crate::traits::Identify;
+use crate::{cat, Document, Result};
 
 impl ChiselIdentifier for Mode {
     fn chisel_identifier(&self) -> Result<String> {
