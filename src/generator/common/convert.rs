@@ -2,13 +2,15 @@
 //!
 //! The generator module is enabled by the `generator` feature flag.
 
+use std::borrow::Borrow;
+
+use crate::{cat, Document};
 use crate::design::{Interface, Streamlet};
-use crate::generator::common::{Component, Mode, Package, Port, Project, Record, Type};
 use crate::design::composer::GenericComponent;
+use crate::generator::common::{Component, Mode, Package, Port, Project, Record, Type};
 use crate::logical::{Group, LogicalType, Stream, Union};
 use crate::physical::{Origin, Signal, Width};
 use crate::traits::Identify;
-use crate::{cat, Document};
 
 // Generator-global constants:
 
@@ -329,7 +331,7 @@ impl Componentify for Streamlet {
                     Port::new_documented("rst", Mode::In, Type::Bit, None),
                 ];
                 self.interfaces().for_each(|interface| {
-                    all_ports.extend(interface.canonical(interface.identifier()));
+                    all_ports.extend(interface.borrow().canonical(interface.identifier()));
                 });
                 all_ports
             },
@@ -349,7 +351,7 @@ impl Componentify for Streamlet {
                 all_ports.extend(
                     self.interfaces()
                         .flat_map(|interface| {
-                            interface.fancy(
+                            interface.borrow().fancy(
                                 interface.identifier(),
                                 cat!(self.identifier().to_string(), interface.identifier()),
                             )
@@ -411,12 +413,13 @@ impl Projectify for crate::design::Project {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use super::*;
+    use crate::{Name, Positive, Result, UniqueKeyBuilder};
     use crate::design::{Interface, Streamlet};
     use crate::generator::common::test::records;
     use crate::generator::vhdl::Declare;
     use crate::logical::tests::{elements, streams};
-    use crate::{Name, Positive, Result, UniqueKeyBuilder};
+
+    use super::*;
 
     #[test]
     fn test_cat() {
@@ -522,8 +525,9 @@ pub(crate) mod tests {
     }
 
     mod fancy {
-        use super::*;
         use crate::generator::common::Field;
+
+        use super::*;
 
         #[test]
         fn logical_to_common_prim() {

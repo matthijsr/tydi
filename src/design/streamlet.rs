@@ -2,18 +2,20 @@
 //!
 //! A streamlet is a component where every [Interface] has a [LogicalType].
 
-use crate::design::composer::impl_graph::ImplementationGraph;
-use crate::design::{IFKey, ComponentKey};
-use crate::logical::LogicalType;
-use crate::traits::Identify;
 
-use crate::{Document, Error, Name, Result, UniqueKeyBuilder, Reverse, Reversed};
+use std::cell::{Ref, RefCell, RefMut};
 use std::collections::HashMap;
 use std::convert::TryInto;
+use std::fmt::Debug;
 use std::rc::Rc;
 use std::str::FromStr;
+
+use crate::{Document, Error, Name, Result, Reverse, Reversed, UniqueKeyBuilder};
+use crate::design::{ComponentKey, IFKey};
 use crate::design::composer::GenericComponent;
 use crate::design::implementation::Implementation;
+use crate::logical::LogicalType;
+use crate::traits::Identify;
 
 /// Streamlet interface mode.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -59,21 +61,12 @@ pub struct Interface {
     mode: Mode,
     /// The type of the interface.
     typ: LogicalType,
+    /// Type inference function
+    inf_f: Option<Box<fn(LogicalType) -> Result<LogicalType>>>,
     /// The documentation string of the interface, if any.
     doc: Option<String>,
 }
 
-impl Interface {
-    /// Return the [Mode] of the interface.
-    pub fn mode(&self) -> Mode {
-        self.mode
-    }
-
-    /// Return the [LogicalStreamType] of the interface.
-    pub fn typ(&self) -> LogicalType {
-        self.typ.clone()
-    }
-}
 
 impl Identify for Interface {
     fn identifier(&self) -> &str {
@@ -123,6 +116,7 @@ impl Interface {
                 key: n,
                 mode,
                 typ: t,
+                inf_f: None,
                 doc: if let Some(d) = doc {
                     Some(d.to_string())
                 } else {
@@ -137,9 +131,35 @@ impl Interface {
         self
     }
 
+    pub fn with_type_inference(mut self, inf_f: fn(LogicalType) -> Result<LogicalType>) -> Self {
+        self.inf_f = Option::from(Box::new(inf_f));
+        self
+    }
+
+    pub fn infer_type(&mut self, typ: LogicalType) -> Result<()> {
+        match &self.inf_f {
+            Some(f) => {
+                self.typ = f(typ)?;
+                Ok(())
+            },
+            None => Ok(())
+        }
+    }
+
     pub fn key(&self) -> &IFKey {
         &self.key
     }
+
+
+        /// Return the [Mode] of the interface.
+        pub fn mode(&self) -> Mode {
+            self.mode
+        }
+
+        /// Return the [LogicalStreamType] of the interface.
+        pub fn typ(&self) -> LogicalType {
+            self.typ.clone()
+        }
 }
 
 impl Reverse for Interface {
@@ -151,16 +171,22 @@ impl Reverse for Interface {
 
 
 /// Streamlet interface definition.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 pub struct Streamlet {
     /// The name of the streamlet.
     key: Name,
     /// The interfaces of the streamlet.
-    interfaces: HashMap<IFKey, Interface>,
+    interfaces: HashMap<IFKey, Rc<RefCell<Interface>>>,
     /// An optional documentation string for the streamlet to be used by back-ends.
     doc: Option<String>,
     /// Placeholder for future implementation of the streamlet. If this is None, it is a primitive.
     implementation: Option<Rc<Implementation>>,
+}
+
+impl PartialEq for Streamlet {
+    fn eq(&self, other: &Streamlet) -> bool {
+        self.key() == other.key()
+    }
 }
 
 impl GenericComponent for Streamlet {
@@ -170,22 +196,33 @@ impl GenericComponent for Streamlet {
     }
 
     /// Return an iterator over the interfaces of this Streamlet.
-    fn interfaces<'a>(&'a self) -> Box<(dyn Iterator<Item = &'a Interface> +'a)> {
-        Box::new(self.interfaces.iter().map(|(_, i)| i))
+    fn interfaces<'a>(&'a self) -> Box<(dyn Iterator<Item = Ref<Interface>> +'a)> {
+        Box::new(self.interfaces.iter().map(|(_, i)| i.borrow()))
     }
 
     fn streamlet(&self) -> &Streamlet {
         self
     }
 
-    fn get_interface(&self, key: IFKey) -> Result<Interface> {
+    fn get_interface(&self, key: IFKey) -> Result<Ref<Interface>> {
         match self.interfaces.get(&key) {
             None => Err(Error::InterfaceError(format!(
                 "Interface {} does not exist for Streamlet  {}.",
                 key,
                 self.identifier()
             ))),
-            Some(iface) => Ok(iface.clone()),
+            Some(iface) => Ok(iface.borrow()),
+        }
+    }
+
+    fn get_interface_mut(&self, key: IFKey) -> Result<RefMut<Interface>> {
+        match self.interfaces.get(&key) {
+            None => Err(Error::InterfaceError(format!(
+                "Interface {} does not exist for Streamlet  {}.",
+                key,
+                self.identifier()
+            ))),
+            Some(iface) => Ok(iface.borrow_mut()),
         }
     }
 
@@ -196,8 +233,8 @@ impl GenericComponent for Streamlet {
 
 impl Streamlet {
 
-    pub fn attach_implementation(&mut self, impl_graph: Implementation) -> Result<()> {
-        self.implementation = Some(Rc::from(impl_graph));
+    pub fn attach_implementation(&mut self, implementation: Implementation) -> Result<()> {
+        self.implementation = Some(Rc::from(implementation));
         Ok(())
     }
 
@@ -236,8 +273,8 @@ impl Streamlet {
             interfaces: builder
                 .finish()?
                 .into_iter()
-                .map(|iface| (iface.key().clone(), iface))
-                .collect::<HashMap<IFKey, Interface>>(),
+                .map(|iface| (iface.key().clone(), Rc::new(RefCell::new(iface))))
+                .collect::<HashMap<IFKey, Rc<RefCell<Interface>>>>(),
             doc: if let Some(d) = doc {
                 Some(d.to_string())
             } else {

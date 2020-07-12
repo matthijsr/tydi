@@ -1,12 +1,13 @@
 //! Implementations of Chisel traits for common representation.
 
+use std::collections::HashMap;
+
+use crate::{cat, Document, Result};
 use crate::error::Error::BackEndError;
 use crate::generator::chisel::{Analyze, ChiselIdentifier, DeclareChisel, FieldMode};
 use crate::generator::chisel::{ChiselMode, DeclareChiselType, IsDecoupled};
 use crate::generator::common::{Component, Field, Mode, Package, Port, Record, Type};
 use crate::traits::Identify;
-use crate::{cat, Document, Result};
-use std::collections::HashMap;
 
 impl ChiselIdentifier for Mode {
     fn chisel_identifier(&self) -> Result<String> {
@@ -283,9 +284,10 @@ impl DeclareChiselType for Record {
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use crate::generator::chisel::DeclareChiselType;
     use crate::generator::common::test::*;
+
+    use super::*;
 
     #[test]
     fn mode_decl() {

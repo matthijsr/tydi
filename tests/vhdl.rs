@@ -6,8 +6,6 @@ mod tests {
     use tydi::generator::common::convert::{Componentify, Packify};
     use tydi::generator::vhdl::Declare;
     use tydi::Name;
-    
-    
 
     #[test]
     fn streamlet_async() {

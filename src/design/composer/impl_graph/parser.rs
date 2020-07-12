@@ -1,23 +1,22 @@
-use crate::design::composer::impl_graph::builder::*;
-use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
-use crate::design::{
-    IFKey, Interface, LibKey, Library, Mode, NodeIFHandle, NodeKey, Project, Streamlet,
-    StreamletHandle, StreamletKey, GEN_LIB,
-};
-use crate::{Error, Name, Result, UniqueKeyBuilder};
-
+use std::collections::HashMap;
 use std::convert::{TryFrom, TryInto};
 use std::rc::Rc;
 
-use crate::design::composer::GenericComponent;
-use crate::error::LineErr;
-
-use pest::iterators::{Pair};
 use pest::{Parser, RuleType};
-use std::collections::HashMap;
+use pest::iterators::Pair;
+
+use crate::{Error, Name, Result};
+use crate::design::{
+    GEN_LIB, LibKey, Library, NodeIFHandle, NodeKey, Project,
+    StreamletHandle, StreamletKey,
+};
+use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
+use crate::design::composer::impl_graph::patterns::MapStream;
 use crate::design::implementation::Implementation;
 use crate::design::implementation::Implementation::Structural;
-use crate::design::composer::impl_graph::patterns::MapStream;
+use crate::error::LineErr;
+use std::borrow::BorrowMut;
+use std::ops::Deref;
 
 #[derive(Parser)]
 #[grammar = "design/composer/impl_graph/impl.pest"]
@@ -76,7 +75,7 @@ impl<'i> ImplParser<'i> {
             .clone();
 
         let gen_lib = Library::new(LibKey::try_new(GEN_LIB).unwrap());
-        project.add_lib(gen_lib);
+        project.add_lib(gen_lib)?;
 
 
         Ok(ImplParser {
@@ -148,7 +147,7 @@ impl<'i> ImplParser<'i> {
                 },
                 Rule::bulk_connection => {
                     println!("It's a BULK connection! <3");
-                    self.transform_bulk_connection(pair);
+                    self.transform_bulk_connection(pair)?;
                 }
                 _ => unimplemented!()
             }
@@ -187,7 +186,7 @@ impl<'i> ImplParser<'i> {
 
     }
 
-    pub fn transform_streamlet_inst(&mut self, pair: Pair<Rule>, key: Name) -> Result<StreamletHandle> {
+    pub fn transform_streamlet_inst(&mut self, pair: Pair<Rule>, _key: Name) -> Result<StreamletHandle> {
         //{ streamlet_handle ~ ("[" ~ (parameter_assign)+ ~ "]")? }
         let mut pairs = pair.into_inner();
 
@@ -225,7 +224,7 @@ impl<'i> ImplParser<'i> {
 
         let name = Name::try_from(format!("{}_gen", key.to_string()))?;
         let mut component = MapStream::try_new(self.project, name.clone(), op.1)?;
-        component.with_backend(name.clone(), StreamletHandle{ lib: Name::try_new(GEN_LIB)?, streamlet: name.clone() });
+        component.with_backend(name.clone(), StreamletHandle{ lib: Name::try_new(GEN_LIB)?, streamlet: name.clone() })?;
         let streamlet = component.finish();
         self.project
             .get_lib_mut(Name::try_from(GEN_LIB).unwrap())?
@@ -244,13 +243,6 @@ impl<'i> ImplParser<'i> {
             _ => unimplemented!()
         }?;
 
-        //(ident | node_if_handle_list)
-        /*let pair = pairs.next().unwrap();
-        let dst = match pair.as_rule() {
-            Rule::ident => Name::try_from(pair),
-            _ => unimplemented!()
-        }?;*/
-
         for pair in pairs {
             let dst = match pair.as_rule() {
                 Rule::ident => Name::try_from(pair),
@@ -262,7 +254,7 @@ impl<'i> ImplParser<'i> {
                     match s.get_node(src.clone())?.component().outputs().next() {
                         Some(i) => Ok(i.clone()),
                         None =>  Err(Error::ComposerError(format!(
-                            "Bulk connection left side doesn't have output interface: {:?}",
+                            "Bulk connection left side doesn't have an output interface: {:?}",
                             src
                         )))
                     }
@@ -275,7 +267,7 @@ impl<'i> ImplParser<'i> {
                     match s.get_node(dst.clone())?.component().inputs().next() {
                         Some(i) => Ok(i.clone()),
                         None =>  Err(Error::ComposerError(format!(
-                            "Bulk connection right side doesn't have input interface: {:?}",
+                            "Bulk connection right side doesn't have an input interface: {:?}",
                             dst
                         )))
                     }
@@ -293,40 +285,21 @@ impl<'i> ImplParser<'i> {
             src=dst;
 
         }
-
-        /*let src_i = match &mut self.imp {
-            Structural(ref mut s) => {
-                match s.get_node(src.clone())?.component().outputs().next() {
-                    Some(i) => Ok(i.clone()),
-                    None =>  Err(Error::ComposerError(format!(
-                        "Bulk connection left side doesn't have output interface: {:?}",
-                        src
-                    )))
-                }
-            },
-            _ => unreachable!()
-        }?;
-
-        let dst_i = match &mut self.imp {
-            Structural(ref mut s) => {
-                match s.get_node(dst.clone())?.component().inputs().next() {
-                    Some(i) => Ok(i.clone()),
-                    None =>  Err(Error::ComposerError(format!(
-                        "Bulk connection right side doesn't have input interface: {:?}",
-                        dst
-                    )))
-                }
-            },
-            _ => unreachable!()
-        }?;*/
-
-
         Ok(())
     }
 
     pub fn connect(&mut self, edge: Edge) -> Result<()> {
         match &mut self.imp {
-            Structural(ref mut s) => s.edges.push(edge),
+            Structural(ref mut s) => {
+
+                //Deal with type inferences
+                let src_type = s.clone().get_node(edge.clone().source().node)?.iface(edge.clone().source().iface)?.typ().clone();
+                let dst_type = s.clone().get_node(edge.clone().sink().node)?.iface(edge.clone().sink().iface)?.typ().clone();
+                s.get_node(edge.clone().source().node)?.iface_mut(edge.clone().source().iface)?.infer_type(dst_type)?;
+                s.get_node(edge.clone().sink().node)?.iface_mut(edge.clone().sink().iface)?.infer_type(src_type)?;
+
+                s.edges.push(edge)
+            },
             _ => unreachable!()
         }
         Ok(())
@@ -408,16 +381,16 @@ impl<'i> TryFrom<Pair<'i, Rule>> for Edge {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use super::*;
+    use std::convert::TryFrom;
 
+    use crate::{Name, Result, UniqueKeyBuilder};
     use crate::design::*;
     use crate::logical::LogicalType;
     use crate::parser::nom::interface;
-    use crate::{Name, Result, UniqueKeyBuilder};
-    use std::convert::TryFrom;
-    use crate::design::implementation::Implementation;
 
-    pub(crate) fn composition_test_proj() -> Project {
+    use super::*;
+
+    pub(crate) fn composition_test_proj() -> Result<Project> {
         let key1 = LibKey::try_new("primitives").unwrap();
         let key2 = LibKey::try_new("compositions").unwrap();
         let mut lib = Library::new(key1.clone());
@@ -453,7 +426,7 @@ pub(crate) mod tests {
             )
             .unwrap();
 
-        let top = lib_comp
+        let _top = lib_comp
             .add_streamlet(
                 Streamlet::from_builder(
                     StreamletKey::try_from("Top_level").unwrap(),
@@ -509,7 +482,7 @@ pub(crate) mod tests {
             )
             .unwrap();
 
-        let test_op = lib.add_streamlet(Streamlet::from_builder(
+        let _test_op = lib.add_streamlet(Streamlet::from_builder(
             StreamletKey::try_from("test_op").unwrap(),
             UniqueKeyBuilder::new().with_items(vec![
                 interface("in: in Stream<Bits<32>, d=0>")
@@ -525,14 +498,14 @@ pub(crate) mod tests {
 
 
         let mut prj = Project::new(Name::try_new("TestProj").unwrap());
-        prj.add_lib(lib);
-        prj.add_lib(lib_comp);
-        prj
+        prj.add_lib(lib)?;
+        prj.add_lib(lib_comp)?;
+        Ok(prj)
     }
 
     pub(crate) fn impl_parser_test() -> Result<Project> {
 
-        let mut prj = composition_test_proj();
+        let mut prj = composition_test_proj()?;
         let top_impl = include_str!("../../../../tests/top.impl");
 
         /*let mut builder = ImplementationBuilder::new(&prj);
@@ -553,9 +526,9 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn parser() {
+    fn parser() -> Result<()> {
 
-        let mut prj = composition_test_proj();
+        let mut prj = composition_test_proj()?;
 
         let top_impl = include_str!("../../../../tests/top.impl");
         let _map_impl = include_str!("../../../../tests/map.impl");
@@ -572,7 +545,8 @@ pub(crate) mod tests {
 
         let mut builder = ImplParser::try_new(&mut prj, &top_impl).unwrap();
         builder.transform_body().unwrap();
-        let imp = builder.finish();
+        let _imp = builder.finish();
+        Ok(())
     }
 
     pub(crate) fn pow2_example() -> Result<Project> {
@@ -614,8 +588,8 @@ pub(crate) mod tests {
 
 
         let mut prj = Project::new(Name::try_new("TestProj").unwrap());
-        prj.add_lib(lib);
-        prj.add_lib(lib_comp);
+        prj.add_lib(lib)?;
+        prj.add_lib(lib_comp)?;
 
         let top_impl = include_str!("../../../../tests/pow2.impl");
         /*let mut builder = ImplementationBuilder::new(&prj);

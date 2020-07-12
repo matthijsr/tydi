@@ -3,20 +3,21 @@
 //! This allows users to build up libraries of streamlets and helps to generate language-specific
 //! output (e.g. a package in VHDL).
 
-use crate::design::{LibKey, Streamlet, StreamletKey, StreamletHandle, ParamStoreKey};
-use crate::error::Error::{FileIOError, ParsingError};
-use crate::parser::nom::{list_of_streamlets};
-use crate::traits::Identify;
-use crate::{Error, Name, Result, UniqueKeyBuilder};
-use log::debug;
 use std::collections::HashMap;
 use std::path::Path;
-use crate::design::param::ParameterStore;
-use crate::design::composer::GenericComponent;
 
+use log::debug;
+
+use crate::{Error, Name, Result, UniqueKeyBuilder};
+use crate::design::{LibKey, ParamStoreKey, Streamlet, StreamletHandle, StreamletKey};
+use crate::design::composer::GenericComponent;
+use crate::design::param::ParameterStore;
+use crate::error::Error::{FileIOError, ParsingError};
+use crate::parser::nom::list_of_streamlets;
+use crate::traits::Identify;
 
 /// A collection of Streamlets.
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq, Debug)]
 pub struct Library {
     key: Name,
     parameter_stores: HashMap<ParamStoreKey, ParameterStore>,

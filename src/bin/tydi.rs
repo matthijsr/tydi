@@ -2,16 +2,17 @@
 //!
 //! The Command-Line Interface binary is enabled by the `cli` feature flag.
 
-use log::{debug, info, LevelFilter};
 use std::convert::TryInto;
 use std::path::{Path, PathBuf};
-use tydi::generator::vhdl::{VHDLBackEnd, VHDLConfig};
-use tydi::generator::GenerateProject;
-use tydi::UniquelyNamedBuilder;
-use tydi::{Logger, Result};
 
+use log::{debug, info, LevelFilter};
 use structopt::StructOpt;
+
+use tydi::{Logger, Result};
 use tydi::design::{Library, Project};
+use tydi::generator::GenerateProject;
+use tydi::generator::vhdl::{VHDLBackEnd, VHDLConfig};
+use tydi::UniquelyNamedBuilder;
 
 static LOGGER: Logger = Logger;
 

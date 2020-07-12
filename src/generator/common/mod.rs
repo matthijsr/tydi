@@ -3,9 +3,9 @@
 //! The goal of this module is to define some common constructs seen in structural hardware
 //! generation that back-ends may or may not use.
 
-use crate::traits::Identify;
 use crate::{cat, Document};
 use crate::{NonNegative, Reversed};
+use crate::traits::Identify;
 
 pub mod convert;
 
@@ -405,12 +405,11 @@ pub struct Project {
 
 #[cfg(test)]
 pub(crate) mod test {
-
-    use super::*;
     use crate::cat;
 
-    pub(crate) mod records {
+    use super::*;
 
+    pub(crate) mod records {
         use super::*;
 
         pub(crate) fn prim(bits: u32) -> Type {

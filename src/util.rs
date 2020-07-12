@@ -1,10 +1,12 @@
-use crate::traits::Identify;
-use crate::{Error, Result};
-use crate::{NonNegative, Positive};
-use colored::Colorize;
-use log::{Level, Metadata, Record};
 use std::collections::HashSet;
 use std::iter::FromIterator;
+
+use colored::Colorize;
+use log::{Level, Metadata, Record};
+
+use crate::{Error, Result};
+use crate::{NonNegative, Positive};
+use crate::traits::Identify;
 
 /// Returns ⌈log2(x)⌉.
 pub(crate) const fn log2_ceil(x: Positive) -> NonNegative {

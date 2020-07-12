@@ -1,11 +1,10 @@
-use crate::design::{ComponentKey, IFKey, Interface, Mode, Project, Streamlet};
-
-use crate::Result;
-
-use crate::design::composer::impl_graph::ImplementationGraph;
-use crate::generator::dot::DotStyle;
+use std::cell::{Ref, RefMut};
 use std::rc::Rc;
+
+use crate::design::{ComponentKey, IFKey, Interface, Mode, Project, Streamlet};
 use crate::design::implementation::Implementation;
+use crate::generator::dot::DotStyle;
+use crate::Result;
 
 pub mod impl_graph;
 
@@ -29,20 +28,32 @@ pub trait GenericComponent {
     fn key(&self) -> ComponentKey {
         self.streamlet().key().clone()
     }
-    fn interfaces<'a>(&'a self) -> Box<(dyn Iterator<Item = &'a Interface> + 'a)> {
+    fn interfaces<'a>(&'a self) -> Box<(dyn Iterator<Item = Ref<Interface>> + 'a)> {
         self.streamlet().interfaces()
     }
     fn streamlet(&self) -> &Streamlet;
-    fn inputs<'a>(&'a self) -> Box<(dyn Iterator<Item = &'a Interface> + 'a)> {
+    fn inputs<'a>(&'a self) -> Box<(dyn Iterator<Item = Ref<Interface>> + 'a)> {
         Box::new(self.interfaces().filter(|iface| iface.mode() == Mode::In))
     }
-    fn outputs<'a>(&'a self) -> Box<(dyn Iterator<Item = &'a Interface> + 'a)> {
+    fn outputs<'a>(&'a self) -> Box<(dyn Iterator<Item = Ref<Interface>> + 'a)> {
         Box::new(self.interfaces().filter(|iface| iface.mode() == Mode::Out))
     }
-    fn get_interface(&self, key: IFKey) -> Result<Interface> {
+    fn get_interface(&self, key: IFKey) -> Result<Ref<Interface>> {
         self.streamlet().get_interface(key)
+    }
+    fn get_interface_mut(&self, key: IFKey) -> Result<RefMut<Interface>> {
+        self.streamlet().get_interface_mut(key)
     }
     fn get_implementation(&self) -> Option<Rc<Implementation>> {
         self.streamlet().get_implementation()
+    }
+    fn connect_action(&self) -> Result<()> {
+       match self.streamlet().get_implementation() {
+           Some(i) => match i.as_ref() {
+               Implementation::Backend(b) => b.connect_action(),
+               _ => Ok(())
+           }
+           _ => Ok(())
+       }
     }
 }

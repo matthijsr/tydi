@@ -72,6 +72,24 @@
 #![doc(html_favicon_url = "https://abs-tudelft.github.io/tydi/tydi_logo.svg")]
 #![doc(html_logo_url = "https://abs-tudelft.github.io/tydi/tydi_logo.svg")]
 
+extern crate pest;
+#[macro_use]
+extern crate pest_derive;
+
+use std::convert::TryFrom;
+use std::convert::TryInto;
+use std::fmt;
+use std::iter::FromIterator;
+use std::ops::Deref;
+use std::ops::Mul;
+use std::str::FromStr;
+
+// Root re-exports
+// TODO(mb): discuss
+pub use error::{Error, Result};
+pub use traits::{Document, Identify, Reverse, Reversed};
+pub use util::{Logger, UniqueKeyBuilder, UniquelyNamedBuilder};
+
 // Crate utils
 pub(crate) mod util;
 
@@ -87,12 +105,6 @@ mod traits;
 pub mod generator;
 #[cfg(feature = "parser")]
 pub mod parser;
-
-// Root re-exports
-// TODO(mb): discuss
-pub use error::{Error, Result};
-pub use traits::{Document, Identify, Reverse, Reversed};
-pub use util::{Logger, UniquelyNamedBuilder, UniqueKeyBuilder};
 
 // Types for positive and non-negative integers.
 
@@ -119,7 +131,6 @@ where
     }
 }
 
-use std::ops::Mul;
 impl<T> Mul for NonZeroReal<T>
 where
     T: Copy + Mul<Output = T> + Into<f64>,
@@ -200,7 +211,6 @@ impl From<&Name> for String {
     }
 }
 
-use std::ops::Deref;
 impl Deref for Name {
     type Target = str;
     fn deref(&self) -> &str {
@@ -208,7 +218,6 @@ impl Deref for Name {
     }
 }
 
-use std::convert::TryFrom;
 impl TryFrom<&str> for Name {
     type Error = Error;
     fn try_from(str: &str) -> Result<Self> {
@@ -223,7 +232,6 @@ impl TryFrom<String> for Name {
     }
 }
 
-use std::str::FromStr;
 impl FromStr for Name {
     type Err = Error;
     fn from_str(str: &str) -> Result<Self> {
@@ -243,7 +251,6 @@ impl PartialEq<str> for Name {
     }
 }
 
-use std::fmt;
 impl fmt::Display for Name {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.0)
@@ -256,7 +263,6 @@ impl fmt::Display for Name {
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct PathName(Vec<Name>);
 
-use std::convert::TryInto;
 impl PathName {
     pub(crate) fn new_empty() -> Self {
         PathName(Vec::new())
@@ -349,8 +355,6 @@ impl<'a> IntoIterator for &'a PathName {
     }
 }
 
-use std::iter::FromIterator;
-
 impl FromIterator<Name> for PathName {
     fn from_iter<I: IntoIterator<Item = Name>>(iter: I) -> Self {
         PathName(iter.into_iter().collect())
@@ -379,6 +383,3 @@ impl TryFrom<&str> for PathName {
     }
 }
 
-extern crate pest;
-#[macro_use]
-extern crate pest_derive;

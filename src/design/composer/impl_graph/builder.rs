@@ -1,10 +1,10 @@
-use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
-use crate::design::{NodeIFHandle, NodeKey, Project, Streamlet, StreamletHandle};
-use crate::{Error, Result};
-
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::rc::Rc;
+
+use crate::{Error, Result};
+use crate::design::{NodeIFHandle, NodeKey, Project, Streamlet, StreamletHandle};
+use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
 
 pub struct GraphBuilder<'a> {
     project: &'a Project,
@@ -157,15 +157,14 @@ impl BasicGraphBuilder {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use super::*;
-
-    use crate::design::composer::impl_graph::*;
-
-    use crate::design::*;
-    use crate::logical::LogicalType;
-    use crate::{Name, Result, UniqueKeyBuilder};
     use std::convert::TryFrom;
+
+    use crate::{Name, Result, UniqueKeyBuilder};
+    use crate::design::*;
     use crate::design::implementation::Implementation;
+    use crate::logical::LogicalType;
+
+    use super::*;
 
     pub(crate) fn composition_example() -> Result<Project> {
         let key1 = LibKey::try_new("primitives").unwrap();
@@ -218,18 +217,18 @@ pub(crate) mod tests {
             .unwrap();
 
         let mut prj = Project::new(Name::try_new("TestProj").unwrap());
-        prj.add_lib(lib);
-        prj.add_lib(lib_comp);
+        prj.add_lib(lib)?;
+        prj.add_lib(lib_comp)?;
 
         let mut imp = GraphBuilder::try_new(&prj, top.clone()).unwrap();
 
         let this = imp.this();
         let _tet1inst = imp.instantiate(test1, "test1inst").unwrap();
 
-        imp.connect(this.io("e"), this.io("f"));
+        imp.connect(this.io("e"), this.io("f"))?;
         let imp = imp.finish();
 
-        prj.add_streamlet_impl(top, Implementation::Structural(imp));
+        prj.add_streamlet_impl(top, Implementation::Structural(imp))?;
 
         Ok(prj)
     }

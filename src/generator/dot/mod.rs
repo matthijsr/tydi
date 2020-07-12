@@ -1,14 +1,14 @@
-use crate::cat;
-use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
-use crate::design::composer::{GenDot, GenericComponent};
-use crate::design::{Interface, Library, Mode, Project, THIS_KEY};
-
-use crate::generator::GenerateProject;
-use crate::{Identify, Result};
+use std::cell::Ref;
 use std::ops::Deref;
 use std::path::Path;
+
+use crate::{Identify, Result};
+use crate::cat;
+use crate::design::{Interface, Library, Mode, Project, THIS_KEY};
+use crate::design::composer::{GenDot, GenericComponent};
+use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
 use crate::design::implementation::Implementation;
-use std::borrow::Borrow;
+use crate::generator::GenerateProject;
 
 fn tab(n: usize) -> String {
     "\t".repeat(n)
@@ -113,7 +113,36 @@ impl GenDot for Node {
     }
 }
 
-fn item_subgraph<'a, I: 'a>(
+fn if_subgraph<'a, I: 'a>(
+    style: &DotStyle,
+    project: &Project,
+    l: usize,
+    prefix: &str,
+    suffix: &str,
+    items: impl Iterator<Item = Ref<'a, I>>,
+) -> String
+    where
+        I: GenDot,
+{
+    format!(
+        "{}subgraph cluster_{}_{} {{\n{}\n{}}}\n",
+        tab(l),
+        prefix,
+        suffix,
+        format!(
+            "{}{}{}",
+            format!("{}label=\"\";\n", tab(l + 1)),
+            format!("{}style=invis;\n", tab(l + 1)),
+            items
+                .map(|i| i.gen_dot(style, project, l + 1, prefix, ""))
+                .collect::<Vec<String>>()
+                .join("\n")
+        ),
+        tab(l),
+    )
+}
+
+fn node_subgraph<'a, I: 'a>(
     style: &DotStyle,
     project: &Project,
     l: usize,
@@ -166,7 +195,7 @@ impl GenDot for ImplementationGraph {
                 format!("{}label=\"Arch\";\n", tab(l + 1)),
                 style.cluster(6, l + 1),
                 //nodes,
-                item_subgraph(
+                node_subgraph(
                     style,
                     project,
                     l + 1,
@@ -206,7 +235,7 @@ impl GenDot for dyn GenericComponent {
                 "\n{}{}{}{}{}\n",
                 format!("{}label = \"{}\";\n", tab(l + 1), self.key()),
                 style.cluster(1, l + 1),
-                item_subgraph(
+                if_subgraph(
                     style,
                     project,
                     l + 1,
@@ -214,7 +243,7 @@ impl GenDot for dyn GenericComponent {
                     "inputs",
                     self.inputs()
                 ),
-                item_subgraph(
+                if_subgraph(
                     style,
                     project,
                     l + 1,
@@ -296,11 +325,11 @@ impl GenerateProject for DotBackend {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
-    use crate::design::composer::impl_graph::builder::tests::composition_example;
 
-    //use crate::design::composer::impl_graph::parser::tests::{impl_parser_test, pow2_example};
+    use super::*;
+
+//use crate::design::composer::impl_graph::parser::tests::{impl_parser_test, pow2_example};
     /*
         #[test]
         fn dot() {

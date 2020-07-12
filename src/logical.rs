@@ -4,16 +4,18 @@
 //!
 //! [Reference]: https://abs-tudelft.github.io/tydi/specification/logical.html
 
-use crate::{
-    physical::{BitCount, Complexity, Fields, PhysicalStream},
-    util::log2_ceil,
-    Error, Name, NonNegative, PathName, Positive, PositiveReal, Result, Reverse,
-};
-use indexmap::IndexMap;
-use std::str::FromStr;
 use std::{
     convert::{TryFrom, TryInto},
     error,
+};
+use std::str::FromStr;
+
+use indexmap::IndexMap;
+
+use crate::{
+    Error,
+    Name,
+    NonNegative, PathName, physical::{BitCount, Complexity, Fields, PhysicalStream}, Positive, PositiveReal, Result, Reverse, util::log2_ceil,
 };
 
 /// Direction of a stream.
@@ -1016,7 +1018,7 @@ pub(crate) mod tests {
     use super::*;
 
     /// Module containing functions that return common LogicalTypes that are not streams.
-    /// To be used for testing purposes only.
+            /// To be used for testing purposes only.
     pub(crate) mod elements {
         use super::*;
 

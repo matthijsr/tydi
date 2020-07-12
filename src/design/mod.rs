@@ -1,8 +1,11 @@
 //! Constructs that are used to generate hardware designs, that are not
 //! part of the specification (yet).
 
-use crate::Name;
+pub use library::Library;
+pub use project::Project;
+pub use streamlet::{Interface, Mode, Streamlet};
 
+use crate::Name;
 
 pub mod composer;
 pub mod library;
@@ -10,10 +13,6 @@ pub mod project;
 pub mod streamlet;
 pub mod param;
 pub mod implementation;
-
-pub use library::Library;
-pub use project::Project;
-pub use streamlet::{Interface, Mode, Streamlet};
 
 /// Index types
 pub type LibKey = Name;

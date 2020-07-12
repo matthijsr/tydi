@@ -1,19 +1,18 @@
 //! Chisel back-end.
 
-use crate::design::Project;
-use crate::generator::common::*;
-use crate::generator::GenerateProject;
-use crate::{Error, Result};
-use log::debug;
 use std::path::Path;
-
-
-use crate::generator::common::convert::Packify;
-use crate::traits::Identify;
 use std::str::FromStr;
+
+use log::debug;
 #[cfg(feature = "cli")]
 use structopt::StructOpt;
 
+use crate::{Error, Result};
+use crate::design::Project;
+use crate::generator::common::*;
+use crate::generator::common::convert::Packify;
+use crate::generator::GenerateProject;
+use crate::traits::Identify;
 
 mod impls;
 
@@ -188,14 +187,11 @@ impl GenerateProject for ChiselBackEnd {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    
     use std::fs;
 
     use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
-    
-    
 
+    use super::*;
 
     #[test]
     fn prj_impl() {

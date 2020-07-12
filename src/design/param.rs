@@ -1,13 +1,11 @@
+use std::collections::HashMap;
+use std::convert::TryInto;
+
+use crate::{Document, Error, Identify, Result, UniqueKeyBuilder};
 ///! Generic parameter type
 
-use crate::design::{ParamKey, ParamHandle, ParamStoreKey};
+use crate::design::{ParamHandle, ParamKey, ParamStoreKey};
 use crate::logical::LogicalType;
-use crate::{Error, Result, Document, UniqueKeyBuilder, Identify};
-use std::convert::TryInto;
-use std::collections::HashMap;
-
-
-
 
 #[derive(Debug, PartialEq)]
 pub enum ParameterVariant {

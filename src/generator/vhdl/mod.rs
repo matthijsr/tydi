@@ -3,19 +3,20 @@
 //! This module contains functionality to convert hardware defined in the common hardware
 //! representation to VHDL source files.
 
-use crate::design::Project;
-use crate::generator::common::*;
-use crate::generator::GenerateProject;
-use crate::{Error, Result, Reversed};
-use log::debug;
 use std::path::Path;
-
-use crate::cat;
-use crate::generator::common::convert::Packify;
-use crate::traits::Identify;
 use std::str::FromStr;
+
+use log::debug;
 #[cfg(feature = "cli")]
 use structopt::StructOpt;
+
+use crate::{Error, Result, Reversed};
+use crate::cat;
+use crate::design::Project;
+use crate::generator::common::*;
+use crate::generator::common::convert::Packify;
+use crate::generator::GenerateProject;
+use crate::traits::Identify;
 
 mod impls;
 
@@ -247,13 +248,12 @@ impl Split for Port {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crate::Reversed;
     use std::fs;
 
     use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
-    
-    
+    use crate::Reversed;
+
+    use super::*;
 
     #[test]
     fn split_primitive() {

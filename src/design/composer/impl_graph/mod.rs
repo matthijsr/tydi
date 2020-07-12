@@ -1,14 +1,16 @@
-use crate::design::composer::GenericComponent;
-use crate::design::{
-    IFKey, Interface, NodeIFHandle, NodeKey, StreamletHandle, StreamletKey, THIS_KEY
-};
-use crate::{Error, Result, Reversed};
-use nom::lib::std::fmt::Formatter;
+use std::cell::{Ref, RefMut};
 use std::collections::HashMap;
+use std::convert::TryInto;
 use std::fmt::Debug;
 use std::rc::Rc;
-use std::convert::TryInto;
-use std::ops::Deref;
+
+use nom::lib::std::fmt::Formatter;
+
+use crate::{Error, Result};
+use crate::design::{
+    IFKey, Interface, NodeIFHandle, NodeKey, StreamletHandle, StreamletKey
+};
+use crate::design::composer::GenericComponent;
 
 pub mod parser;
 pub mod builder;
@@ -41,13 +43,24 @@ impl Node {
         self.key.clone()
     }
 
-    pub fn iface(&self, key: IFKey) -> Result<Interface> {
-        match self.key().deref() {
+    pub fn iface(&self, key: IFKey) -> Result<Ref<Interface>> {
+        /*match self.key().deref() {
+            THIS_KEY => {
+                self.item.get_interface(key).map(|i| i.reverse())
+            },
+            _ => self.item.get_interface(key),
+        }*/
+        self.item.get_interface(key)
+    }
+
+    pub fn iface_mut(&self, key: IFKey) -> Result<RefMut<Interface>> {
+        /*match self.key() {
             THIS_KEY => {
                 self.item.get_interface(key).map(|i| i.reversed())
             },
-            _ => self.item.get_interface(key).clone(),
-        }
+            _ => self.item.get_interface(key),
+        }*/
+        self.item.get_interface_mut(key)
     }
 
     pub fn io<K>(&self, key: K) -> Result<NodeIFHandle>
@@ -112,6 +125,9 @@ impl ImplementationGraph {
     }
     pub fn this(&self) -> &Node {
         self.nodes.get(&NodeKey::this()).unwrap()
+    }
+    pub fn streamlet(self) -> StreamletHandle {
+        self.streamlet.clone()
     }
 }
 

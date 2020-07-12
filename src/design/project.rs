@@ -1,10 +1,10 @@
-use crate::design::composer::impl_graph::ImplementationGraph;
-use crate::design::{LibKey, Library, Streamlet, StreamletHandle};
-use crate::util::UniquelyNamedBuilder;
+use std::collections::HashMap;
+
 use crate::{Error, Result};
 use crate::{Identify, Name};
-use std::collections::HashMap;
+use crate::design::{LibKey, Library, Streamlet, StreamletHandle};
 use crate::design::implementation::Implementation;
+use crate::util::UniquelyNamedBuilder;
 
 /// A collection of Streamlets.
 pub struct Project {
@@ -100,10 +100,6 @@ pub mod tests {
     /// Some projects that can be used throughout the crate for testing.
     pub mod proj {
         use super::*;
-        use crate::UniqueKeyBuilder;
-        use crate::design::{Interface, Mode};
-        use crate::logical::LogicalType;
-        use crate::parser::nom::interface;
 
         pub(crate) fn empty_proj() -> Project {
             Project {
