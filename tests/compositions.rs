@@ -99,17 +99,7 @@ mod tests {
 
     pub(crate) fn impl_parser_test() -> Result<Project> {
         let mut prj = composition_test_proj()?;
-        let top_impl = include_str!("implementations/top.impl");
-
-        /*let mut builder = ImplementationBuilder::new(&prj);
-        builder.parse_implementation(&top_impl)?;
-        let imp = builder.finish();
-        prj.add_streamlet_impl(top, imp)?;*/
-
-        /*let mut builder = ImplementationBuilder::new(&prj);
-        builder.parse_implementation(&map_impl)?;
-        let imp = builder.finish();
-        prj.add_streamlet_impl(map, imp)?;*/
+        let top_impl = include_str!("implementations/composition_example.impl");
 
         let mut builder = ImplParser::try_new(&mut prj, &top_impl)?;
         builder.transform_body().unwrap();
@@ -128,17 +118,7 @@ mod tests {
     fn parser() -> Result<()> {
         let mut prj = composition_test_proj()?;
 
-        let top_impl = include_str!("implementations/top.impl");
-
-        /*let mut builder = ImplementationBuilder::new(&prj);
-        builder.parse_implementation(&top_impl)?;
-        let imp = builder.finish();
-        prj.add_streamlet_impl(top, imp)?;*/
-
-        /*let mut builder = ImplementationBuilder::new(&prj);
-        builder.parse_implementation(&map_impl)?;
-        let imp = builder.finish();
-        prj.add_streamlet_impl(map, imp)?;*/
+        let top_impl = include_str!("implementations/composition_example.impl");
 
         let mut builder =ImplParser::try_new(&mut prj, &top_impl).unwrap();
         builder.transform_body().unwrap();

@@ -31,8 +31,6 @@ impl MapStream {
             ))),
         }?;
 
-        println!("Map input: {:?}", op_input_data_type);
-
         let advanced_stream = Stream::new(
             op_input_data_type.data().clone(),
             op_input_data_type.throughput(),

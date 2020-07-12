@@ -120,12 +120,10 @@ impl<'i> ImplParser<'i> {
         for pair in pair.into_inner() {
             match &pair.as_rule() {
                 Rule::node => {
-                    println!("Node!");
                     let node_tuple = self.transform_node(pair)?;
                     let node = node_tuple.1;
                     match &mut self.imp {
                         Structural(ref mut s) => {
-                            println!("Insert node: {:?}", node.key);
                             match s.nodes.insert(node.key().clone(), node) {
                                 None => Ok(()),
                                 Some(_lib) => Err(Error::ComposerError(format!(
@@ -138,12 +136,10 @@ impl<'i> ImplParser<'i> {
                     }
                 }
                 Rule::connection => {
-                    println!("It's a connection! <3");
                     let edge = Edge::try_from(pair)?;
                     self.connect(edge)?
                 }
                 Rule::bulk_connection => {
-                    println!("It's a BULK connection! <3");
                     self.transform_bulk_connection(pair)?;
                 }
                 _ => unimplemented!(),
@@ -158,7 +154,6 @@ impl<'i> ImplParser<'i> {
         //ident
         let name_pair = pairs.next().unwrap();
         let key = Name::try_from(name_pair).unwrap();
-        println!("Key: {:?}", key);
         //(pattern | streamlet_inst)
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
@@ -171,7 +166,6 @@ impl<'i> ImplParser<'i> {
                 Ok((key.clone(), node, node_tuple.1))
             }
             Rule::pattern => {
-                println!("Pattern! FInally!");
                 let node_tuple = self.transform_pattern(pair, key.clone())?;
                 let node = Node {
                     key: key.clone(),
@@ -210,11 +204,9 @@ impl<'i> ImplParser<'i> {
         let pair = pair.into_inner().next().unwrap();
         match pair.as_rule() {
             Rule::map_stream => {
-                println!("Map <3");
                 self.transform_map_stream(pair, key)
             }
             Rule::reduce_stream => {
-                println!("Reduce <3");
                 self.transform_reduce_stream(pair, key)
             }
             _ => unreachable!(),
@@ -439,7 +431,6 @@ impl<'i> TryFrom<Pair<'i, Rule>> for StreamletHandle {
             let streamlet = pairs.next().unwrap().as_str();
             let lib_key = LibKey::try_from(lib)?;
             let streamlet_key = StreamletKey::try_from(streamlet)?;
-            println!("StreamletHandle: {}.{}", lib, streamlet);
             Ok(StreamletHandle {
                 lib: lib_key,
                 streamlet: streamlet_key,
@@ -467,7 +458,6 @@ impl<'i> TryFrom<Pair<'i, Rule>> for NodeIFHandle {
 
             let iface = pairs.next().unwrap().as_str();
             let iface = Name::try_from(iface)?;
-            println!("NodeIfHandle: {}.{}", node, iface);
             Ok(NodeIFHandle { node, iface })
         })
     }

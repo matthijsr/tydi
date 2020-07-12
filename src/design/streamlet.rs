@@ -137,9 +137,7 @@ impl Interface {
     pub fn infer_type(&mut self, typ: LogicalType) -> Result<()> {
         match &self.inf_f {
             Some(f) => {
-                println!("Self type: {:?}->{:?}", self.key(), self.typ());
                 self.typ = f(typ)?;
-                println!("Self type: {:?}->{:?}", self.key(), self.typ());
                 Ok(())
             }
             None => Ok(()),
