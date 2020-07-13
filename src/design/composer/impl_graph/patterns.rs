@@ -1,12 +1,12 @@
-use std::borrow::{Borrow};
+use std::borrow::Borrow;
 use std::convert::TryFrom;
 
 use crate::design::composer::GenericComponent;
 use crate::design::implementation::{Implementation, ImplementationBackend};
 use crate::design::{IFKey, Interface, Mode, Project, Streamlet, StreamletHandle, StreamletKey};
-use crate::logical::{LogicalType, Stream};
+use crate::logical::{Direction, LogicalType, Stream, Synchronicity};
 use crate::physical::Complexity;
-use crate::{Error, Name, Result, UniqueKeyBuilder};
+use crate::{Error, Name, NonZeroReal, Result, UniqueKeyBuilder};
 
 ///! MapStream construct
 #[derive(Clone, Debug)]
@@ -230,21 +230,73 @@ impl GenericComponent for FilterStream {
 }
 
 impl FilterStream {
-    pub fn try_new(_project: &Project, name: Name, _op: StreamletHandle) -> Result<Self> {
-        let input_if = Interface::try_new("in", Mode::In, LogicalType::Null, None)?
-            .with_type_inference(|i| {
-                match i.clone() {
-                    LogicalType::Stream(s) => Ok(s),
-                    _ => Err(Error::ComposerError(format!(
-                        "The data type for the FilterStream pattern required to be be Stream!",
-                    ))),
-                }?;
-                Ok(i)
-            });
+    pub fn try_new(_project: &Project, name: Name) -> Result<Self> {
+        let input_if = Interface::try_new(
+            "in",
+            Mode::In,
+            Stream::new(
+                //Boolean stream
+                LogicalType::Null,
+                //TODO: What to do with this?
+                NonZeroReal::new(1.0 as f64)?,
+                0,
+                Synchronicity::Sync,
+                Complexity::default(),
+                Direction::Forward,
+                //TODO: do we want to pass user signals?
+                None,
+                //TODO: ?
+                false,
+            ),
+            None,
+        )?
+        .with_type_inference(|i| {
+            match i.clone() {
+                LogicalType::Stream(s) => Ok(s),
+                _ => Err(Error::ComposerError(format!(
+                    "The data type for the FilterStream pattern required to be be Stream!",
+                ))),
+            }?;
+            Ok(i)
+        });
 
-        let output_if = Interface::try_new("out", Mode::Out, LogicalType::Null, None)?;
+        let output_if = Interface::try_new(
+            "out",
+            Mode::Out,
+            Stream::new(
+                //Boolean stream
+                LogicalType::Null,
+                //TODO: What to do with this?
+                NonZeroReal::new(1.0 as f64)?,
+                0,
+                Synchronicity::Sync,
+                Complexity::default(),
+                Direction::Forward,
+                //TODO: do we want to pass user signals?
+                None,
+                //TODO: ?
+                false,
+            ),
+            None,
+        )?
+        .with_type_inference(|i| Ok(i));
 
-        let predicate_if = Interface::try_new("pred", Mode::In, LogicalType::Null, None)?;
+        let predicate_stream_type = Stream::new(
+            //Boolean stream
+            LogicalType::try_new_bits(1)?,
+            //TODO: What to do with this?
+            NonZeroReal::new(1.0 as f64)?,
+            0,
+            Synchronicity::Sync,
+            Complexity::default(),
+            Direction::Forward,
+            //TODO: do we want to pass user signals?
+            None,
+            //TODO: ?
+            false,
+        );
+
+        let predicate_if = Interface::try_new("pred", Mode::In, predicate_stream_type, None)?;
 
         let mut ifaces: Vec<Interface> = vec![];
         ifaces.push(input_if);
@@ -295,7 +347,6 @@ impl ImplementationBackend for FilterStreamBackend {
 mod tests {
     use std::convert::TryFrom;
 
-    use crate::tests::*;
     use crate::design::StreamletHandle;
     use crate::{Name, Result};
 

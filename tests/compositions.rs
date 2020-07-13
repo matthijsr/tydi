@@ -12,6 +12,8 @@ mod tests {
     use tydi::design::composer::impl_graph::parser::ImplParser;
     use tydi::generator::dot::DotBackend;
     use tydi::generator::GenerateProject;
+    use tydi::generator::chisel::ChiselBackEnd;
+    use std::fs;
 
     pub(crate) fn composition_test_proj() -> Result<Project> {
         let key1 = LibKey::try_new("primitives").unwrap();
@@ -20,41 +22,13 @@ mod tests {
 
         let mut lib_comp = Library::new(key2.clone());
 
-        //Add streamlet
-        let _test1 = lib
-            .add_streamlet(
-                Streamlet::from_builder(
-                    StreamletKey::try_from("Test1").unwrap(),
-                    UniqueKeyBuilder::new().with_items(vec![
-                        Interface::try_new("a", Mode::In, LogicalType::Null, None).unwrap(),
-                        Interface::try_new("b", Mode::Out, LogicalType::Null, None).unwrap(),
-                    ]),
-                    None,
-                )
-                    .unwrap(),
-            )
-            .unwrap();
-
-        let _test2 = lib
-            .add_streamlet(
-                Streamlet::from_builder(
-                    StreamletKey::try_from("Test2").unwrap(),
-                    UniqueKeyBuilder::new().with_items(vec![
-                        Interface::try_new("c", Mode::In, LogicalType::Null, None).unwrap(),
-                        Interface::try_new("d", Mode::Out, LogicalType::Null, None).unwrap(),
-                    ]),
-                    None,
-                )
-                    .unwrap(),
-            )
-            .unwrap();
-
         let _top = lib_comp
             .add_streamlet(
                 Streamlet::from_builder(
                     StreamletKey::try_from("Top_level").unwrap(),
                     UniqueKeyBuilder::new().with_items(vec![
                         interface("in: in Stream<Bits<32>, d=1>").unwrap().1,
+                        interface("in2: in Stream<Bits<1>, d=0>").unwrap().1,
                         interface("out: out Stream<Bits<32>, d=0>").unwrap().1,
                     ]),
                     None,
@@ -136,6 +110,20 @@ mod tests {
         // TODO: implement actual test.
 
         assert!(dot.generate(&prj, tmpdir).is_ok());
+    }
+
+    #[test]
+    fn chisel_impl() {
+        let _tmpdir = tempfile::tempdir().unwrap();
+
+        //let prj = impl_parser_test().unwrap();
+        let prj = impl_parser_test().unwrap();
+        let vhdl = ChiselBackEnd::default();
+        // TODO: implement actual test.
+
+        let _folder = fs::create_dir_all("output").unwrap();
+
+        assert!(vhdl.generate(&prj, "output").is_ok());
     }
 
 }

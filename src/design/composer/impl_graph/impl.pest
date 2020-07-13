@@ -33,7 +33,7 @@ connection			= { node_if_handle ~ "<=" ~  node_if_handle }
 
 //Bulk connection
 node_if_handle_list	= { "(" ~ node_if_handle ~ ("," ~ node_if_handle)* ~ (")") }
-bulk_connection		= { (ident) ~ ("<=>" ~ (ident))+ }
+chain_connection		= { (ident) ~ ("<=>" ~ (ident))+ }
 
 //Streamlet instantiation
 streamlet_inst		= { streamlet_handle ~ ("[" ~ (parameter_assign)+ ~ "]")? }
@@ -42,7 +42,7 @@ streamlet_inst		= { streamlet_handle ~ ("[" ~ (parameter_assign)+ ~ "]")? }
 node        		= { ident ~ ":" ~  (pattern | streamlet_inst) }
 
 //Implementation of a streamlet
-structural_body = { (( connection | bulk_connection | node) ~ ";")* }
+structural_body = { (( connection | chain_connection | node) ~ ";")* }
 structural			= { "structural" ~ "{" ~ structural_body ~ "}"}
 implementation      = { "impl" ~ streamlet_handle ~ structural }
 //implementation      = { "implementation of" ~ streamlet_handle ~ "is" ~ connection }

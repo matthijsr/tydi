@@ -184,25 +184,4 @@ impl GenerateProject for ChiselBackEnd {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use std::fs;
 
-    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
-
-    use super::*;
-
-    #[test]
-    fn prj_impl() {
-        let _tmpdir = tempfile::tempdir().unwrap();
-
-        //let prj = impl_parser_test().unwrap();
-        let prj = impl_parser_test().unwrap();
-        let vhdl = ChiselBackEnd::default();
-        // TODO: implement actual test.
-
-        let _folder = fs::create_dir_all("output").unwrap();
-
-        assert!(vhdl.generate(&prj, "output").is_ok());
-    }
-}

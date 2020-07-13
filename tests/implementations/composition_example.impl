@@ -1,9 +1,10 @@
 impl compositions.Top_level structural {
-   inst1: primitives.Magic;
-   /*inst1.in <= this.in;*/
-   inst2: MapStream(op_inst: primitives.test_op);
-   /*inst2.in <= inst1.out;
-   this.out <= inst2.out;*/
-   inst3: ReduceStream(op_inst: primitives.test_op);
-   this <=> inst1 <=> inst2 <=> inst3 <=> this;
+   streamlet_inst: primitives.Magic;
+
+   filter_stage: FilterStream(this.in2);
+   map_stage: MapStream(op_inst: primitives.test_op);
+   reduce_stage: ReduceStream(op_inst: primitives.test_op);
+   streamlet_inst.in <= this.in;
+   streamlet_inst <=> filter_stage <=> map_stage <=> reduce_stage;
+   this.out <= reduce_stage.out;
 }
