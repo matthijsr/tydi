@@ -5,12 +5,15 @@ use std::rc::Rc;
 use pest::iterators::Pair;
 use pest::{Parser, RuleType};
 
-use crate::design::composer::impl_graph::patterns::{MapStream, ReduceStream, FilterStream};
+use crate::design::composer::impl_graph::patterns::{FilterStream, MapStream, ReduceStream};
 use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
 use crate::design::composer::GenericComponent;
 use crate::design::implementation::Implementation;
 use crate::design::implementation::Implementation::Structural;
-use crate::design::{LibKey, Library, Mode, NodeIFHandle, NodeKey, Project, Streamlet, StreamletHandle, StreamletKey, GEN_LIB, IFKey};
+use crate::design::{
+    IFKey, LibKey, Library, Mode, NodeIFHandle, NodeKey, Project, Streamlet, StreamletHandle,
+    StreamletKey, GEN_LIB,
+};
 use crate::error::LineErr;
 use crate::{Error, Name, Result, Reversed, UniqueKeyBuilder};
 
@@ -137,7 +140,10 @@ impl<'i> ImplParser<'i> {
         Ok(())
     }
 
-    pub fn transform_node(&mut self, pair: Pair<Rule>) -> Result<(Name, Node, StreamletHandle, Vec<Edge>)> {
+    pub fn transform_node(
+        &mut self,
+        pair: Pair<Rule>,
+    ) -> Result<(Name, Node, StreamletHandle, Vec<Edge>)> {
         //{ ident ~ ":" ~  (pattern | streamlet_inst) }
         let mut pairs = pair.into_inner();
         //ident
@@ -169,7 +175,7 @@ impl<'i> ImplParser<'i> {
     pub fn transform_streamlet_inst(
         &mut self,
         pair: Pair<Rule>,
-        key: Name,
+        _key: Name,
     ) -> Result<(Rc<dyn GenericComponent>, StreamletHandle, Vec<Edge>)> {
         //{ streamlet_handle ~ ("[" ~ (parameter_assign)+ ~ "]")? }
         let mut pairs = pair.into_inner();
@@ -180,7 +186,8 @@ impl<'i> ImplParser<'i> {
         let streamlet = self
             .project
             .get_lib(streamlet_handle.lib())?
-            .get_streamlet(streamlet_handle.streamlet())?.clone();
+            .get_streamlet(streamlet_handle.streamlet())?
+            .clone();
         Ok((Rc::new(streamlet.clone()), streamlet_handle, Vec::new()))
     }
 
@@ -192,15 +199,9 @@ impl<'i> ImplParser<'i> {
         //{ map_stream | filter_stream | reduce_stream }
         let pair = pair.into_inner().next().unwrap();
         match pair.as_rule() {
-            Rule::map_stream => {
-                self.transform_map_stream(pair, key)
-            },
-            Rule::reduce_stream => {
-                self.transform_reduce_stream(pair, key)
-            },
-            Rule::filter_stream => {
-                self.transform_filter_stream(pair, key)
-            },
+            Rule::map_stream => self.transform_map_stream(pair, key),
+            Rule::reduce_stream => self.transform_reduce_stream(pair, key),
+            Rule::filter_stream => self.transform_filter_stream(pair, key),
             _ => unreachable!(),
         }
     }
@@ -274,12 +275,12 @@ impl<'i> ImplParser<'i> {
             .project
             .get_lib_mut(Name::try_from(GEN_LIB).unwrap())?
             .add_streamlet(object.streamlet().clone())?;
-        let edges = vec![Edge{
+        let edges = vec![Edge {
             source: predicate.clone(),
             sink: NodeIFHandle {
                 node: key.clone(),
-                iface: IFKey::try_new("pred")?
-            }
+                iface: IFKey::try_new("pred")?,
+            },
         }];
         Ok((Rc::new(object), handle, edges))
     }
@@ -304,7 +305,12 @@ impl<'i> ImplParser<'i> {
 
             let src_i = match &mut self.imp {
                 Structural(ref mut s) => {
-                    match s.get_node(src.clone())?.component().outputs().find(|i| i.key().to_string() == "out".to_string()) {
+                    match s
+                        .get_node(src.clone())?
+                        .component()
+                        .outputs()
+                        .find(|i| i.key().to_string() == "out".to_string())
+                    {
                         Some(i) => Ok(i.clone()),
                         None => Err(Error::ComposerError(format!(
                             "Chain connection left side doesn't have an output interface: {:?}",
@@ -430,15 +436,13 @@ impl<'i> ImplParser<'i> {
 
     pub fn insert_node(&mut self, node: Node) -> Result<()> {
         match &mut self.imp {
-            Structural(ref mut s) => {
-                match s.nodes.insert(node.clone().key(), node.clone()) {
-                    None => Ok(()),
-                    Some(_lib) => Err(Error::ComposerError(format!(
-                        "Instance {} already exists.",
-                        node.key
-                    ))),
-                }
-            }
+            Structural(ref mut s) => match s.nodes.insert(node.clone().key(), node.clone()) {
+                None => Ok(()),
+                Some(_lib) => Err(Error::ComposerError(format!(
+                    "Instance {} already exists.",
+                    node.key
+                ))),
+            },
             _ => unreachable!(),
         }
     }
@@ -512,3 +516,44 @@ impl<'i> TryFrom<Pair<'i, Rule>> for Edge {
         })
     }
 }
+
+#[cfg(test)]
+pub mod tests {
+    use std::convert::TryFrom;
+
+    use crate::design::StreamletHandle;
+    use crate::{Name, Result};
+    use super::*;
+    use crate::design::composer::tests::composition_test_proj;
+
+
+    pub fn impl_parser_test() -> Result<Project> {
+        let mut prj = composition_test_proj()?;
+        let top_impl = include_str!("../../../../tests/implementations/composition_example.impl");
+
+        let mut builder = ImplParser::try_new(&mut prj, &top_impl)?;
+        builder.transform_body().unwrap();
+        let imp = builder.finish();
+        prj.add_streamlet_impl(
+            StreamletHandle {
+                lib: Name::try_from("compositions")?,
+                streamlet: Name::try_from("Top_level")?,
+            },
+            imp,
+        )?;
+        Ok(prj)
+    }
+
+    #[test]
+    fn parser() -> Result<()> {
+        let mut prj = composition_test_proj()?;
+
+        let top_impl = include_str!("../../../../tests/implementations/composition_example.impl");
+
+        let mut builder = ImplParser::try_new(&mut prj, &top_impl).unwrap();
+        builder.transform_body().unwrap();
+        let _imp = builder.finish();
+        Ok(())
+    }
+}
+

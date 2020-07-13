@@ -250,10 +250,10 @@ impl Split for Port {
 mod test {
     use std::fs;
 
-    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
     use crate::Reversed;
 
     use super::*;
+    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
 
     #[test]
     fn split_primitive() {

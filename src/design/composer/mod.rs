@@ -4,7 +4,7 @@ use std::rc::Rc;
 use crate::design::implementation::Implementation;
 use crate::design::{ComponentKey, IFKey, Interface, Mode, Project, Streamlet};
 use crate::generator::dot::DotStyle;
-use crate::{Result};
+use crate::Result;
 
 pub mod impl_graph;
 
@@ -52,5 +52,76 @@ pub trait GenericComponent {
     }
     fn connect_action(&self) -> Result<()> {
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::convert::TryFrom;
+    use std::fs;
+    use crate::design::composer::impl_graph::parser::ImplParser;
+    use crate::design::*;
+    use crate::generator::chisel::ChiselBackEnd;
+    use crate::generator::dot::DotBackend;
+    use crate::generator::GenerateProject;
+
+    use crate::parser::nom::interface;
+    use crate::{Name, Result, UniqueKeyBuilder};
+
+    pub(crate) fn composition_test_proj() -> Result<Project> {
+        let key1 = LibKey::try_new("primitives").unwrap();
+        let key2 = LibKey::try_new("compositions").unwrap();
+        let mut lib = Library::new(key1.clone());
+
+        let mut lib_comp = Library::new(key2.clone());
+
+        let _top = lib_comp
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("Top_level").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        interface("in: in Stream<Bits<32>, d=1>").unwrap().1,
+                        interface("in2: in Stream<Bits<1>, d=0>").unwrap().1,
+                        interface("out: out Stream<Bits<32>, d=0>").unwrap().1,
+                    ]),
+                    None,
+                )
+                    .unwrap(),
+            )
+            .unwrap();
+
+        let _map = lib
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("Magic").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        interface("in: in Stream<Bits<32>, d=1>").unwrap().1,
+                        interface("out: out Stream<Bits<32>, d=1>").unwrap().1,
+                    ]),
+                    None,
+                )
+                    .unwrap(),
+            )
+            .unwrap();
+
+        let _test_op = lib
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("test_op").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        interface("in: in Stream<Bits<32>, d=0>").unwrap().1,
+                        interface("out: out Stream<Bits<32>, d=0>").unwrap().1,
+                    ]),
+                    None,
+                )
+                    .unwrap(),
+            )
+            .unwrap();
+
+        let mut prj = Project::new(Name::try_new("TestProj").unwrap());
+        prj.add_lib(lib)?;
+        prj.add_lib(lib_comp)?;
+        Ok(prj)
     }
 }

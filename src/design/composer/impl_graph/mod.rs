@@ -140,5 +140,3 @@ impl PartialEq for ImplementationGraph {
         self.streamlet.streamlet() == other.streamlet_key()
     }
 }
-
-

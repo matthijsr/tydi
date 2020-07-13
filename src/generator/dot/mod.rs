@@ -364,3 +364,32 @@ impl GenerateProject for DotBackend {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::convert::TryFrom;
+    use std::fs;
+    use crate::design::composer::impl_graph::parser::ImplParser;
+    use crate::design::*;
+    use crate::generator::chisel::ChiselBackEnd;
+    use crate::generator::dot::DotBackend;
+    use crate::generator::GenerateProject;
+
+    use crate::parser::nom::interface;
+    use crate::{Name, Result, UniqueKeyBuilder};
+    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
+
+
+    #[test]
+    fn dot_impl() {
+        let tmpdir = tempfile::tempdir().unwrap();
+
+        let prj = impl_parser_test().unwrap();
+        //let prj = pow2_example().unwrap();
+        let dot = DotBackend {};
+        // TODO: implement actual test.
+
+        assert!(dot.generate(&prj, tmpdir).is_ok());
+    }
+}

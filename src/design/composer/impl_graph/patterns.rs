@@ -349,8 +349,8 @@ mod tests {
 
     use crate::design::StreamletHandle;
     use crate::{Name, Result};
-
     use super::*;
+    use crate::design::composer::tests::composition_test_proj;
 
     #[test]
     fn test_map() -> Result<()> {
