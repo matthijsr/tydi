@@ -206,11 +206,11 @@ mod tests {
 
         //let prj = impl_parser_test().unwrap();
         let prj = impl_parser_test().unwrap();
-        let vhdl = ChiselBackEnd::default();
+        let chisel = ChiselBackEnd::default();
         // TODO: implement actual test.
 
         let _folder = fs::create_dir_all("output").unwrap();
 
-        assert!(vhdl.generate(&prj, "output").is_ok());
+        assert!(chisel.generate(&prj, "output").is_ok());
     }
 }
