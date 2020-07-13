@@ -7,6 +7,9 @@ use crate::generator::dot::DotStyle;
 use crate::Result;
 
 pub mod impl_graph;
+pub mod misc;
+pub mod parser;
+pub mod patterns;
 
 /// Traits for components in the implementation graph
 pub trait GenHDL {
@@ -60,7 +63,7 @@ mod tests {
     use super::*;
     use std::convert::TryFrom;
     use std::fs;
-    use crate::design::composer::impl_graph::parser::ImplParser;
+    use crate::design::implementation::composer::parser::ImplParser;
     use crate::design::*;
     use crate::generator::chisel::ChiselBackEnd;
     use crate::generator::dot::DotBackend;

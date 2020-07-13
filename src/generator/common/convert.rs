@@ -4,7 +4,7 @@
 
 use std::borrow::Borrow;
 
-use crate::design::composer::GenericComponent;
+use crate::design::implementation::composer::GenericComponent;
 use crate::design::{Interface, Streamlet};
 use crate::generator::common::{Component, Mode, Package, Port, Project, Record, Type};
 use crate::logical::{Group, LogicalType, Stream, Union};

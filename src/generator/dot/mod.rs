@@ -3,8 +3,8 @@ use std::ops::Deref;
 use std::path::Path;
 
 use crate::cat;
-use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
-use crate::design::composer::{GenDot, GenericComponent};
+use crate::design::implementation::composer::impl_graph::{Edge, ImplementationGraph, Node};
+use crate::design::implementation::composer::{GenDot, GenericComponent};
 use crate::design::implementation::Implementation;
 use crate::design::{Interface, Library, Mode, Project, THIS_KEY};
 use crate::generator::GenerateProject;
@@ -370,7 +370,7 @@ mod tests {
     use super::*;
     use std::convert::TryFrom;
     use std::fs;
-    use crate::design::composer::impl_graph::parser::ImplParser;
+    use crate::design::implementation::composer::parser::ImplParser;
     use crate::design::*;
     use crate::generator::chisel::ChiselBackEnd;
     use crate::generator::dot::DotBackend;
@@ -378,7 +378,7 @@ mod tests {
 
     use crate::parser::nom::interface;
     use crate::{Name, Result, UniqueKeyBuilder};
-    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
+    use crate::design::implementation::composer::parser::tests::impl_parser_test;
 
 
     #[test]
@@ -392,4 +392,6 @@ mod tests {
 
         assert!(dot.generate(&prj, tmpdir).is_ok());
     }
+
+
 }

@@ -1,26 +1,25 @@
 use std::collections::HashMap;
 use std::convert::{TryFrom, TryInto};
+use std::ops::Deref;
 use std::rc::Rc;
 
-use pest::iterators::Pair;
 use pest::{Parser, RuleType};
+use pest::iterators::Pair;
 
-use crate::design::composer::impl_graph::patterns::{FilterStream, MapStream, ReduceStream};
-use crate::design::composer::impl_graph::{Edge, ImplementationGraph, Node};
-use crate::design::composer::GenericComponent;
+use crate::{Error, Name, Result, Reversed, UniqueKeyBuilder};
+use crate::design::{
+    GEN_LIB, IFKey, LibKey, Library, Mode, NodeIFHandle, NodeKey, Project, Streamlet,
+    StreamletHandle, StreamletKey,
+};
+use crate::design::implementation::composer::impl_graph::{Edge, ImplementationGraph, Node};
+use crate::design::implementation::composer::GenericComponent;
+use crate::design::implementation::composer::patterns::{FilterStream, MapStream, ReduceStream};
 use crate::design::implementation::Implementation;
 use crate::design::implementation::Implementation::Structural;
-use crate::design::{
-    IFKey, LibKey, Library, Mode, NodeIFHandle, NodeKey, Project, Streamlet, StreamletHandle,
-    StreamletKey, GEN_LIB,
-};
 use crate::error::LineErr;
-use crate::{Error, Name, Result, Reversed, UniqueKeyBuilder};
-
-use std::ops::Deref;
 
 #[derive(Parser)]
-#[grammar = "design/composer/impl_graph/impl.pest"]
+#[grammar = "design/implementation/composer/impl.pest"]
 pub struct ImplDef;
 
 pub trait LineNum {
@@ -397,31 +396,31 @@ impl<'i> ImplParser<'i> {
                 if src_if.mode() != Mode::Out {
                     Err(Error::ComposerError(format!(
                         "Interface {:?} is not an output.",
-                        edge.clone().source
+                        edge.clone().source()
                     )))
                 } else if dst_if.mode() != Mode::In {
                     Err(Error::ComposerError(format!(
                         "Interface {:?} is not an input.",
-                        edge.clone().source
+                        edge.clone().source()
                     )))
-                } else if s.get_edge(edge.clone().source).is_ok() {
+                } else if s.get_edge(edge.clone().source()).is_ok() {
                     Err(Error::ComposerError(format!(
                         "Cannot connect {:?} to {:?}, source is already connected.",
-                        edge.clone().sink,
-                        edge.clone().source
+                        edge.clone().sink(),
+                        edge.clone().source()
                     )))
-                } else if s.get_edge(edge.clone().sink).is_ok() {
+                } else if s.get_edge(edge.clone().sink()).is_ok() {
                     Err(Error::ComposerError(format!(
                         "Cannot connect {:?} to {:?}, sink is already connected.",
-                        edge.clone().sink,
-                        edge.clone().source
+                        edge.clone().sink(),
+                        edge.clone().source()
                     )))
                 } else if src_if.typ() != dst_if.typ() {
                     Err(Error::ComposerError(format!(
                         "Type incompatibility between sink {:?} : {:?}, and source {:?} : {:?}.",
-                        edge.clone().sink,
+                        edge.clone().sink(),
                         dst_type,
-                        edge.clone().source,
+                        edge.clone().source(),
                         src_type
                     )))
                 } else {
@@ -440,7 +439,7 @@ impl<'i> ImplParser<'i> {
                 None => Ok(()),
                 Some(_lib) => Err(Error::ComposerError(format!(
                     "Instance {} already exists.",
-                    node.key
+                    node.key()
                 ))),
             },
             _ => unreachable!(),
@@ -521,11 +520,11 @@ impl<'i> TryFrom<Pair<'i, Rule>> for Edge {
 pub mod tests {
     use std::convert::TryFrom;
 
-    use crate::design::StreamletHandle;
     use crate::{Name, Result};
-    use super::*;
-    use crate::design::composer::tests::composition_test_proj;
+    use crate::design::implementation::composer::tests::composition_test_proj;
+    use crate::design::StreamletHandle;
 
+    use super::*;
 
     pub fn impl_parser_test() -> Result<Project> {
         let mut prj = composition_test_proj()?;

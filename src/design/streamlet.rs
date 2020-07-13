@@ -9,7 +9,7 @@ use std::fmt::Debug;
 use std::rc::Rc;
 use std::str::FromStr;
 
-use crate::design::composer::GenericComponent;
+use crate::design::implementation::composer::GenericComponent;
 use crate::design::implementation::Implementation;
 use crate::design::{ComponentKey, IFKey};
 use crate::logical::LogicalType;

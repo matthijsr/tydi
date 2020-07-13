@@ -1,9 +1,11 @@
 use std::fmt::{Debug, Formatter};
 
-use crate::design::composer::impl_graph::ImplementationGraph;
+use crate::design::implementation::composer::impl_graph::ImplementationGraph;
 use crate::design::StreamletHandle;
 use crate::Name;
 use crate::Result;
+
+pub mod composer;
 
 ///Trait for general implementation backends
 pub trait ImplementationBackend {

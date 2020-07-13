@@ -253,7 +253,7 @@ mod test {
     use crate::Reversed;
 
     use super::*;
-    use crate::design::composer::impl_graph::parser::tests::impl_parser_test;
+    use crate::design::implementation::composer::parser::tests::impl_parser_test;
 
     #[test]
     fn split_primitive() {

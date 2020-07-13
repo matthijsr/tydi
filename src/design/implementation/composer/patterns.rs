@@ -1,7 +1,7 @@
 use std::borrow::Borrow;
 use std::convert::TryFrom;
 
-use crate::design::composer::GenericComponent;
+use crate::design::implementation::composer::GenericComponent;
 use crate::design::implementation::{Implementation, ImplementationBackend};
 use crate::design::{IFKey, Interface, Mode, Project, Streamlet, StreamletHandle, StreamletKey};
 use crate::logical::{Direction, LogicalType, Stream, Synchronicity};
@@ -350,7 +350,7 @@ mod tests {
     use crate::design::StreamletHandle;
     use crate::{Name, Result};
     use super::*;
-    use crate::design::composer::tests::composition_test_proj;
+    use crate::design::implementation::composer::tests::composition_test_proj;
 
     #[test]
     fn test_map() -> Result<()> {

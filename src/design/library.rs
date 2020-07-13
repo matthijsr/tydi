@@ -8,7 +8,7 @@ use std::path::Path;
 
 use log::debug;
 
-use crate::design::composer::GenericComponent;
+use crate::design::implementation::composer::GenericComponent;
 use crate::design::param::ParameterStore;
 use crate::design::{LibKey, ParamStoreKey, Streamlet, StreamletHandle, StreamletKey};
 use crate::error::Error::{FileIOError, ParsingError};

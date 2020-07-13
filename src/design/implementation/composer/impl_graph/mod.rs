@@ -6,18 +6,16 @@ use std::rc::Rc;
 
 use nom::lib::std::fmt::Formatter;
 
-use crate::design::composer::GenericComponent;
+use crate::design::implementation::composer::GenericComponent;
 use crate::design::{IFKey, Interface, NodeIFHandle, NodeKey, StreamletHandle, StreamletKey};
 use crate::{Error, Result};
 
-pub mod misc;
-pub mod parser;
-pub mod patterns;
+
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Edge {
-    source: NodeIFHandle,
-    sink: NodeIFHandle,
+    pub(crate) source: NodeIFHandle,
+    pub(crate) sink: NodeIFHandle,
 }
 
 impl Edge {
@@ -31,8 +29,8 @@ impl Edge {
 
 #[derive(Clone)]
 pub struct Node {
-    key: NodeKey,
-    item: Rc<dyn GenericComponent>,
+    pub(crate) key: NodeKey,
+    pub(crate) item: Rc<dyn GenericComponent>,
 }
 
 impl Node {
@@ -83,9 +81,9 @@ impl Node {
 
 #[derive(Clone)]
 pub struct ImplementationGraph {
-    streamlet: StreamletHandle,
-    edges: Vec<Edge>,
-    nodes: HashMap<NodeKey, Node>,
+    pub(crate) streamlet: StreamletHandle,
+    pub(crate) edges: Vec<Edge>,
+    pub(crate) nodes: HashMap<NodeKey, Node>,
 }
 
 impl ImplementationGraph {

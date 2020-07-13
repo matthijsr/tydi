@@ -7,7 +7,6 @@ pub use streamlet::{Interface, Mode, Streamlet};
 
 use crate::Name;
 
-pub mod composer;
 pub mod implementation;
 pub mod library;
 pub mod param;
