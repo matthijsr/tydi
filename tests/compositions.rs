@@ -29,7 +29,7 @@ mod tests {
                     StreamletKey::try_from("Top_level").unwrap(),
                     UniqueKeyBuilder::new().with_items(vec![
                         interface("numbers: in Stream<Bits<32>, d=1>").unwrap().1,
-                        interface("strings: in Stream<Bits<8>, d=1>").unwrap().1,
+                        interface("chars: in Stream<Bits<8>, d=1>").unwrap().1,
                         interface("out: out Stream<Bits<32>, d=0>").unwrap().1,
                     ]),
                     None,
@@ -121,5 +121,44 @@ mod tests {
         let _folder = fs::create_dir_all("output").unwrap();
 
         assert!(chisel.generate(&prj, "output").is_ok());
+    }
+
+    pub fn sandbox_prj() -> Result<Project> {
+        let key1 = LibKey::try_new("primitives").unwrap();
+        let key2 = LibKey::try_new("compositions").unwrap();
+        let mut lib = Library::new(key1.clone());
+
+
+        let _test_op = lib
+            .add_streamlet(
+                Streamlet::from_builder(
+                    StreamletKey::try_from("Sum").unwrap(),
+                    UniqueKeyBuilder::new().with_items(vec![
+                        interface("in: in Stream<Group<size: Bits<64>, char: Stream<Bits<8>, s = Flatten>>, d=0>").unwrap().1,
+                        interface("out: out Stream<Bits<64>, d=0>").unwrap().1,
+                    ]),
+                    None,
+                )
+                    .unwrap(),
+            )
+            .unwrap();
+
+        let mut prj = Project::new(Name::try_new("TestProj").unwrap());
+        prj.add_lib(lib)?;
+
+        Ok(prj)
+    }
+
+    #[test]
+    fn sandbox_vhdl() {
+        let _tmpdir = tempfile::tempdir().unwrap();
+
+        //let prj = impl_parser_test().unwrap();
+        let prj = sandbox_prj().unwrap();
+        let vhdl = VHDLBackEnd::default();
+
+        let _folder = fs::create_dir_all("output").unwrap();
+
+        assert!(vhdl.generate(&prj, "output").is_ok());
     }
 }
