@@ -23,8 +23,8 @@ impl ChiselIdentifier for ChiselMode {
         match self {
             ChiselMode::In => Ok("Input".to_string()),
             ChiselMode::Out => Ok("Output".to_string()),
-            ChiselMode::Forward => Ok("".to_string()),
-            ChiselMode::Reverse => Ok("Flipped".to_string()),
+            ChiselMode::Forward => Ok("Flipped".to_string()),
+            ChiselMode::Reverse => Ok("".to_string()),
         }
     }
 }
