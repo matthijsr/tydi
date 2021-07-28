@@ -581,14 +581,11 @@ impl Signal {
         origin: Origin,
         width: Option<NonNegative>,
     ) -> Option<Signal> {
-        match width {
-            None => None,
-            Some(w) => Some(Signal {
-                name: name.into(),
-                origin,
-                width: Width::Vector(w),
-            }),
-        }
+        width.map(|w| Signal {
+            name: name.into(),
+            origin,
+            width: Width::Vector(w),
+        })
     }
 
     /// Returns a vector-style signal.
@@ -781,7 +778,6 @@ mod tests {
         assert!(c31 < c311);
         assert!(c311 < c32);
         assert!(c32 < c4);
-        assert_eq!(c4, c4);
         assert_eq!(c4, c400);
         assert_eq!(c400, c4);
         assert!(!(c400 > c4));

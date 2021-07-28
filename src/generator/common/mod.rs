@@ -152,7 +152,7 @@ impl Record {
     /// Append a string to the name of this record, and any nested records.
     pub fn append_name_nested(&self, with: impl Into<String>) -> Self {
         let p: String = with.into();
-        let mut result = Record::new_empty(cat!(self.identifier, p.clone()));
+        let mut result = Record::new_empty(cat!(self.identifier, p));
         for f in self.fields() {
             result.insert(match f.typ() {
                 Type::Record(r) => Field::new(
@@ -445,7 +445,7 @@ pub(crate) mod test {
             Type::record(
                 n.clone(),
                 vec![
-                    Field::new("a", rec(cat!(n.clone(), "a")), false),
+                    Field::new("a", rec(cat!(n, "a")), false),
                     Field::new("b", rec_rev(cat!(n, "b")), false),
                 ],
             )
@@ -456,7 +456,7 @@ pub(crate) mod test {
             Type::record(
                 n.clone(),
                 vec![
-                    Field::new("a", rec(cat!(n.clone(), "a")), false),
+                    Field::new("a", rec(cat!(n, "a")), false),
                     Field::new("b", rec(cat!(n, "b")), false),
                 ],
             )
@@ -480,10 +480,10 @@ pub(crate) mod test {
         let flat = records::rec("test").flatten(vec![], false);
         assert_eq!(flat[0].0, vec!["c".to_string()]);
         assert_eq!(flat[0].1, Type::bitvec(42));
-        assert_eq!(flat[0].2, false);
+        assert!(!flat[0].2);
         assert_eq!(flat[1].0, vec!["d".to_string()]);
         assert_eq!(flat[1].1, Type::bitvec(1337));
-        assert_eq!(flat[1].2, false);
+        assert!(!flat[1].2);
     }
 
     #[test]
@@ -493,19 +493,19 @@ pub(crate) mod test {
         assert_eq!(flat[0].0[0], "a".to_string());
         assert_eq!(flat[0].0[1], "c".to_string());
         assert_eq!(flat[0].1, Type::bitvec(42));
-        assert_eq!(flat[0].2, false);
+        assert!(!flat[0].2);
         assert_eq!(flat[1].0[0], "a".to_string());
         assert_eq!(flat[1].0[1], "d".to_string());
         assert_eq!(flat[1].1, Type::bitvec(1337));
-        assert_eq!(flat[1].2, false);
+        assert!(!flat[1].2);
         assert_eq!(flat[2].0[0], "b".to_string());
         assert_eq!(flat[2].0[1], "c".to_string());
         assert_eq!(flat[2].1, Type::bitvec(42));
-        assert_eq!(flat[2].2, false);
+        assert!(!flat[2].2);
         assert_eq!(flat[3].0[0], "b".to_string());
         assert_eq!(flat[3].0[1], "d".to_string());
         assert_eq!(flat[3].1, Type::bitvec(1337));
-        assert_eq!(flat[3].2, false);
+        assert!(!flat[3].2);
     }
 
     #[test]
