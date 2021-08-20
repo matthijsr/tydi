@@ -55,7 +55,7 @@ pub enum ArchitectureDeclaration<'a> {
 }
 
 /// The kind of object declared (signal, variable, constant, ports)
-#[derive(Debug, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ObjectKind {
     Signal,
     Variable,
@@ -79,11 +79,25 @@ impl fmt::Display for ObjectKind {
 }
 
 /// The direction of the object declared, if relevant (ports)
-#[derive(Debug, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ObjectMode {
     None,
     In,
     Out,
+}
+
+impl fmt::Display for ObjectMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                ObjectMode::None => "None",
+                ObjectMode::In => "In",
+                ObjectMode::Out => "Out",
+            }
+        )
+    }
 }
 
 impl From<Mode> for ObjectMode {
@@ -214,8 +228,17 @@ impl ObjectDeclaration {
         &self.default
     }
 
-    pub fn mode(&self) -> &ObjectMode {
-        &self.mode
+    pub fn mode(&self) -> ObjectMode {
+        self.mode.clone()
+    }
+
+    pub fn set_mode(&mut self, mode: ObjectMode) -> Result<()> {
+        if self.mode() != mode && self.mode() != ObjectMode::None {
+            Err(Error::InvalidArgument(format!("Cannot set mode of object declared as {} to {}, already has mode {}", self.identifier(), mode, self.mode())))
+        } else {
+            self.mode = mode;
+            Ok(())
+        }
     }
 }
 

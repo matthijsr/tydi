@@ -17,7 +17,10 @@ use crate::{
     Error, Identify, Name, Result,
 };
 
-use super::assignment::{Assignment, AssignmentKind, FieldSelection, RangeConstraint};
+use super::{
+    assignment::{Assignment, AssignmentKind, FieldSelection, RangeConstraint},
+    declaration::ObjectMode,
+};
 
 /// Types of VHDL objects, possibly referring to fields
 #[derive(Debug, Clone)]
@@ -174,24 +177,38 @@ impl ObjectType {
         }
     }
 
-    pub fn can_assign(&self, assignment: &Assignment) -> Result<()> {
+    /// Checks whether this object type can be assigned with the given mode, returns the updated mode if none was specified
+    pub fn can_assign(&self, assignment: &mut Assignment, mode: ObjectMode) -> Result<ObjectMode> {
         let mut to_object = self.clone();
         for field in assignment.to_field() {
             to_object = to_object.get_field(field)?;
         }
         match assignment.kind() {
-            AssignmentKind::Object(object) => to_object.can_assign_type(&object.typ()?),
+            AssignmentKind::Object(object) => {
+                to_object.can_assign_type(&object.typ()?)?;
+                if mode != object.object().mode() {
+                    if mode == ObjectMode::None {
+                        Ok(object.object().mode())
+                    } else {
+                        object.set_mode(mode)?;
+                        Ok(mode)
+                    }
+                } else {
+                    Ok(mode)
+                }
+            }
             AssignmentKind::Direct(direct) => match direct {
                 DirectAssignment::Value(value) => match value {
                     ValueAssignment::Bit(_) => match to_object {
-                        ObjectType::Bit => Ok(()),
+                        ObjectType::Bit => Ok(mode),
                         ObjectType::Array(_) | ObjectType::Record(_) => Err(Error::InvalidTarget(
                             format!("Cannot assign Bit to {}", to_object),
                         )),
                     },
                     ValueAssignment::BitVec(bitvec) => match to_object {
                         ObjectType::Array(array) if array.is_bitvector() => {
-                            bitvec.validate_width(array.width())
+                            bitvec.validate_width(array.width())?;
+                            Ok(mode)
                         }
                         _ => Err(Error::InvalidTarget(format!(
                             "Cannot assign Bit Vector to {}",
@@ -202,11 +219,20 @@ impl ObjectType {
                 DirectAssignment::FullRecord(record) => {
                     if let ObjectType::Record(to_record) = &to_object {
                         if to_record.fields().len() == record.len() {
+                            let mut field_mode = mode.clone();
                             for (field, value) in record {
                                 let to_field = to_object.get_field(&FieldSelection::name(field))?;
-                                to_field.can_assign(&Assignment::from(value.clone()))?;
+                                let assign_mode =
+                                    to_field.can_assign(&Assignment::from(value.clone()), mode)?;
+                                if field_mode != assign_mode {
+                                    if field_mode == ObjectMode::None {
+                                        field_mode = assign_mode;
+                                    } else if assign_mode != ObjectMode::None {
+                                        return Err(Error::InvalidTarget(format!("Cannot assign object with mode {} to field with mode {}", assign_mode, field_mode)));
+                                    }
+                                }
                             }
-                            Ok(())
+                            Ok(field_mode)
                         } else {
                             Err(Error::InvalidArgument(format!("Attempted full record assignment. Number of fields do not match. Record has {} fields, assignment has {} fields", to_record.fields().len(), record.len())))
                         }

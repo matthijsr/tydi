@@ -9,7 +9,7 @@ use crate::generator::common::Type;
 use crate::physical::Width;
 use crate::{Document, Error, Name, Result};
 
-use super::declaration::ObjectDeclaration;
+use super::declaration::{ObjectDeclaration, ObjectMode};
 use super::object::ObjectType;
 
 use self::bitvec::BitVecValue;
@@ -21,7 +21,7 @@ pub mod bitvec;
 pub mod declare;
 
 pub trait Assign {
-    fn assign(&self, assignment: &(impl Into<Assignment> + Clone)) -> Result<AssignDeclaration>;
+    fn assign(&mut self, assignment: &(impl Into<Assignment> + Clone)) -> Result<AssignDeclaration>;
 }
 
 /// Describing the declaration of an assignment
@@ -227,6 +227,10 @@ impl fmt::Display for ObjectAssignment {
 }
 
 impl ObjectAssignment {
+    pub fn set_mode(mut self, mode: ObjectMode) -> Result<()> {
+        self.object.set_mode(mode)
+    }
+
     /// Returns a reference to the object being assigned from
     pub fn object(&self) -> &ObjectDeclaration {
         &self.object
@@ -262,7 +266,7 @@ impl ObjectAssignment {
 }
 
 /// Possible values which can be assigned to std_logic
-#[derive(Debug, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum StdLogicValue {
     /// Uninitialized, 'U'
     U,
