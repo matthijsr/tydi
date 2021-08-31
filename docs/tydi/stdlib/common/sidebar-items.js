@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["architecture",""],["entity",""]]});

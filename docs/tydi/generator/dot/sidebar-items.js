@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Color",""],["Colors",""],["DotBackend","A configurable VHDL back-end entry point."],["DotStyle",""]]});

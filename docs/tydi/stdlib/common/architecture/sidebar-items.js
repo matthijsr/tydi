@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["assignment",""],["declaration",""],["impls",""],["object",""],["statement",""]],"struct":[["Architecture","An architecture"]],"trait":[["ArchitectureDeclare",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["FlatAssignment","This trait enables connecting complex objects and flat (bit/bit vector) objects by selecting to individual bit/bit vector fields across multiple assignments."],["FlatLength",""]]});

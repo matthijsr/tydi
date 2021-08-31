@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/generator/common/convert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>convert.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="https://abs-tudelft.github.io/tydi/tydi_logo.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../tydi/index.html'><div class='logo-container'><img src='https://abs-tudelft.github.io/tydi/tydi_logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/generator/common/convert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>convert.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="https://abs-tudelft.github.io/tydi/tydi_logo.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../tydi/index.html'><div class='logo-container'><img src='https://abs-tudelft.github.io/tydi/tydi_logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -644,17 +644,87 @@
 <span id="644">644</span>
 <span id="645">645</span>
 <span id="646">646</span>
-</pre><div class="example-wrap"><pre class="rust ">
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+</pre><pre class="rust">
 <span class="doccomment">//! Generator methods and implementations for Tydi types.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The generator module is enabled by the `generator` feature flag.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">design</span>::{<span class="ident">Interface</span>, <span class="ident">Streamlet</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">generator</span>::<span class="ident">common</span>::{<span class="ident">Component</span>, <span class="ident">Mode</span>, <span class="ident">Package</span>, <span class="ident">Port</span>, <span class="ident">Project</span>, <span class="ident">Record</span>, <span class="ident">Type</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">logical</span>::{<span class="ident">Group</span>, <span class="ident">LogicalType</span>, <span class="ident">Stream</span>, <span class="ident">Union</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">physical</span>::{<span class="ident">Origin</span>, <span class="ident">Signal</span>, <span class="ident">Width</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">traits</span>::<span class="ident">Identify</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cat</span>, <span class="ident">Document</span>};
+<span class="kw">use</span> <span class="ident">std::borrow::Borrow</span>;
+<span class="kw">use</span> <span class="ident">std::cell::Ref</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::design::implementation::composer::GenericComponent</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::design</span>::{<span class="ident">Interface</span>, <span class="ident">Streamlet</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::error</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::generator::common</span>::{<span class="ident">Component</span>, <span class="ident">Mode</span>, <span class="ident">Package</span>, <span class="ident">Port</span>, <span class="ident">Project</span>, <span class="ident">Record</span>, <span class="ident">Type</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::logical</span>::{<span class="ident">Group</span>, <span class="ident">LogicalType</span>, <span class="ident">Stream</span>, <span class="ident">Union</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::physical</span>::{<span class="ident">Origin</span>, <span class="ident">Signal</span>, <span class="ident">Width</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::traits::Identify</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cat</span>, <span class="ident">Document</span>, <span class="ident">NonZeroReal</span>};
 
 <span class="comment">// Generator-global constants:</span>
 
@@ -681,7 +751,7 @@
         <span class="ident">_port_name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">_port_type_prefix</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&gt;</span> {
-        <span class="ident">Vec</span>::<span class="ident">new</span>()
+        <span class="ident">Vec::new</span>()
     }
 }
 
@@ -706,16 +776,24 @@
     <span class="kw">fn</span> <span class="ident">fancy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Project</span>;
 }
 
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Multilane</span> {
+    <span class="kw">fn</span> <span class="ident">with_throughput</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">identity</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">throughput</span>: <span class="ident">NonZeroReal</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>;
+}
+
 <span class="kw">impl</span> <span class="ident">Typify</span> <span class="kw">for</span> <span class="ident">LogicalType</span> {
     <span class="kw">fn</span> <span class="ident">canonical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Signal</span><span class="op">&gt;</span> {
         <span class="comment">// This implementation for LogicalType assumes the LogicalType has already been</span>
         <span class="comment">// flattened through synthesize.</span>
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">LogicalType</span>::<span class="ident">Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">LogicalType</span>::<span class="ident">Bits</span>(<span class="ident">width</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">Signal</span>::<span class="ident">vec</span>(<span class="ident">prefix</span>.<span class="ident">into</span>(), <span class="ident">Origin</span>::<span class="ident">Source</span>, <span class="kw-2">*</span><span class="ident">width</span>)],
-            <span class="ident">LogicalType</span>::<span class="ident">Group</span>(<span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>.<span class="ident">canonical</span>(<span class="ident">prefix</span>),
-            <span class="ident">LogicalType</span>::<span class="ident">Stream</span>(<span class="ident">stream</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">canonical</span>(<span class="ident">prefix</span>),
-            <span class="ident">LogicalType</span>::<span class="ident">Union</span>(<span class="ident">union</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">union</span>.<span class="ident">canonical</span>(<span class="ident">prefix</span>),
+            <span class="ident">LogicalType::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Vec::new</span>(),
+            <span class="ident">LogicalType::Bits</span>(<span class="ident">width</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">Signal::vec</span>(<span class="ident">prefix</span>.<span class="ident">into</span>(), <span class="ident">Origin::Source</span>, <span class="kw-2">*</span><span class="ident">width</span>)],
+            <span class="ident">LogicalType::Group</span>(<span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>.<span class="ident">canonical</span>(<span class="ident">prefix</span>),
+            <span class="ident">LogicalType::Stream</span>(<span class="ident">stream</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">canonical</span>(<span class="ident">prefix</span>),
+            <span class="ident">LogicalType::Union</span>(<span class="ident">union</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">union</span>.<span class="ident">canonical</span>(<span class="ident">prefix</span>),
         }
     }
 
@@ -723,11 +801,11 @@
         <span class="comment">// This implementation for LogicalType assumes the LogicalType has already been</span>
         <span class="comment">// flattened through synthesize.</span>
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">LogicalType</span>::<span class="ident">Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">LogicalType</span>::<span class="ident">Bits</span>(<span class="ident">width</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Type</span>::<span class="ident">bitvec</span>(<span class="ident">width</span>.<span class="ident">get</span>())),
-            <span class="ident">LogicalType</span>::<span class="ident">Group</span>(<span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>.<span class="ident">fancy</span>(<span class="ident">prefix</span>),
-            <span class="ident">LogicalType</span>::<span class="ident">Stream</span>(<span class="ident">stream</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">fancy</span>(<span class="ident">prefix</span>),
-            <span class="ident">LogicalType</span>::<span class="ident">Union</span>(<span class="ident">union</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">union</span>.<span class="ident">fancy</span>(<span class="ident">prefix</span>),
+            <span class="ident">LogicalType::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">LogicalType::Bits</span>(<span class="ident">width</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Type::bitvec</span>(<span class="ident">width</span>.<span class="ident">get</span>())),
+            <span class="ident">LogicalType::Group</span>(<span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>.<span class="ident">fancy</span>(<span class="ident">prefix</span>),
+            <span class="ident">LogicalType::Stream</span>(<span class="ident">stream</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">fancy</span>(<span class="ident">prefix</span>),
+            <span class="ident">LogicalType::Union</span>(<span class="ident">union</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">union</span>.<span class="ident">fancy</span>(<span class="ident">prefix</span>),
         }
     }
 }
@@ -735,9 +813,9 @@
 <span class="kw">impl</span> <span class="ident">Typify</span> <span class="kw">for</span> <span class="ident">Group</span> {
     <span class="kw">fn</span> <span class="ident">canonical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Signal</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">for</span> (<span class="ident">field_name</span>, <span class="ident">field_logical</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">field_result</span> <span class="op">=</span> <span class="ident">field_logical</span>.<span class="ident">canonical</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>));
+            <span class="kw">let</span> <span class="ident">field_result</span> <span class="op">=</span> <span class="ident">field_logical</span>.<span class="ident">canonical</span>(<span class="macro">cat!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>));
             <span class="ident">result</span>.<span class="ident">extend</span>(<span class="ident">field_result</span>);
         }
         <span class="ident">result</span>
@@ -745,29 +823,25 @@
 
     <span class="kw">fn</span> <span class="ident">fancy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rec</span> <span class="op">=</span> <span class="ident">Record</span>::<span class="ident">new_empty</span>(<span class="ident">n</span>.<span class="ident">clone</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rec</span> <span class="op">=</span> <span class="ident">Record::new_empty</span>(<span class="ident">n</span>.<span class="ident">clone</span>());
         <span class="kw">for</span> (<span class="ident">field_name</span>, <span class="ident">field_logical</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field_common_type</span>) <span class="op">=</span> <span class="ident">field_logical</span>.<span class="ident">fancy</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>)) {
-                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="ident">field_name</span>.<span class="ident">to_string</span>(), <span class="ident">field_common_type</span>, <span class="bool-val">false</span>)
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field_common_type</span>) <span class="op">=</span> <span class="ident">field_logical</span>.<span class="ident">fancy</span>(<span class="macro">cat!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>)) {
+                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="ident">field_name</span>.<span class="ident">to_string</span>(), <span class="ident">field_common_type</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>)
             }
         }
-        <span class="prelude-val">Some</span>(<span class="ident">Type</span>::<span class="ident">Record</span>(<span class="ident">rec</span>))
+        <span class="prelude-val">Some</span>(<span class="ident">Type::Record</span>(<span class="ident">rec</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Typify</span> <span class="kw">for</span> <span class="ident">Union</span> {
     <span class="kw">fn</span> <span class="ident">canonical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Signal</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">tag_name</span>, <span class="ident">tag_bc</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">tag</span>() {
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">Signal</span>::<span class="ident">vec</span>(
-                <span class="macro">cat</span><span class="macro">!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">tag_name</span>),
-                <span class="ident">Origin</span>::<span class="ident">Source</span>,
-                <span class="ident">tag_bc</span>,
-            ));
+            <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">Signal::vec</span>(<span class="macro">cat!</span>(<span class="ident">n</span>, <span class="ident">tag_name</span>), <span class="ident">Origin::Source</span>, <span class="ident">tag_bc</span>));
         }
         <span class="kw">for</span> (<span class="ident">field_name</span>, <span class="ident">field_logical</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">field_result</span> <span class="op">=</span> <span class="ident">field_logical</span>.<span class="ident">canonical</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>));
+            <span class="kw">let</span> <span class="ident">field_result</span> <span class="op">=</span> <span class="ident">field_logical</span>.<span class="ident">canonical</span>(<span class="macro">cat!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>));
             <span class="ident">result</span>.<span class="ident">extend</span>(<span class="ident">field_result</span>);
         }
         <span class="ident">result</span>
@@ -775,16 +849,25 @@
 
     <span class="kw">fn</span> <span class="ident">fancy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rec</span> <span class="op">=</span> <span class="ident">Record</span>::<span class="ident">new_empty</span>(<span class="ident">n</span>.<span class="ident">clone</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rec</span> <span class="op">=</span> <span class="ident">Record::new_empty</span>(<span class="ident">n</span>.<span class="ident">clone</span>());
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">tag_name</span>, <span class="ident">tag_bc</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">tag</span>() {
-            <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="ident">tag_name</span>, <span class="ident">Type</span>::<span class="ident">bitvec</span>(<span class="ident">tag_bc</span>.<span class="ident">get</span>()), <span class="bool-val">false</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">variants_doc</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+            <span class="kw">for</span> (<span class="ident">field_name</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>() {
+                <span class="ident">variants_doc</span>.<span class="ident">push</span>(<span class="ident">field_name</span>.<span class="ident">to_string</span>());
+            }
+            <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(
+                <span class="ident">tag_name</span>,
+                <span class="ident">Type::bitvec</span>(<span class="ident">tag_bc</span>.<span class="ident">get</span>()),
+                <span class="bool-val">false</span>,
+                <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot; Variants: {}&quot;</span>, <span class="ident">variants_doc</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))),
+            );
         }
         <span class="kw">for</span> (<span class="ident">field_name</span>, <span class="ident">field_logical</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field_common_type</span>) <span class="op">=</span> <span class="ident">field_logical</span>.<span class="ident">fancy</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>)) {
-                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="ident">field_name</span>, <span class="ident">field_common_type</span>, <span class="bool-val">false</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field_common_type</span>) <span class="op">=</span> <span class="ident">field_logical</span>.<span class="ident">fancy</span>(<span class="macro">cat!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>)) {
+                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="ident">field_name</span>, <span class="ident">field_common_type</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>);
             }
         }
-        <span class="prelude-val">Some</span>(<span class="ident">Type</span>::<span class="ident">Record</span>(<span class="ident">rec</span>))
+        <span class="prelude-val">Some</span>(<span class="ident">Type::Union</span>(<span class="ident">rec</span>))
     }
 }
 
@@ -793,15 +876,15 @@
         <span class="comment">// This implementation for Stream assumes the parent LogicalType has already been</span>
         <span class="comment">// flattened through synthesize.</span>
         <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
-        <span class="kw">let</span> <span class="ident">logical</span> <span class="op">=</span> <span class="ident">LogicalType</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="ident">clone</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">logical</span>.<span class="ident">is_element_only</span>());
+        <span class="kw">let</span> <span class="ident">logical</span> <span class="op">=</span> <span class="ident">LogicalType::from</span>(<span class="self">self</span>.<span class="ident">clone</span>());
+        <span class="macro">assert!</span>(<span class="ident">logical</span>.<span class="ident">is_element_only</span>());
         <span class="kw">if</span> <span class="op">!</span><span class="ident">logical</span>.<span class="ident">is_null</span>() {
             <span class="kw">let</span> <span class="ident">synth</span> <span class="op">=</span> <span class="ident">logical</span>.<span class="ident">synthesize</span>();
             <span class="kw">let</span> (<span class="ident">path</span>, <span class="ident">phys</span>) <span class="op">=</span> <span class="ident">synth</span>.<span class="ident">streams</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
             <span class="kw">for</span> <span class="ident">signal</span> <span class="kw">in</span> <span class="ident">phys</span>.<span class="ident">signal_list</span>().<span class="ident">into_iter</span>() {
-                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="macro">cat</span><span class="macro">!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">path</span>, <span class="ident">signal</span>.<span class="ident">identifier</span>());
+                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="macro">cat!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">path</span>, <span class="ident">signal</span>.<span class="ident">identifier</span>());
                 <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">signal</span>.<span class="ident">with_name</span>(<span class="ident">n</span>));
             }
         }
@@ -815,11 +898,11 @@
         <span class="kw">let</span> <span class="ident">pre</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">into</span>();
         <span class="comment">// We need to wrap the Stream back into a LogicalType</span>
         <span class="comment">// to be able to use various methods for checks and synthesize.</span>
-        <span class="kw">let</span> <span class="ident">logical</span> <span class="op">=</span> <span class="ident">LogicalType</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="ident">clone</span>());
+        <span class="kw">let</span> <span class="ident">logical</span> <span class="op">=</span> <span class="ident">LogicalType::from</span>(<span class="self">self</span>.<span class="ident">clone</span>());
 
         <span class="comment">// At this point, it should not be possible that this is a</span>
         <span class="comment">// non-element-only LogicalType.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">logical</span>.<span class="ident">is_element_only</span>());
+        <span class="macro">assert!</span>(<span class="ident">logical</span>.<span class="ident">is_element_only</span>());
 
         <span class="comment">// Check if the logical stream is null.</span>
         <span class="kw">if</span> <span class="op">!</span><span class="ident">logical</span>.<span class="ident">is_null</span>() {
@@ -833,33 +916,37 @@
             <span class="kw">let</span> <span class="ident">signals</span> <span class="op">=</span> <span class="ident">physical</span>.<span class="ident">signal_list</span>();
 
             <span class="comment">// Set up the resulting record.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rec</span> <span class="op">=</span> <span class="ident">Record</span>::<span class="ident">new_empty_stream</span>(<span class="kw">match</span> <span class="ident">name</span>.<span class="ident">len</span>() {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rec</span> <span class="op">=</span> <span class="ident">Record::new_empty_stream</span>(<span class="kw">match</span> <span class="ident">name</span>.<span class="ident">len</span>() {
                 <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pre</span>.<span class="ident">clone</span>(),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">cat</span><span class="macro">!</span>(<span class="ident">pre</span>.<span class="ident">clone</span>(), <span class="ident">name</span>),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">cat!</span>(<span class="ident">pre</span>, <span class="ident">name</span>),
             });
 
+            <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="macro">cat!</span>(<span class="ident">pre</span>, <span class="ident">name</span>, <span class="string">&quot;data&quot;</span>);
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>().<span class="ident">fancy</span>(<span class="kw-2">&amp;</span><span class="ident">prefix</span>).<span class="ident">unwrap</span>();
             <span class="comment">// Insert data record. There must be something there since it is not null.</span>
+            <span class="comment">// TODO: The fancy version doesn&#39;t account for throughput.</span>
             <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(
                 <span class="string">&quot;data&quot;</span>,
-                <span class="self">self</span>.<span class="ident">data</span>().<span class="ident">fancy</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="ident">pre</span>, <span class="ident">name</span>, <span class="string">&quot;data&quot;</span>)).<span class="ident">unwrap</span>(),
+                <span class="ident">data</span>.<span class="ident">with_throughput</span>(<span class="kw-2">&amp;</span><span class="ident">prefix</span>, <span class="self">self</span>.<span class="ident">throughput</span>()).<span class="ident">unwrap</span>(),
                 <span class="bool-val">false</span>,
+                <span class="prelude-val">None</span>,
             );
 
             <span class="comment">// Check signals related to dimensionality, complexity, etc.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sig</span>) <span class="op">=</span> <span class="ident">signals</span>.<span class="ident">last</span>() {
-                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="string">&quot;last&quot;</span>, <span class="ident">sig</span>.<span class="ident">width</span>().<span class="ident">into</span>(), <span class="ident">sig</span>.<span class="ident">reversed</span>());
+                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="string">&quot;last&quot;</span>, <span class="ident">sig</span>.<span class="ident">width</span>().<span class="ident">into</span>(), <span class="ident">sig</span>.<span class="ident">reversed</span>(), <span class="prelude-val">None</span>);
             }
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sig</span>) <span class="op">=</span> <span class="ident">signals</span>.<span class="ident">stai</span>() {
-                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="string">&quot;stai&quot;</span>, <span class="ident">sig</span>.<span class="ident">width</span>().<span class="ident">into</span>(), <span class="ident">sig</span>.<span class="ident">reversed</span>());
+                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="string">&quot;stai&quot;</span>, <span class="ident">sig</span>.<span class="ident">width</span>().<span class="ident">into</span>(), <span class="ident">sig</span>.<span class="ident">reversed</span>(), <span class="prelude-val">None</span>);
             }
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sig</span>) <span class="op">=</span> <span class="ident">signals</span>.<span class="ident">endi</span>() {
-                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="string">&quot;endi&quot;</span>, <span class="ident">sig</span>.<span class="ident">width</span>().<span class="ident">into</span>(), <span class="ident">sig</span>.<span class="ident">reversed</span>());
+                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="string">&quot;endi&quot;</span>, <span class="ident">sig</span>.<span class="ident">width</span>().<span class="ident">into</span>(), <span class="ident">sig</span>.<span class="ident">reversed</span>(), <span class="prelude-val">None</span>);
             }
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sig</span>) <span class="op">=</span> <span class="ident">signals</span>.<span class="ident">strb</span>() {
-                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="string">&quot;strb&quot;</span>, <span class="ident">sig</span>.<span class="ident">width</span>().<span class="ident">into</span>(), <span class="ident">sig</span>.<span class="ident">reversed</span>());
+                <span class="ident">rec</span>.<span class="ident">insert_new_field</span>(<span class="string">&quot;strb&quot;</span>, <span class="ident">sig</span>.<span class="ident">width</span>().<span class="ident">into</span>(), <span class="ident">sig</span>.<span class="ident">reversed</span>(), <span class="prelude-val">None</span>);
             }
 
-            <span class="prelude-val">Some</span>(<span class="ident">Type</span>::<span class="ident">Record</span>(<span class="ident">rec</span>))
+            <span class="prelude-val">Some</span>(<span class="ident">Type::Record</span>(<span class="ident">rec</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -869,8 +956,8 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Width</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Type</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">width</span>: <span class="ident">Width</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">width</span> {
-            <span class="ident">Width</span>::<span class="ident">Scalar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type</span>::<span class="ident">Bit</span>,
-            <span class="ident">Width</span>::<span class="ident">Vector</span>(<span class="ident">w</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type</span>::<span class="ident">bitvec</span>(<span class="ident">w</span>),
+            <span class="ident">Width::Scalar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Bit</span>,
+            <span class="ident">Width::Vector</span>(<span class="ident">w</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::bitvec</span>(<span class="ident">w</span>),
         }
     }
 }
@@ -879,20 +966,20 @@
 <span class="doccomment">/// mode.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ModeFor</span> {
     <span class="doccomment">/// Return the port mode of self, given a streamlet interface mode.</span>
-    <span class="kw">fn</span> <span class="ident">mode_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">streamlet_mode</span>: <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Mode</span>;
+    <span class="kw">fn</span> <span class="ident">mode_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">streamlet_mode</span>: <span class="kw">crate</span><span class="ident">::design::Mode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Mode</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">ModeFor</span> <span class="kw">for</span> <span class="ident">Origin</span> {
     <span class="doccomment">/// Return the common representation port mode for this signal origin, given the interface mode.</span>
-    <span class="kw">fn</span> <span class="ident">mode_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">streamlet_mode</span>: <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Mode</span> {
+    <span class="kw">fn</span> <span class="ident">mode_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">streamlet_mode</span>: <span class="kw">crate</span><span class="ident">::design::Mode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Mode</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Origin</span>::<span class="ident">Sink</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">streamlet_mode</span> {
-                <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">In</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode</span>::<span class="ident">Out</span>,
-                <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">Out</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode</span>::<span class="ident">In</span>,
+            <span class="ident">Origin::Sink</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">streamlet_mode</span> {
+                <span class="kw">crate</span><span class="ident">::design::Mode::In</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode::Out</span>,
+                <span class="kw">crate</span><span class="ident">::design::Mode::Out</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode::In</span>,
             },
-            <span class="ident">Origin</span>::<span class="ident">Source</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">streamlet_mode</span> {
-                <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">In</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode</span>::<span class="ident">In</span>,
-                <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">Out</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode</span>::<span class="ident">Out</span>,
+            <span class="ident">Origin::Source</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">streamlet_mode</span> {
+                <span class="kw">crate</span><span class="ident">::design::Mode::In</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode::In</span>,
+                <span class="kw">crate</span><span class="ident">::design::Mode::Out</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode::Out</span>,
             },
         }
     }
@@ -901,25 +988,25 @@
 <span class="kw">impl</span> <span class="ident">Portify</span> <span class="kw">for</span> <span class="ident">Interface</span> {
     <span class="kw">fn</span> <span class="ident">canonical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ports</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ports</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">let</span> <span class="ident">synth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">typ</span>().<span class="ident">synthesize</span>();
 
         <span class="kw">for</span> (<span class="ident">path</span>, <span class="ident">width</span>) <span class="kw">in</span> <span class="ident">synth</span>.<span class="ident">signals</span>() {
-            <span class="ident">ports</span>.<span class="ident">push</span>(<span class="ident">Port</span>::<span class="ident">new</span>(
-                <span class="macro">cat</span><span class="macro">!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">path</span>.<span class="ident">to_string</span>()),
+            <span class="ident">ports</span>.<span class="ident">push</span>(<span class="ident">Port::new</span>(
+                <span class="macro">cat!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">path</span>.<span class="ident">to_string</span>()),
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">mode</span>() {
-                    <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">Out</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode</span>::<span class="ident">Out</span>,
-                    <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">In</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode</span>::<span class="ident">In</span>,
+                    <span class="kw">crate</span><span class="ident">::design::Mode::Out</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode::Out</span>,
+                    <span class="kw">crate</span><span class="ident">::design::Mode::In</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode::In</span>,
                 },
-                <span class="ident">Type</span>::<span class="ident">bitvec</span>(<span class="ident">width</span>.<span class="ident">get</span>()),
+                <span class="ident">Type::bitvec</span>(<span class="ident">width</span>.<span class="ident">get</span>()),
             ));
         }
 
         <span class="kw">for</span> (<span class="ident">path</span>, <span class="ident">phys</span>) <span class="kw">in</span> <span class="ident">synth</span>.<span class="ident">streams</span>() {
             <span class="kw">for</span> <span class="ident">s</span> <span class="kw">in</span> <span class="ident">phys</span>.<span class="ident">signal_list</span>().<span class="ident">into_iter</span>() {
-                <span class="kw">let</span> <span class="ident">port_name</span> <span class="op">=</span> <span class="macro">cat</span><span class="macro">!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">path</span>, <span class="ident">s</span>.<span class="ident">identifier</span>());
-                <span class="ident">ports</span>.<span class="ident">push</span>(<span class="ident">Port</span>::<span class="ident">new</span>(
+                <span class="kw">let</span> <span class="ident">port_name</span> <span class="op">=</span> <span class="macro">cat!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">path</span>, <span class="ident">s</span>.<span class="ident">identifier</span>());
+                <span class="ident">ports</span>.<span class="ident">push</span>(<span class="ident">Port::new</span>(
                     <span class="ident">port_name</span>,
                     <span class="ident">s</span>.<span class="ident">origin</span>().<span class="ident">mode_for</span>(<span class="self">self</span>.<span class="ident">mode</span>()),
                     <span class="ident">s</span>.<span class="ident">width</span>().<span class="ident">into</span>(),
@@ -934,18 +1021,18 @@
         <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">tn</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">type_name</span>.<span class="ident">into</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">typ</span>().<span class="ident">split_streams</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sig_type</span>) <span class="op">=</span> <span class="ident">split</span>.<span class="ident">signal</span>().<span class="ident">fancy</span>(<span class="ident">tn</span>.<span class="ident">clone</span>()) {
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">Port</span>::<span class="ident">new</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="ident">n</span>.<span class="ident">clone</span>()), <span class="self">self</span>.<span class="ident">mode</span>().<span class="ident">into</span>(), <span class="ident">sig_type</span>));
+            <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">Port::new</span>(<span class="macro">cat!</span>(<span class="ident">n</span>), <span class="self">self</span>.<span class="ident">mode</span>().<span class="ident">into</span>(), <span class="ident">sig_type</span>));
         }
 
         <span class="comment">// Split the LogicalType up into discrete, simple streams.</span>
         <span class="kw">for</span> (<span class="ident">path</span>, <span class="ident">simple_stream</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">typ</span>().<span class="ident">split_streams</span>().<span class="ident">streams</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">typ</span>) <span class="op">=</span> <span class="ident">simple_stream</span>.<span class="ident">fancy</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="ident">tn</span>.<span class="ident">clone</span>(), <span class="ident">path</span>)) {
-                <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">Port</span>::<span class="ident">new</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="ident">n</span>.<span class="ident">clone</span>(), <span class="ident">path</span>), <span class="self">self</span>.<span class="ident">mode</span>().<span class="ident">into</span>(), <span class="ident">typ</span>));
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">typ</span>) <span class="op">=</span> <span class="ident">simple_stream</span>.<span class="ident">fancy</span>(<span class="macro">cat!</span>(<span class="ident">tn</span>.<span class="ident">clone</span>(), <span class="ident">path</span>)) {
+                <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">Port::new</span>(<span class="macro">cat!</span>(<span class="ident">n</span>, <span class="ident">path</span>), <span class="self">self</span>.<span class="ident">mode</span>().<span class="ident">into</span>(), <span class="ident">typ</span>));
             }
         }
 
@@ -953,29 +1040,32 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Mode</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">m</span>: <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw">crate</span><span class="ident">::design::Mode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Mode</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">m</span>: <span class="kw">crate</span><span class="ident">::design::Mode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">m</span> {
-            <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">Out</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode</span>::<span class="ident">Out</span>,
-            <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">In</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode</span>::<span class="ident">In</span>,
+            <span class="kw">crate</span><span class="ident">::design::Mode::Out</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode::Out</span>,
+            <span class="kw">crate</span><span class="ident">::design::Mode::In</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Mode::In</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Componentify</span> <span class="kw">for</span> <span class="ident">Streamlet</span> {
     <span class="kw">fn</span> <span class="ident">canonical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">suffix</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Component</span> {
-        <span class="ident">Component</span>::<span class="ident">new</span>(
-            <span class="macro">cat</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">identifier</span>().<span class="ident">to_string</span>(), <span class="ident">suffix</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>)),
-            <span class="macro">vec</span><span class="macro">!</span>[],
+        <span class="ident">Component::new</span>(
+            <span class="macro">cat!</span>(<span class="self">self</span>.<span class="ident">identifier</span>().<span class="ident">to_string</span>(), <span class="ident">suffix</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>)),
+            <span class="macro">vec!</span>[],
             {
                 <span class="comment">// Always add clock and reset for now.</span>
                 <span class="comment">// TODO(johanpel): at some point we need to associate interfaces with clock domains.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">all_ports</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
-                    <span class="ident">Port</span>::<span class="ident">new_documented</span>(<span class="string">&quot;clk&quot;</span>, <span class="ident">Mode</span>::<span class="ident">In</span>, <span class="ident">Type</span>::<span class="ident">Bit</span>, <span class="prelude-val">None</span>),
-                    <span class="ident">Port</span>::<span class="ident">new_documented</span>(<span class="string">&quot;rst&quot;</span>, <span class="ident">Mode</span>::<span class="ident">In</span>, <span class="ident">Type</span>::<span class="ident">Bit</span>, <span class="prelude-val">None</span>),
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">all_ports</span> <span class="op">=</span> <span class="macro">vec!</span>[
+                    <span class="ident">Port::new_documented</span>(<span class="string">&quot;clk&quot;</span>, <span class="ident">Mode::In</span>, <span class="ident">Type::Bit</span>, <span class="prelude-val">None</span>),
+                    <span class="ident">Port::new_documented</span>(<span class="string">&quot;rst&quot;</span>, <span class="ident">Mode::In</span>, <span class="ident">Type::Bit</span>, <span class="prelude-val">None</span>),
                 ];
-                <span class="self">self</span>.<span class="ident">interfaces</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">interface</span><span class="op">|</span> {
-                    <span class="ident">all_ports</span>.<span class="ident">extend</span>(<span class="ident">interface</span>.<span class="ident">canonical</span>(<span class="ident">interface</span>.<span class="ident">identifier</span>()));
+                <span class="self">self</span>.<span class="ident">inputs</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">interface</span><span class="op">|</span> {
+                    <span class="ident">all_ports</span>.<span class="ident">extend</span>(<span class="ident">interface</span>.<span class="ident">borrow</span>().<span class="ident">canonical</span>(<span class="ident">interface</span>.<span class="ident">identifier</span>()));
+                });
+                <span class="self">self</span>.<span class="ident">outputs</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">interface</span><span class="op">|</span> {
+                    <span class="ident">all_ports</span>.<span class="ident">extend</span>(<span class="ident">interface</span>.<span class="ident">borrow</span>().<span class="ident">canonical</span>(<span class="ident">interface</span>.<span class="ident">identifier</span>()));
                 });
                 <span class="ident">all_ports</span>
             },
@@ -984,24 +1074,28 @@
     }
 
     <span class="kw">fn</span> <span class="ident">fancy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">suffix</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Component</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">Component</span>::<span class="ident">new</span>(
-            <span class="macro">cat</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">identifier</span>().<span class="ident">to_string</span>(), <span class="ident">suffix</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>)),
-            <span class="macro">vec</span><span class="macro">!</span>[],
+        <span class="prelude-val">Some</span>(<span class="ident">Component::new</span>(
+            <span class="macro">cat!</span>(<span class="self">self</span>.<span class="ident">identifier</span>().<span class="ident">to_string</span>(), <span class="ident">suffix</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>)),
+            <span class="macro">vec!</span>[],
             {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">all_ports</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
-                    <span class="ident">Port</span>::<span class="ident">new_documented</span>(<span class="string">&quot;clk&quot;</span>, <span class="ident">Mode</span>::<span class="ident">In</span>, <span class="ident">Type</span>::<span class="ident">Bit</span>, <span class="prelude-val">None</span>),
-                    <span class="ident">Port</span>::<span class="ident">new_documented</span>(<span class="string">&quot;rst&quot;</span>, <span class="ident">Mode</span>::<span class="ident">In</span>, <span class="ident">Type</span>::<span class="ident">Bit</span>, <span class="prelude-val">None</span>),
+                <span class="kw">let</span> <span class="ident">collect_ports</span> <span class="op">=</span>
+                    <span class="op">|</span><span class="ident">interfaces</span>: <span class="ident">Box</span><span class="op">&lt;</span>(<span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">Interface</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&gt;</span> {
+                        <span class="ident">interfaces</span>
+                            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">interface</span><span class="op">|</span> {
+                                <span class="ident">interface</span>.<span class="ident">borrow</span>().<span class="ident">fancy</span>(
+                                    <span class="ident">interface</span>.<span class="ident">identifier</span>(),
+                                    <span class="macro">cat!</span>(<span class="self">self</span>.<span class="ident">identifier</span>().<span class="ident">to_string</span>(), <span class="ident">interface</span>.<span class="ident">identifier</span>()),
+                                )
+                            })
+                            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                    };
+
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">all_ports</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
+                    <span class="ident">Port::new_documented</span>(<span class="string">&quot;clk&quot;</span>, <span class="ident">Mode::In</span>, <span class="ident">Type::Bit</span>, <span class="prelude-val">None</span>),
+                    <span class="ident">Port::new_documented</span>(<span class="string">&quot;rst&quot;</span>, <span class="ident">Mode::In</span>, <span class="ident">Type::Bit</span>, <span class="prelude-val">None</span>),
                 ];
-                <span class="ident">all_ports</span>.<span class="ident">extend</span>(
-                    <span class="self">self</span>.<span class="ident">interfaces</span>()
-                        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">interface</span><span class="op">|</span> {
-                            <span class="ident">interface</span>.<span class="ident">fancy</span>(
-                                <span class="ident">interface</span>.<span class="ident">identifier</span>(),
-                                <span class="macro">cat</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">identifier</span>().<span class="ident">to_string</span>(), <span class="ident">interface</span>.<span class="ident">identifier</span>()),
-                            )
-                        })
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-                );
+                <span class="ident">all_ports</span>.<span class="ident">extend</span>(<span class="ident">collect_ports</span>(<span class="self">self</span>.<span class="ident">inputs</span>()));
+                <span class="ident">all_ports</span>.<span class="ident">extend</span>(<span class="ident">collect_ports</span>(<span class="self">self</span>.<span class="ident">outputs</span>()));
                 <span class="ident">all_ports</span>
             },
             <span class="self">self</span>.<span class="ident">doc</span>(),
@@ -1009,7 +1103,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Packify</span> <span class="kw">for</span> <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Library</span> {
+<span class="kw">impl</span> <span class="ident">Packify</span> <span class="kw">for</span> <span class="kw">crate</span><span class="ident">::design::Library</span> {
     <span class="kw">fn</span> <span class="ident">canonical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Package</span> {
         <span class="ident">Package</span> {
             <span class="ident">identifier</span>: <span class="self">self</span>.<span class="ident">identifier</span>().<span class="ident">to_string</span>(),
@@ -1028,7 +1122,7 @@
                 .<span class="ident">streamlets</span>()
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">s</span>.<span class="ident">canonical</span>(<span class="ident">CANON_SUFFIX</span>)];
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">s</span>.<span class="ident">canonical</span>(<span class="ident">CANON_SUFFIX</span>)];
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">fancy</span>(<span class="prelude-val">None</span>) {
                         <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">user</span>);
                     }
@@ -1039,7 +1133,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Projectify</span> <span class="kw">for</span> <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Project</span> {
+<span class="kw">impl</span> <span class="ident">Projectify</span> <span class="kw">for</span> <span class="kw">crate</span><span class="ident">::design::Project</span> {
     <span class="kw">fn</span> <span class="ident">canonical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Project</span> {
         <span class="ident">Project</span> {
             <span class="ident">identifier</span>: <span class="self">self</span>.<span class="ident">identifier</span>().<span class="ident">to_string</span>(),
@@ -1055,21 +1149,54 @@
     }
 }
 
+<span class="kw">impl</span> <span class="ident">Multilane</span> <span class="kw">for</span> <span class="ident">Type</span> {
+    <span class="kw">fn</span> <span class="ident">with_throughput</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">identity</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">throughput</span>: <span class="ident">NonZeroReal</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">throughput</span>.<span class="number">0</span> <span class="op">&gt;</span> <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">f64</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidArgument</span>(<span class="macro">format!</span>(
+                <span class="string">&quot;Throughput exceeds {}&quot;</span>,
+                <span class="ident">u32::MAX</span>
+            )));
+        }
+        <span class="kw">let</span> <span class="ident">element_lanes</span> <span class="op">=</span> <span class="ident">throughput</span>.<span class="number">0</span>.<span class="ident">ceil</span>() <span class="kw">as</span> <span class="ident">u32</span>;
+        <span class="kw">if</span> <span class="ident">element_lanes</span> <span class="op">&gt;</span> <span class="number">1</span> {
+            <span class="kw">match</span> <span class="self">self</span> {
+                <span class="ident">Type::Bit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Type::BitVec</span> {
+                    <span class="ident">width</span>: <span class="ident">element_lanes</span>,
+                }),
+                <span class="ident">Type::BitVec</span> { <span class="ident">width</span>: <span class="kw">_</span> } <span class="op">|</span> <span class="ident">Type::Record</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Type::Union</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Type::Array</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">Type::array</span>(
+                        <span class="macro">format!</span>(<span class="string">&quot;{}_array&quot;</span>, <span class="ident">identity</span>.<span class="ident">into</span>()),
+                        <span class="self">self</span>.<span class="ident">clone</span>(),
+                        <span class="ident">element_lanes</span>,
+                    ))
+                }
+            }
+        } <span class="kw">else</span> {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">clone</span>());
+        }
+    }
+}
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::design</span>::{<span class="ident">Interface</span>, <span class="ident">Streamlet</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::generator::common::test::records</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::generator::vhdl::Declare</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::logical::tests</span>::{<span class="ident">elements</span>, <span class="ident">streams</span>};
+    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Name</span>, <span class="ident">Positive</span>, <span class="prelude-ty">Result</span>, <span class="ident">UniqueKeyBuilder</span>};
+
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">design</span>::{<span class="ident">Interface</span>, <span class="ident">Streamlet</span>};
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">generator</span>::<span class="ident">common</span>::<span class="ident">test</span>::<span class="ident">records</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">generator</span>::<span class="ident">vhdl</span>::<span class="ident">Declare</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">logical</span>::<span class="ident">tests</span>::{<span class="ident">elements</span>, <span class="ident">streams</span>};
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Name</span>, <span class="ident">Positive</span>, <span class="prelude-ty">Result</span>, <span class="ident">UniquelyNamedBuilder</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_cat</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="string">&quot;ok&quot;</span>), <span class="string">&quot;ok&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="string">&quot;ok&quot;</span>, <span class="string">&quot;tydi&quot;</span>), <span class="string">&quot;ok_tydi&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="string">&quot;ok&quot;</span>, <span class="string">&quot;tydi&quot;</span>, <span class="string">&quot;&quot;</span>), <span class="string">&quot;ok_tydi&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">cat</span><span class="macro">!</span>(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>), <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">cat!</span>(<span class="string">&quot;ok&quot;</span>), <span class="string">&quot;ok&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">cat!</span>(<span class="string">&quot;ok&quot;</span>, <span class="string">&quot;tydi&quot;</span>), <span class="string">&quot;ok_tydi&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">cat!</span>(<span class="string">&quot;ok&quot;</span>, <span class="string">&quot;tydi&quot;</span>, <span class="string">&quot;&quot;</span>), <span class="string">&quot;ok_tydi&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">cat!</span>(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>), <span class="string">&quot;&quot;</span>);
     }
 
     <span class="kw">mod</span> <span class="ident">canonical</span> {
@@ -1077,162 +1204,165 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">logical_to_common_prim</span>() {
-            <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">elements</span>::<span class="ident">prim</span>(<span class="number">8</span>).<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">elements::prim</span>(<span class="number">8</span>).<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
+            <span class="macro">assert_eq!</span>(
                 <span class="ident">typ</span>,
-                <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">Signal</span>::<span class="ident">vec</span>(
+                <span class="macro">vec!</span>[<span class="ident">Signal::vec</span>(
                     <span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">Origin</span>::<span class="ident">Source</span>,
-                    <span class="ident">Positive</span>::<span class="ident">new</span>(<span class="number">8</span>).<span class="ident">unwrap</span>()
+                    <span class="ident">Origin::Source</span>,
+                    <span class="ident">Positive::new</span>(<span class="number">8</span>).<span class="ident">unwrap</span>()
                 )]
             )
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">logical_to_common_groups</span>() {
-            <span class="kw">let</span> <span class="ident">typ0</span> <span class="op">=</span> <span class="ident">elements</span>::<span class="ident">group</span>().<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="kw">let</span> <span class="ident">typ0</span> <span class="op">=</span> <span class="ident">elements::group</span>().<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
+            <span class="macro">assert_eq!</span>(
                 <span class="ident">typ0</span>,
-                <span class="macro">vec</span><span class="macro">!</span>[
-                    <span class="ident">Signal</span>::<span class="ident">vec</span>(
+                <span class="macro">vec!</span>[
+                    <span class="ident">Signal::vec</span>(
                         <span class="string">&quot;test_c&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">Origin</span>::<span class="ident">Source</span>,
-                        <span class="ident">Positive</span>::<span class="ident">new</span>(<span class="number">42</span>).<span class="ident">unwrap</span>()
+                        <span class="ident">Origin::Source</span>,
+                        <span class="ident">Positive::new</span>(<span class="number">42</span>).<span class="ident">unwrap</span>()
                     ),
-                    <span class="ident">Signal</span>::<span class="ident">vec</span>(
+                    <span class="ident">Signal::vec</span>(
                         <span class="string">&quot;test_d&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">Origin</span>::<span class="ident">Source</span>,
-                        <span class="ident">Positive</span>::<span class="ident">new</span>(<span class="number">1337</span>).<span class="ident">unwrap</span>()
+                        <span class="ident">Origin::Source</span>,
+                        <span class="ident">Positive::new</span>(<span class="number">1337</span>).<span class="ident">unwrap</span>()
                     )
                 ]
             );
 
-            <span class="kw">let</span> <span class="ident">typ1</span> <span class="op">=</span> <span class="ident">elements</span>::<span class="ident">group_nested</span>().<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="kw">let</span> <span class="ident">typ1</span> <span class="op">=</span> <span class="ident">elements::group_nested</span>().<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
+            <span class="macro">assert_eq!</span>(
                 <span class="ident">typ1</span>,
-                <span class="macro">vec</span><span class="macro">!</span>[
-                    <span class="ident">Signal</span>::<span class="ident">vec</span>(
+                <span class="macro">vec!</span>[
+                    <span class="ident">Signal::vec</span>(
                         <span class="string">&quot;test_a_c&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">Origin</span>::<span class="ident">Source</span>,
-                        <span class="ident">Positive</span>::<span class="ident">new</span>(<span class="number">42</span>).<span class="ident">unwrap</span>()
+                        <span class="ident">Origin::Source</span>,
+                        <span class="ident">Positive::new</span>(<span class="number">42</span>).<span class="ident">unwrap</span>()
                     ),
-                    <span class="ident">Signal</span>::<span class="ident">vec</span>(
+                    <span class="ident">Signal::vec</span>(
                         <span class="string">&quot;test_a_d&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">Origin</span>::<span class="ident">Source</span>,
-                        <span class="ident">Positive</span>::<span class="ident">new</span>(<span class="number">1337</span>).<span class="ident">unwrap</span>()
+                        <span class="ident">Origin::Source</span>,
+                        <span class="ident">Positive::new</span>(<span class="number">1337</span>).<span class="ident">unwrap</span>()
                     ),
-                    <span class="ident">Signal</span>::<span class="ident">vec</span>(
+                    <span class="ident">Signal::vec</span>(
                         <span class="string">&quot;test_b_c&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">Origin</span>::<span class="ident">Source</span>,
-                        <span class="ident">Positive</span>::<span class="ident">new</span>(<span class="number">42</span>).<span class="ident">unwrap</span>()
+                        <span class="ident">Origin::Source</span>,
+                        <span class="ident">Positive::new</span>(<span class="number">42</span>).<span class="ident">unwrap</span>()
                     ),
-                    <span class="ident">Signal</span>::<span class="ident">vec</span>(
+                    <span class="ident">Signal::vec</span>(
                         <span class="string">&quot;test_b_d&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">Origin</span>::<span class="ident">Source</span>,
-                        <span class="ident">Positive</span>::<span class="ident">new</span>(<span class="number">1337</span>).<span class="ident">unwrap</span>()
+                        <span class="ident">Origin::Source</span>,
+                        <span class="ident">Positive::new</span>(<span class="number">1337</span>).<span class="ident">unwrap</span>()
                     ),
                 ]
             );
 
-            <span class="kw">let</span> <span class="ident">typ2</span> <span class="op">=</span> <span class="ident">elements</span>::<span class="ident">group_of_single</span>().<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="kw">let</span> <span class="ident">typ2</span> <span class="op">=</span> <span class="ident">elements::group_of_single</span>().<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
+            <span class="macro">assert_eq!</span>(
                 <span class="ident">typ2</span>,
-                <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">Signal</span>::<span class="ident">vec</span>(
+                <span class="macro">vec!</span>[<span class="ident">Signal::vec</span>(
                     <span class="string">&quot;test_a&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">Origin</span>::<span class="ident">Source</span>,
-                    <span class="ident">Positive</span>::<span class="ident">new</span>(<span class="number">42</span>).<span class="ident">unwrap</span>()
+                    <span class="ident">Origin::Source</span>,
+                    <span class="ident">Positive::new</span>(<span class="number">42</span>).<span class="ident">unwrap</span>()
                 ),]
             );
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">logical_to_common_streams</span>() {
-            <span class="kw">let</span> <span class="ident">typ0</span> <span class="op">=</span> <span class="ident">streams</span>::<span class="ident">prim</span>(<span class="number">8</span>).<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
-            <span class="macro">dbg</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">typ0</span>);
+            <span class="kw">let</span> <span class="ident">typ0</span> <span class="op">=</span> <span class="ident">streams::prim</span>(<span class="number">8</span>).<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
+            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span><span class="ident">typ0</span>);
 
-            <span class="kw">let</span> <span class="ident">typ1</span> <span class="op">=</span> <span class="ident">streams</span>::<span class="ident">group</span>().<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
-            <span class="macro">dbg</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">typ1</span>);
+            <span class="kw">let</span> <span class="ident">typ1</span> <span class="op">=</span> <span class="ident">streams::group</span>().<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>);
+            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span><span class="ident">typ1</span>);
             <span class="comment">// TODO(johanpel): implement actual test</span>
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">interface_to_port</span>() {
-            <span class="kw">let</span> <span class="ident">if0</span> <span class="op">=</span> <span class="ident">Interface</span>::<span class="ident">try_new</span>(<span class="string">&quot;test&quot;</span>, <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">In</span>, <span class="ident">streams</span>::<span class="ident">prim</span>(<span class="number">8</span>), <span class="prelude-val">None</span>)
+            <span class="kw">let</span> <span class="ident">if0</span> <span class="op">=</span> <span class="ident">Interface::try_new</span>(<span class="string">&quot;test&quot;</span>, <span class="kw">crate</span><span class="ident">::design::Mode::In</span>, <span class="ident">streams::prim</span>(<span class="number">8</span>), <span class="prelude-val">None</span>)
                 .<span class="ident">unwrap</span>();
-            <span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">if0</span>.<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>));
-            <span class="kw">let</span> <span class="ident">if1</span> <span class="op">=</span> <span class="ident">Interface</span>::<span class="ident">try_new</span>(<span class="string">&quot;test&quot;</span>, <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">Out</span>, <span class="ident">streams</span>::<span class="ident">group</span>(), <span class="prelude-val">None</span>)
+            <span class="macro">dbg!</span>(<span class="ident">if0</span>.<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>));
+            <span class="kw">let</span> <span class="ident">if1</span> <span class="op">=</span> <span class="ident">Interface::try_new</span>(<span class="string">&quot;test&quot;</span>, <span class="kw">crate</span><span class="ident">::design::Mode::Out</span>, <span class="ident">streams::group</span>(), <span class="prelude-val">None</span>)
                 .<span class="ident">unwrap</span>();
-            <span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">if1</span>.<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>));
+            <span class="macro">dbg!</span>(<span class="ident">if1</span>.<span class="ident">canonical</span>(<span class="string">&quot;test&quot;</span>));
             <span class="comment">// TODO(johanpel): implement actual test</span>
         }
     }
 
     <span class="kw">mod</span> <span class="ident">fancy</span> {
+        <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::generator::common::Field</span>;
+
         <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">generator</span>::<span class="ident">common</span>::<span class="ident">Field</span>;
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">logical_to_common_prim</span>() {
-            <span class="kw">let</span> <span class="ident">typ</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">elements</span>::<span class="ident">prim</span>(<span class="number">8</span>).<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">typ</span>, <span class="ident">records</span>::<span class="ident">prim</span>(<span class="number">8</span>));
+            <span class="kw">let</span> <span class="ident">typ</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">elements::prim</span>(<span class="number">8</span>).<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">typ</span>, <span class="ident">records::prim</span>(<span class="number">8</span>));
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">logical_to_common_groups</span>() {
-            <span class="kw">let</span> <span class="ident">typ0</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">elements</span>::<span class="ident">group</span>().<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">typ0</span>, <span class="ident">records</span>::<span class="ident">rec</span>(<span class="string">&quot;test&quot;</span>));
+            <span class="kw">let</span> <span class="ident">typ0</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">elements::group</span>().<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">typ0</span>, <span class="ident">records::rec</span>(<span class="string">&quot;test&quot;</span>));
 
-            <span class="kw">let</span> <span class="ident">typ1</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">elements</span>::<span class="ident">group_nested</span>().<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">typ1</span>, <span class="ident">records</span>::<span class="ident">rec_nested</span>(<span class="string">&quot;test&quot;</span>));
+            <span class="kw">let</span> <span class="ident">typ1</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">elements::group_nested</span>().<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">typ1</span>, <span class="ident">records::rec_nested</span>(<span class="string">&quot;test&quot;</span>));
 
-            <span class="kw">let</span> <span class="ident">typ2</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">elements</span>::<span class="ident">group_of_single</span>().<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">typ2</span>, <span class="ident">records</span>::<span class="ident">rec_of_single</span>(<span class="string">&quot;test&quot;</span>));
+            <span class="kw">let</span> <span class="ident">typ2</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">elements::group_of_single</span>().<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">typ2</span>, <span class="ident">records::rec_of_single</span>(<span class="string">&quot;test&quot;</span>));
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">logical_to_common_streams</span>() {
-            <span class="kw">let</span> <span class="ident">typ0</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">streams</span>::<span class="ident">prim</span>(<span class="number">8</span>).<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="kw">let</span> <span class="ident">typ0</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">streams::prim</span>(<span class="number">8</span>).<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(
                 <span class="ident">typ0</span>,
-                <span class="ident">Type</span>::<span class="ident">record</span>(
+                <span class="ident">Type::record</span>(
                     <span class="string">&quot;test&quot;</span>,
-                    <span class="macro">vec</span><span class="macro">!</span>[
-                        <span class="ident">Field</span>::<span class="ident">new</span>(<span class="string">&quot;valid&quot;</span>, <span class="ident">Type</span>::<span class="ident">Bit</span>, <span class="bool-val">false</span>),
-                        <span class="ident">Field</span>::<span class="ident">new</span>(<span class="string">&quot;ready&quot;</span>, <span class="ident">Type</span>::<span class="ident">Bit</span>, <span class="bool-val">true</span>),
-                        <span class="ident">Field</span>::<span class="ident">new</span>(<span class="string">&quot;data&quot;</span>, <span class="ident">Type</span>::<span class="ident">bitvec</span>(<span class="number">8</span>), <span class="bool-val">false</span>)
+                    <span class="macro">vec!</span>[
+                        <span class="ident">Field::new</span>(<span class="string">&quot;valid&quot;</span>, <span class="ident">Type::Bit</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>),
+                        <span class="ident">Field::new</span>(<span class="string">&quot;ready&quot;</span>, <span class="ident">Type::Bit</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>),
+                        <span class="ident">Field::new</span>(<span class="string">&quot;data&quot;</span>, <span class="ident">Type::bitvec</span>(<span class="number">8</span>), <span class="bool-val">false</span>, <span class="prelude-val">None</span>)
                     ]
                 )
             );
 
-            <span class="kw">let</span> <span class="ident">typ1</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">streams</span>::<span class="ident">group</span>().<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="kw">let</span> <span class="ident">typ1</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="ident">streams::group</span>().<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(
                 <span class="ident">typ1</span>,
-                <span class="ident">Type</span>::<span class="ident">record</span>(
+                <span class="ident">Type::record</span>(
                     <span class="string">&quot;test&quot;</span>,
-                    <span class="macro">vec</span><span class="macro">!</span>[
-                        <span class="ident">Field</span>::<span class="ident">new</span>(
+                    <span class="macro">vec!</span>[
+                        <span class="ident">Field::new</span>(
                             <span class="string">&quot;a&quot;</span>,
-                            <span class="ident">Type</span>::<span class="ident">record</span>(
+                            <span class="ident">Type::record</span>(
                                 <span class="string">&quot;test_a&quot;</span>,
-                                <span class="macro">vec</span><span class="macro">!</span>[
-                                    <span class="ident">Field</span>::<span class="ident">new</span>(<span class="string">&quot;valid&quot;</span>, <span class="ident">Type</span>::<span class="ident">Bit</span>, <span class="bool-val">false</span>),
-                                    <span class="ident">Field</span>::<span class="ident">new</span>(<span class="string">&quot;ready&quot;</span>, <span class="ident">Type</span>::<span class="ident">Bit</span>, <span class="bool-val">true</span>),
-                                    <span class="ident">Field</span>::<span class="ident">new</span>(<span class="string">&quot;data&quot;</span>, <span class="ident">Type</span>::<span class="ident">bitvec</span>(<span class="number">42</span>), <span class="bool-val">false</span>)
+                                <span class="macro">vec!</span>[
+                                    <span class="ident">Field::new</span>(<span class="string">&quot;valid&quot;</span>, <span class="ident">Type::Bit</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>),
+                                    <span class="ident">Field::new</span>(<span class="string">&quot;ready&quot;</span>, <span class="ident">Type::Bit</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>),
+                                    <span class="ident">Field::new</span>(<span class="string">&quot;data&quot;</span>, <span class="ident">Type::bitvec</span>(<span class="number">42</span>), <span class="bool-val">false</span>, <span class="prelude-val">None</span>)
                                 ]
                             ),
-                            <span class="bool-val">false</span>
+                            <span class="bool-val">false</span>,
+                            <span class="prelude-val">None</span>,
                         ),
-                        <span class="ident">Field</span>::<span class="ident">new</span>(
+                        <span class="ident">Field::new</span>(
                             <span class="string">&quot;b&quot;</span>,
-                            <span class="ident">Type</span>::<span class="ident">record</span>(
+                            <span class="ident">Type::record</span>(
                                 <span class="string">&quot;test_b&quot;</span>,
-                                <span class="macro">vec</span><span class="macro">!</span>[
-                                    <span class="ident">Field</span>::<span class="ident">new</span>(<span class="string">&quot;valid&quot;</span>, <span class="ident">Type</span>::<span class="ident">Bit</span>, <span class="bool-val">false</span>),
-                                    <span class="ident">Field</span>::<span class="ident">new</span>(<span class="string">&quot;ready&quot;</span>, <span class="ident">Type</span>::<span class="ident">Bit</span>, <span class="bool-val">true</span>),
-                                    <span class="ident">Field</span>::<span class="ident">new</span>(<span class="string">&quot;data&quot;</span>, <span class="ident">Type</span>::<span class="ident">bitvec</span>(<span class="number">1337</span>), <span class="bool-val">false</span>)
+                                <span class="macro">vec!</span>[
+                                    <span class="ident">Field::new</span>(<span class="string">&quot;valid&quot;</span>, <span class="ident">Type::Bit</span>, <span class="bool-val">false</span>, <span class="prelude-val">None</span>),
+                                    <span class="ident">Field::new</span>(<span class="string">&quot;ready&quot;</span>, <span class="ident">Type::Bit</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>),
+                                    <span class="ident">Field::new</span>(<span class="string">&quot;data&quot;</span>, <span class="ident">Type::bitvec</span>(<span class="number">1337</span>), <span class="bool-val">false</span>, <span class="prelude-val">None</span>)
                                 ]
                             ),
-                            <span class="bool-val">false</span>
+                            <span class="bool-val">false</span>,
+                            <span class="prelude-val">None</span>,
                         )
                     ]
                 )
@@ -1241,23 +1371,23 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">interface_to_port</span>() {
-            <span class="kw">let</span> <span class="ident">if0</span> <span class="op">=</span> <span class="ident">Interface</span>::<span class="ident">try_new</span>(<span class="string">&quot;test&quot;</span>, <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">In</span>, <span class="ident">streams</span>::<span class="ident">prim</span>(<span class="number">8</span>), <span class="prelude-val">None</span>)
+            <span class="kw">let</span> <span class="ident">if0</span> <span class="op">=</span> <span class="ident">Interface::try_new</span>(<span class="string">&quot;test&quot;</span>, <span class="kw">crate</span><span class="ident">::design::Mode::In</span>, <span class="ident">streams::prim</span>(<span class="number">8</span>), <span class="prelude-val">None</span>)
                 .<span class="ident">unwrap</span>();
-            <span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">if0</span>.<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>, <span class="string">&quot;test&quot;</span>));
-            <span class="kw">let</span> <span class="ident">if1</span> <span class="op">=</span> <span class="ident">Interface</span>::<span class="ident">try_new</span>(<span class="string">&quot;test&quot;</span>, <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">Out</span>, <span class="ident">streams</span>::<span class="ident">group</span>(), <span class="prelude-val">None</span>)
+            <span class="macro">dbg!</span>(<span class="ident">if0</span>.<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>, <span class="string">&quot;test&quot;</span>));
+            <span class="kw">let</span> <span class="ident">if1</span> <span class="op">=</span> <span class="ident">Interface::try_new</span>(<span class="string">&quot;test&quot;</span>, <span class="kw">crate</span><span class="ident">::design::Mode::Out</span>, <span class="ident">streams::group</span>(), <span class="prelude-val">None</span>)
                 .<span class="ident">unwrap</span>();
-            <span class="macro">dbg</span><span class="macro">!</span>(<span class="ident">if1</span>.<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>, <span class="string">&quot;test&quot;</span>));
+            <span class="macro">dbg!</span>(<span class="ident">if1</span>.<span class="ident">fancy</span>(<span class="string">&quot;test&quot;</span>, <span class="string">&quot;test&quot;</span>));
             <span class="comment">// TODO(johanpel): write actual test</span>
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">simple_streamlet</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">streamlet</span> <span class="op">=</span> <span class="ident">Streamlet</span>::<span class="ident">from_builder</span>(
-            <span class="ident">Name</span>::<span class="ident">try_new</span>(<span class="string">&quot;test&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">UniquelyNamedBuilder</span>::<span class="ident">new</span>().<span class="ident">with_items</span>(<span class="macro">vec</span><span class="macro">!</span>[
-                <span class="ident">Interface</span>::<span class="ident">try_new</span>(<span class="string">&quot;x&quot;</span>, <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">In</span>, <span class="ident">streams</span>::<span class="ident">prim</span>(<span class="number">8</span>), <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
-                <span class="ident">Interface</span>::<span class="ident">try_new</span>(<span class="string">&quot;y&quot;</span>, <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">Out</span>, <span class="ident">streams</span>::<span class="ident">group</span>(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
+        <span class="kw">let</span> <span class="ident">streamlet</span> <span class="op">=</span> <span class="ident">Streamlet::from_builder</span>(
+            <span class="ident">Name::try_new</span>(<span class="string">&quot;test&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">UniqueKeyBuilder::new</span>().<span class="ident">with_items</span>(<span class="macro">vec!</span>[
+                <span class="ident">Interface::try_new</span>(<span class="string">&quot;x&quot;</span>, <span class="kw">crate</span><span class="ident">::design::Mode::In</span>, <span class="ident">streams::prim</span>(<span class="number">8</span>), <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
+                <span class="ident">Interface::try_new</span>(<span class="string">&quot;y&quot;</span>, <span class="kw">crate</span><span class="ident">::design::Mode::Out</span>, <span class="ident">streams::group</span>(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
             ]),
             <span class="prelude-val">None</span>,
         )<span class="question-mark">?</span>;
@@ -1265,19 +1395,19 @@
         <span class="kw">let</span> <span class="ident">common_streamlet</span> <span class="op">=</span> <span class="ident">streamlet</span>.<span class="ident">fancy</span>(<span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">pkg</span> <span class="op">=</span> <span class="ident">Package</span> {
             <span class="ident">identifier</span>: <span class="string">&quot;boomer&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">components</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">common_streamlet</span>],
+            <span class="ident">components</span>: <span class="macro">vec!</span>[<span class="ident">common_streamlet</span>],
         };
-        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">pkg</span>.<span class="ident">declare</span>()<span class="question-mark">?</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">pkg</span>.<span class="ident">declare</span>()<span class="question-mark">?</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">nested_streams_streamlet</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">streamlet</span> <span class="op">=</span> <span class="ident">Streamlet</span>::<span class="ident">from_builder</span>(
-            <span class="ident">Name</span>::<span class="ident">try_new</span>(<span class="string">&quot;test&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">UniquelyNamedBuilder</span>::<span class="ident">new</span>().<span class="ident">with_items</span>(<span class="macro">vec</span><span class="macro">!</span>[
-                <span class="ident">Interface</span>::<span class="ident">try_new</span>(<span class="string">&quot;x&quot;</span>, <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">In</span>, <span class="ident">streams</span>::<span class="ident">prim</span>(<span class="number">8</span>), <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
-                <span class="ident">Interface</span>::<span class="ident">try_new</span>(<span class="string">&quot;y&quot;</span>, <span class="kw">crate</span>::<span class="ident">design</span>::<span class="ident">Mode</span>::<span class="ident">Out</span>, <span class="ident">streams</span>::<span class="ident">nested</span>(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
+        <span class="kw">let</span> <span class="ident">streamlet</span> <span class="op">=</span> <span class="ident">Streamlet::from_builder</span>(
+            <span class="ident">Name::try_new</span>(<span class="string">&quot;test&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">UniqueKeyBuilder::new</span>().<span class="ident">with_items</span>(<span class="macro">vec!</span>[
+                <span class="ident">Interface::try_new</span>(<span class="string">&quot;x&quot;</span>, <span class="kw">crate</span><span class="ident">::design::Mode::In</span>, <span class="ident">streams::prim</span>(<span class="number">8</span>), <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
+                <span class="ident">Interface::try_new</span>(<span class="string">&quot;y&quot;</span>, <span class="kw">crate</span><span class="ident">::design::Mode::Out</span>, <span class="ident">streams::nested</span>(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
             ]),
             <span class="prelude-val">None</span>,
         )<span class="question-mark">?</span>;
@@ -1285,11 +1415,11 @@
         <span class="kw">let</span> <span class="ident">common_streamlet</span> <span class="op">=</span> <span class="ident">streamlet</span>.<span class="ident">fancy</span>(<span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">pkg</span> <span class="op">=</span> <span class="ident">Package</span> {
             <span class="ident">identifier</span>: <span class="string">&quot;testing&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">components</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">common_streamlet</span>],
+            <span class="ident">components</span>: <span class="macro">vec!</span>[<span class="ident">common_streamlet</span>],
         };
-        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">pkg</span>.<span class="ident">declare</span>()<span class="question-mark">?</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">pkg</span>.<span class="ident">declare</span>()<span class="question-mark">?</span>);
         <span class="prelude-val">Ok</span>(())
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "tydi";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tydi" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>

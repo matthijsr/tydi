@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ObjectType","Types of VHDL objects, possibly referring to fields"]],"mod":[["object_from",""]],"struct":[["ArrayObject","An array object, arrays contain a single type of object, but can contain nested objects"],["RecordObject","An record object"]]});

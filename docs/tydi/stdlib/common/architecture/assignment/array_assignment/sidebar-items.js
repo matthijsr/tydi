@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ArrayAssignment","An enum for describing complete assignment to an array"]]});

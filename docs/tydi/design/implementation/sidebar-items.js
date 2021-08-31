@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Implementation","An implementation variant."]],"mod":[["composer",""]]});
