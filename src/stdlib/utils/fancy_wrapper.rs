@@ -204,16 +204,17 @@ begin
    out_pass_endi <= out_pass_dn_wire.endi;
    out_pass_strb <= out_pass_dn_wire.strb;
    out_pass_up_wire.ready <= out_pass_ready;
-   fancy: passthrough_stub port map(
-     clk => clk_wire,
-     rst => rst_wire,
-     in_pass_dn => in_pass_dn_wire,
-     in_pass_up => in_pass_up_wire,
-     in_pass2_dn => in_pass2_dn_wire,
-     in_pass2_up => in_pass2_up_wire,
-     out_pass_dn => out_pass_dn_wire,
-     out_pass_up => out_pass_up_wire
-   );
+   fancy: passthrough_stub
+      port map(
+         clk => clk_wire,
+         rst => rst_wire,
+         in_pass_dn => in_pass_dn_wire,
+         in_pass_up => in_pass_up_wire,
+         in_pass2_dn => in_pass2_dn_wire,
+         in_pass2_up => in_pass2_up_wire,
+         out_pass_dn => out_pass_dn_wire,
+         out_pass_up => out_pass_up_wire
+      );
 end Behavioral;
 "#,
             arch.declare()?

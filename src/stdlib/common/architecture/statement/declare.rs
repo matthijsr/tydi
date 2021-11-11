@@ -120,28 +120,29 @@ mod tests {
             .map_port("b_dn", &AssignmentKind::to_direct(&b_dn_rec, true)?)?
             .map_port("b_up", &AssignmentKind::to_direct(&b_up_rec, true)?)?;
         assert_eq!(
-            r#"some_label: test_comp port map(
-  a_dn => (
-    c => a_other_dn_rec.c
-  ),
-  a_up => (
-    d => a_other_up_rec.d
-  ),
-  b_dn => (
-    a => (
-      c => b_other_dn_rec.a.c,
-      d => b_other_dn_rec.a.d
-    ),
-    b => (
-      c => b_other_dn_rec.b.c
-    )
-  ),
-  b_up => (
-    b => (
-      d => b_other_up_rec.b.d
-    )
-  )
-);
+            r#"some_label: test_comp
+   port map(
+      a_dn => (
+        c => a_other_dn_rec.c
+      ),
+      a_up => (
+        d => a_other_up_rec.d
+      ),
+      b_dn => (
+        a => (
+          c => b_other_dn_rec.a.c,
+          d => b_other_dn_rec.a.d
+        ),
+        b => (
+          c => b_other_dn_rec.b.c
+        )
+      ),
+      b_up => (
+        b => (
+          d => b_other_up_rec.b.d
+        )
+      )
+   );
 "#,
             mapped.declare("", ";\n")?
         );
