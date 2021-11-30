@@ -40,7 +40,7 @@ pub struct PortMapping {
     component_name: String,
     /// The ports, in the order they were declared on the component
     ports: IndexMap<String, ObjectDeclaration>,
-    // Mappings for those ports, will be declared in the order of the original component declaration,
+    /// Mappings for those ports, will be declared in the order of the original component declaration,
     /// irrespective of the order they're mapped during generation.
     mappings: HashMap<String, AssignDeclaration>,
     /// Generics that the component has
