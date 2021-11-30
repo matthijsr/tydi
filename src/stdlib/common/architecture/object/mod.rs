@@ -245,8 +245,7 @@ impl ObjectType {
                         )),
                     },
                     ValueAssignment::Integer(integer) => match to_object {
-                        //TODO: check if integer is in natural and positive range
-                        ObjectType::Natural => Ok(()),
+                        ObjectType::Natural => if *integer >= 0 { Ok(()) } else { Err(..) },
                         ObjectType::Positive => if *integer == 0 { Err(Error::BackEndError("Cannot assign zero to Positive".to_string())) } else { Ok(()) },
                         ObjectType::Bit | ObjectType::Array(_) | ObjectType::Record(_) => Err(Error::InvalidTarget(
                             format!("Cannot assign Integer to {}", to_object),
