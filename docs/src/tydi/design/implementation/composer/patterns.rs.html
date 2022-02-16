@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/design/implementation/composer/patterns.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>patterns.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="shortcut icon" href="https://abs-tudelft.github.io/tydi/tydi_logo.svg"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../tydi/index.html'><div class='logo-container'><img src='https://abs-tudelft.github.io/tydi/tydi_logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img src="../../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;design&#x2F;implementation&#x2F;composer&#x2F;patterns.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>patterns.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><script defer src="../../../../../main.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;abs-tudelft.github.io&#x2F;tydi&#x2F;tydi_logo.svg"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../tydi/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;abs-tudelft.github.io&#x2F;tydi&#x2F;tydi_logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -373,17 +374,16 @@
 <span id="373">373</span>
 <span id="374">374</span>
 <span id="375">375</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="ident">std::borrow::Borrow</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Borrow</span>;
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::design::implementation::composer::GenericComponent</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::design::implementation::Implementation</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::design</span>::{<span class="ident">IFKey</span>, <span class="ident">Interface</span>, <span class="ident">Mode</span>, <span class="ident">Project</span>, <span class="ident">Streamlet</span>, <span class="ident">StreamletHandle</span>, <span class="ident">StreamletKey</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::logical</span>::{<span class="ident">Direction</span>, <span class="ident">LogicalType</span>, <span class="ident">Stream</span>, <span class="ident">Synchronicity</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::physical::Complexity</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::design::implementation::composer::GenericComponent</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::design::implementation::Implementation</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::design</span>::{<span class="ident">IFKey</span>, <span class="ident">Interface</span>, <span class="ident">Mode</span>, <span class="ident">Project</span>, <span class="ident">Streamlet</span>, <span class="ident">StreamletHandle</span>, <span class="ident">StreamletKey</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::logical</span>::{<span class="ident">Direction</span>, <span class="ident">LogicalType</span>, <span class="ident">Stream</span>, <span class="ident">Synchronicity</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::physical::Complexity</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Error</span>, <span class="ident">Name</span>, <span class="ident">NonZeroReal</span>, <span class="prelude-ty">Result</span>, <span class="ident">UniqueKeyBuilder</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::design::implementation::composer::impl_backend::ImplementationBackend</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::design::implementation::composer::impl_backend::ImplementationBackend</span>;
 
 <span class="doccomment">///! MapStream construct</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -392,18 +392,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">GenericComponent</span> <span class="kw">for</span> <span class="ident">MapStream</span> {
-    <span class="kw">fn</span> <span class="ident">streamlet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Streamlet</span> {
+    <span class="kw">fn</span> <span class="ident">streamlet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Streamlet</span> {
         <span class="self">self</span>.<span class="ident">streamlet</span>.<span class="ident">borrow</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">MapStream</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_new</span>(<span class="ident">project</span>: <span class="kw-2">&amp;</span><span class="ident">Project</span>, <span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">op</span>: <span class="ident">StreamletHandle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_new</span>(<span class="ident">project</span>: <span class="kw-2">&amp;</span><span class="ident">Project</span>, <span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">op</span>: <span class="ident">StreamletHandle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">project</span>.<span class="ident">get_lib</span>(<span class="ident">op</span>.<span class="ident">lib</span>())<span class="question-mark">?</span>.<span class="ident">get_streamlet</span>(<span class="ident">op</span>.<span class="ident">streamlet</span>())<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">op_input_data_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">op</span>.<span class="ident">inputs</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">typ</span>() {
-            <span class="ident">LogicalType::Stream</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ComposerError</span>(<span class="macro">format!</span>(
+            <span class="ident">LogicalType::Stream</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ComposerError</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;The data type for the MapStream pattern required to be be Stream!&quot;</span>,
             ))),
         }<span class="question-mark">?</span>;
@@ -445,7 +445,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_backend</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">streamlet_handle</span>: <span class="ident">StreamletHandle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_backend</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">streamlet_handle</span>: <span class="ident">StreamletHandle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">//self.backend = Option::from(MapStreamBackend { name, streamlet_handle });</span>
         <span class="self">self</span>.<span class="ident">streamlet</span>
             .<span class="ident">attach_implementation</span>(<span class="ident">Implementation::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">MapStreamBackend</span> {
@@ -455,7 +455,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MapStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="ident">MapStream</span> {
         <span class="self">self</span>
     }
 }
@@ -466,11 +466,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ImplementationBackend</span> <span class="kw">for</span> <span class="ident">MapStreamBackend</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Name</span> {
         <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">streamlet_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StreamletHandle</span> {
+    <span class="kw">fn</span> <span class="ident">streamlet_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StreamletHandle</span> {
         <span class="self">self</span>.<span class="ident">streamlet_handle</span>.<span class="ident">clone</span>()
     }
 }
@@ -482,18 +482,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">GenericComponent</span> <span class="kw">for</span> <span class="ident">ReduceStream</span> {
-    <span class="kw">fn</span> <span class="ident">streamlet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Streamlet</span> {
+    <span class="kw">fn</span> <span class="ident">streamlet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Streamlet</span> {
         <span class="self">self</span>.<span class="ident">streamlet</span>.<span class="ident">borrow</span>()
     }
-    <span class="kw">fn</span> <span class="ident">connect_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">connect_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input_stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>
             .<span class="ident">streamlet</span>
             .<span class="ident">get_interface</span>(<span class="ident">IFKey::try_from</span>(<span class="string">&quot;in&quot;</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>
             .<span class="ident">typ</span>()
             .<span class="ident">clone</span>()
         {
-            <span class="ident">LogicalType::Stream</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ComposerError</span>(<span class="macro">format!</span>(
+            <span class="ident">LogicalType::Stream</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ComposerError</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;The data type for the ReduceStream pattern required to be be Stream!&quot;</span>,
             ))),
         }<span class="question-mark">?</span>;
@@ -518,12 +518,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ReduceStream</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_new</span>(<span class="ident">_project</span>: <span class="kw-2">&amp;</span><span class="ident">Project</span>, <span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">_op</span>: <span class="ident">StreamletHandle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_new</span>(<span class="ident">_project</span>: <span class="kw-2">&amp;</span><span class="ident">Project</span>, <span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">_op</span>: <span class="ident">StreamletHandle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input_if</span> <span class="op">=</span> <span class="ident">Interface::try_new</span>(<span class="string">&quot;in&quot;</span>, <span class="ident">Mode::In</span>, <span class="ident">LogicalType::Null</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>
             .<span class="ident">with_type_inference</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
                 <span class="kw">match</span> <span class="ident">i</span>.<span class="ident">clone</span>() {
-                    <span class="ident">LogicalType::Stream</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ComposerError</span>(<span class="macro">format!</span>(
+                    <span class="ident">LogicalType::Stream</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ComposerError</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;The data type for the ReduceStream pattern required to be be Stream!&quot;</span>,
                     ))),
                 }<span class="question-mark">?</span>;
@@ -547,7 +547,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_backend</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">streamlet_handle</span>: <span class="ident">StreamletHandle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_backend</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">streamlet_handle</span>: <span class="ident">StreamletHandle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">//self.backend = Option::from(MapStreamBackend { name, streamlet_handle });</span>
         <span class="self">self</span>.<span class="ident">streamlet</span>
             .<span class="ident">attach_implementation</span>(<span class="ident">Implementation::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">ReduceStreamBackend</span> {
@@ -557,7 +557,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReduceStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="ident">ReduceStream</span> {
         <span class="self">self</span>
     }
 }
@@ -568,11 +568,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ImplementationBackend</span> <span class="kw">for</span> <span class="ident">ReduceStreamBackend</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Name</span> {
         <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">streamlet_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StreamletHandle</span> {
+    <span class="kw">fn</span> <span class="ident">streamlet_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StreamletHandle</span> {
         <span class="self">self</span>.<span class="ident">streamlet_handle</span>.<span class="ident">clone</span>()
     }
 }
@@ -584,18 +584,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">GenericComponent</span> <span class="kw">for</span> <span class="ident">FilterStream</span> {
-    <span class="kw">fn</span> <span class="ident">streamlet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Streamlet</span> {
+    <span class="kw">fn</span> <span class="ident">streamlet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Streamlet</span> {
         <span class="self">self</span>.<span class="ident">streamlet</span>.<span class="ident">borrow</span>()
     }
-    <span class="kw">fn</span> <span class="ident">connect_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">connect_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input_stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>
             .<span class="ident">streamlet</span>
             .<span class="ident">get_interface</span>(<span class="ident">IFKey::try_from</span>(<span class="string">&quot;in&quot;</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>
             .<span class="ident">typ</span>()
             .<span class="ident">clone</span>()
         {
-            <span class="ident">LogicalType::Stream</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ComposerError</span>(<span class="macro">format!</span>(
+            <span class="ident">LogicalType::Stream</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ComposerError</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;The data type for the ReduceStream pattern required to be be Stream!&quot;</span>,
             ))),
         }<span class="question-mark">?</span>;
@@ -607,7 +607,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FilterStream</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_new</span>(<span class="ident">_project</span>: <span class="kw-2">&amp;</span><span class="ident">Project</span>, <span class="ident">name</span>: <span class="ident">Name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_new</span>(<span class="ident">_project</span>: <span class="kw-2">&amp;</span><span class="ident">Project</span>, <span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input_if</span> <span class="op">=</span> <span class="ident">Interface::try_new</span>(
             <span class="string">&quot;in&quot;</span>,
             <span class="ident">Mode::In</span>,
@@ -629,8 +629,8 @@
         )<span class="question-mark">?</span>
         .<span class="ident">with_type_inference</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
             <span class="kw">match</span> <span class="ident">i</span>.<span class="ident">clone</span>() {
-                <span class="ident">LogicalType::Stream</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ComposerError</span>(<span class="macro">format!</span>(
+                <span class="ident">LogicalType::Stream</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ComposerError</span>(<span class="macro">format!</span>(
                     <span class="string">&quot;The data type for the FilterStream pattern required to be be Stream!&quot;</span>,
                 ))),
             }<span class="question-mark">?</span>;
@@ -690,7 +690,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_backend</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">streamlet_handle</span>: <span class="ident">StreamletHandle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_backend</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">streamlet_handle</span>: <span class="ident">StreamletHandle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">//self.backend = Option::from(MapStreamBackend { name, streamlet_handle });</span>
         <span class="self">self</span>.<span class="ident">streamlet</span>
             .<span class="ident">attach_implementation</span>(<span class="ident">Implementation::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">FilterStreamBackend</span> {
@@ -700,7 +700,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FilterStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="ident">FilterStream</span> {
         <span class="self">self</span>
     }
 }
@@ -711,11 +711,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ImplementationBackend</span> <span class="kw">for</span> <span class="ident">FilterStreamBackend</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Name</span> {
         <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">streamlet_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StreamletHandle</span> {
+    <span class="kw">fn</span> <span class="ident">streamlet_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StreamletHandle</span> {
         <span class="self">self</span>.<span class="ident">streamlet_handle</span>.<span class="ident">clone</span>()
     }
 }
@@ -724,13 +724,13 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::design::StreamletHandle</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::design::StreamletHandle</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Name</span>, <span class="prelude-ty">Result</span>};
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::design::implementation::composer::tests::composition_test_proj</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::design::implementation::composer::tests::composition_test_proj</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_map</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_map</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">prj</span> <span class="op">=</span> <span class="ident">composition_test_proj</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">test_map</span> <span class="op">=</span> <span class="ident">MapStream::try_new</span>(
@@ -749,5 +749,6 @@
         <span class="prelude-val">Ok</span>(())
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tydi" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div><script src="../../../../../main.js"></script><script src="../../../../../source-script.js"></script><script src="../../../../../source-files.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tydi" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div>
+</body></html>

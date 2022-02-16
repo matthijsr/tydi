@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/stdlib/common/architecture/assignment/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../../../storage.js"></script><script src="../../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../../noscript.css"></noscript><link rel="shortcut icon" href="https://abs-tudelft.github.io/tydi/tydi_logo.svg"><style type="text/css">#crate-search{background-image:url("../../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../../tydi/index.html'><div class='logo-container'><img src='https://abs-tudelft.github.io/tydi/tydi_logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../../settings.html" title="settings"><img src="../../../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;stdlib&#x2F;common&#x2F;architecture&#x2F;assignment&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../../storage.js"></script><script src="../../../../../../crates.js"></script><script defer src="../../../../../../main.js"></script><script defer src="../../../../../../source-script.js"></script><script defer src="../../../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;abs-tudelft.github.io&#x2F;tydi&#x2F;tydi_logo.svg"><style type="text/css">#crate-search{background-image:url("../../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../../tydi/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;abs-tudelft.github.io&#x2F;tydi&#x2F;tydi_logo.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -637,21 +638,20 @@
 <span id="637">637</span>
 <span id="638">638</span>
 <span id="639">639</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident">indexmap::map::IndexMap</span>;
 
 <span class="kw">use</span> <span class="ident">array_assignment::ArrayAssignment</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::physical::Width</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::physical::Width</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Document</span>, <span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
 
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::declaration</span>::{<span class="ident">ObjectDeclaration</span>, <span class="ident">ObjectKind</span>};
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::object::ObjectType</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::declaration</span>::{<span class="ident">ObjectDeclaration</span>, <span class="ident">ObjectKind</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::object::ObjectType</span>;
 
-<span class="kw">use</span> <span class="self">self</span><span class="ident">::bitvec::BitVecValue</span>;
+<span class="kw">use</span> <span class="ident"><span class="self">self</span>::bitvec::BitVecValue</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">array_assignment</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">assign</span>;
@@ -662,7 +662,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">impls</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Assign</span> {
-    <span class="kw">fn</span> <span class="ident">assign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">assignment</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Assignment</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AssignDeclaration</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">assign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">assignment</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Assignment</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>)) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AssignDeclaration</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Describing the declaration of an assignment</span>
@@ -676,7 +676,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AssignDeclaration</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">object</span>: <span class="ident">ObjectDeclaration</span>, <span class="ident">assignment</span>: <span class="ident">Assignment</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AssignDeclaration</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">object</span>: <span class="ident">ObjectDeclaration</span>, <span class="ident">assignment</span>: <span class="ident">Assignment</span>) -&gt; <span class="ident">AssignDeclaration</span> {
         <span class="ident">AssignDeclaration</span> {
             <span class="ident">object</span>,
             <span class="ident">assignment</span>,
@@ -684,16 +684,16 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ObjectDeclaration</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ObjectDeclaration</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">object</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assignment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Assignment</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assignment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Assignment</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">assignment</span>
     }
 
     <span class="doccomment">/// The object declaration with any field selections on it</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">object</span>().<span class="ident">identifier</span>().<span class="ident">to_string</span>();
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">assignment</span>().<span class="ident">to_field</span>() {
             <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">to_string</span>());
@@ -702,27 +702,27 @@
     }
 
     <span class="doccomment">/// Return this assignment declaration with documentation added.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_doc</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">doc</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_doc</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">doc</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">doc</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">doc</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the documentation of this assignment declaration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_doc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">doc</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_doc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">doc</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">doc</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">doc</span>.<span class="ident">into</span>())
     }
 
     <span class="doccomment">/// Attempts to reverse the assignment. This is (currently) only possible for object assignments</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AssignDeclaration</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AssignDeclaration</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">assignment</span>().<span class="ident">kind</span>() {
-            <span class="ident">AssignmentKind::Object</span>(<span class="ident">object</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">object</span>.<span class="ident">object</span>().<span class="ident">assign</span>(
+            <span class="ident">AssignmentKind::Object</span>(<span class="ident">object</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">object</span>.<span class="ident">object</span>().<span class="ident">assign</span>(
                 <span class="kw-2">&amp;</span><span class="ident">Assignment::from</span>(
                     <span class="ident">ObjectAssignment::from</span>(<span class="self">self</span>.<span class="ident">object</span>().<span class="ident">clone</span>())
                         .<span class="ident">assign_from</span>(<span class="self">self</span>.<span class="ident">assignment</span>().<span class="ident">to_field</span>())<span class="question-mark">?</span>,
                 )
                 .<span class="ident">to_nested</span>(<span class="ident">object</span>.<span class="ident">from_field</span>()),
             )<span class="question-mark">?</span>),
-            <span class="ident">AssignmentKind::Direct</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTarget</span>(
+            <span class="ident">AssignmentKind::Direct</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTarget</span>(
                 <span class="string">&quot;Cannot reverse a direct assignment.&quot;</span>.<span class="ident">to_string</span>(),
             )),
         }
@@ -730,7 +730,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Document</span> <span class="kw">for</span> <span class="ident">AssignDeclaration</span> {
-    <span class="kw">fn</span> <span class="ident">doc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">doc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">doc</span>.<span class="ident">clone</span>()
     }
 }
@@ -745,52 +745,52 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Assignment</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">to</span>: <span class="ident">FieldSelection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">to</span>: <span class="ident">FieldSelection</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">to_field</span>.<span class="ident">push</span>(<span class="ident">to</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_nested</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">nested</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_nested</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">nested</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">to_field</span>.<span class="ident">extend</span>(<span class="ident">nested</span>.<span class="ident">clone</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Append a named field selection</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_named</span>(<span class="self">self</span>, <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_named</span>(<span class="self">self</span>, <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">to</span>(<span class="ident">FieldSelection::Name</span>(<span class="ident">to</span>.<span class="ident">to_string</span>()))
     }
 
     <span class="doccomment">/// Append a range field selection</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_range</span>(<span class="self">self</span>, <span class="ident">to</span>: <span class="ident">RangeConstraint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_range</span>(<span class="self">self</span>, <span class="ident">to</span>: <span class="ident">RangeConstraint</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">to</span>(<span class="ident">FieldSelection::Range</span>(<span class="ident">to</span>))
     }
 
     <span class="doccomment">/// Append a downto range field selection</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_downto</span>(<span class="self">self</span>, <span class="ident">start</span>: <span class="ident">i32</span>, <span class="ident">end</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_downto</span>(<span class="self">self</span>, <span class="ident">start</span>: <span class="ident">i32</span>, <span class="ident">end</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">to_range</span>(<span class="ident">RangeConstraint::downto</span>(<span class="ident">start</span>, <span class="ident">end</span>)<span class="question-mark">?</span>))
     }
 
     <span class="doccomment">/// Append a to range field selection</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_to</span>(<span class="self">self</span>, <span class="ident">start</span>: <span class="ident">i32</span>, <span class="ident">end</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_to</span>(<span class="self">self</span>, <span class="ident">start</span>: <span class="ident">i32</span>, <span class="ident">end</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">to_range</span>(<span class="ident">RangeConstraint::to</span>(<span class="ident">start</span>, <span class="ident">end</span>)<span class="question-mark">?</span>))
     }
 
     <span class="doccomment">/// Append a to range field selection</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_index</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_index</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">to_range</span>(<span class="ident">RangeConstraint::Index</span>(<span class="ident">index</span>))
     }
 
     <span class="doccomment">/// Returns the fields selected</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_field</span>
     }
 
     <span class="doccomment">/// Returns the assignment kind</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AssignmentKind</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AssignmentKind</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">declare_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object_identifier</span>: <span class="ident">String</span>, <span class="ident">pre</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">post</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">declare_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">object_identifier</span>: <span class="ident">String</span>, <span class="ident">pre</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">post</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AssignmentKind::Direct</span>(<span class="ident">DirectAssignment::Value</span>(<span class="ident">ValueAssignment::BitVec</span>(<span class="ident">bitvec</span>))) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">kind</span>()
         {
@@ -812,7 +812,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AssignmentKind</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">full_record</span>(<span class="ident">fields</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">AssignmentKind</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AssignmentKind</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">full_record</span>(<span class="ident">fields</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">AssignmentKind</span><span class="op">&gt;</span>) -&gt; <span class="ident">AssignmentKind</span> {
         <span class="ident">AssignmentKind::Direct</span>(<span class="ident">DirectAssignment::FullRecord</span>(<span class="ident">fields</span>))
     }
 
@@ -822,15 +822,15 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_direct</span>(
         <span class="ident">object</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ObjectAssignment</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>),
         <span class="ident">convert_all</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AssignmentKind</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AssignmentKind</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">object</span> <span class="op">=</span> <span class="ident">object</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
         <span class="kw">match</span> <span class="ident">object</span>.<span class="ident">typ</span>()<span class="question-mark">?</span> {
-            <span class="ident">ObjectType::Bit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">object</span>.<span class="ident">into</span>()),
-            <span class="ident">ObjectType::Record</span>(<span class="ident">rec</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ObjectType::Bit</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">object</span>.<span class="ident">into</span>()),
+            <span class="ident">ObjectType::Record</span>(<span class="ident">rec</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">IndexMap::new</span>();
                 <span class="kw">for</span> (<span class="ident">field</span>, <span class="ident">typ</span>) <span class="kw">in</span> <span class="ident">rec</span>.<span class="ident">fields</span>() {
                     <span class="kw">match</span> <span class="ident">typ</span> {
-                        <span class="ident">ObjectType::Array</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">convert_all</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">ObjectType::Array</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">convert_all</span> =&gt; {
                             <span class="ident">fields</span>.<span class="ident">insert</span>(
                                 <span class="ident">field</span>.<span class="ident">clone</span>(),
                                 <span class="ident">AssignmentKind::to_direct</span>(
@@ -841,7 +841,7 @@
                                 )<span class="question-mark">?</span>,
                             );
                         }
-                        <span class="ident">ObjectType::Record</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">convert_all</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">ObjectType::Record</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">convert_all</span> =&gt; {
                             <span class="ident">fields</span>.<span class="ident">insert</span>(
                                 <span class="ident">field</span>.<span class="ident">clone</span>(),
                                 <span class="ident">AssignmentKind::to_direct</span>(
@@ -852,7 +852,7 @@
                                 )<span class="question-mark">?</span>,
                             );
                         }
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">_</span> =&gt; {
                             <span class="ident">fields</span>.<span class="ident">insert</span>(
                                 <span class="ident">field</span>.<span class="ident">clone</span>(),
                                 <span class="ident">object</span>
@@ -865,13 +865,13 @@
                 }
                 <span class="prelude-val">Ok</span>(<span class="ident">AssignmentKind::Direct</span>(<span class="ident">DirectAssignment::FullRecord</span>(<span class="ident">fields</span>)))
             }
-            <span class="ident">ObjectType::Array</span>(<span class="ident">arr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ObjectType::Array</span>(<span class="ident">arr</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">arr</span>.<span class="ident">is_bitvector</span>() {
                     <span class="prelude-val">Ok</span>(<span class="ident">object</span>.<span class="ident">into</span>())
                 } <span class="kw">else</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[];
                     <span class="kw">match</span> <span class="ident">arr</span>.<span class="ident">typ</span>() {
-                        <span class="ident">ObjectType::Array</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">convert_all</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">ObjectType::Array</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">convert_all</span> =&gt; {
                             <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">arr</span>.<span class="ident">low</span>()..<span class="ident">arr</span>.<span class="ident">high</span>() <span class="op">+</span> <span class="number">1</span> {
                                 <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">AssignmentKind::to_direct</span>(
                                     <span class="kw-2">&amp;</span><span class="ident">object</span>
@@ -881,7 +881,7 @@
                                 )<span class="question-mark">?</span>);
                             }
                         }
-                        <span class="ident">ObjectType::Record</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">convert_all</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">ObjectType::Record</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">convert_all</span> =&gt; {
                             <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">arr</span>.<span class="ident">low</span>()..<span class="ident">arr</span>.<span class="ident">high</span>() <span class="op">+</span> <span class="number">1</span> {
                                 <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">AssignmentKind::to_direct</span>(
                                     <span class="kw-2">&amp;</span><span class="ident">object</span>
@@ -891,7 +891,7 @@
                                 )<span class="question-mark">?</span>);
                             }
                         }
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">_</span> =&gt; {
                             <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">arr</span>.<span class="ident">low</span>()..<span class="ident">arr</span>.<span class="ident">high</span>() <span class="op">+</span> <span class="number">1</span> {
                                 <span class="ident">fields</span>.<span class="ident">push</span>(
                                     <span class="ident">object</span>
@@ -915,16 +915,16 @@
         <span class="ident">object_identifier</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">pre</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">post</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">object_identifier</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">object_identifier</span>.<span class="ident">into</span>();
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AssignmentKind::Object</span>(<span class="ident">object</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">object</span>.<span class="ident">to_string</span>()),
-            <span class="ident">AssignmentKind::Direct</span>(<span class="ident">direct</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">direct</span> {
-                <span class="ident">DirectAssignment::Value</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">value</span> {
-                    <span class="ident">ValueAssignment::Bit</span>(<span class="ident">bit</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">bit</span>)),
-                    <span class="ident">ValueAssignment::BitVec</span>(<span class="ident">bitvec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">bitvec</span>.<span class="ident">declare_for</span>(<span class="ident">object_identifier</span>)),
+            <span class="ident">AssignmentKind::Object</span>(<span class="ident">object</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">object</span>.<span class="ident">to_string</span>()),
+            <span class="ident">AssignmentKind::Direct</span>(<span class="ident">direct</span>) =&gt; <span class="kw">match</span> <span class="ident">direct</span> {
+                <span class="ident">DirectAssignment::Value</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span> {
+                    <span class="ident">ValueAssignment::Bit</span>(<span class="ident">bit</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">bit</span>)),
+                    <span class="ident">ValueAssignment::BitVec</span>(<span class="ident">bitvec</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">bitvec</span>.<span class="ident">declare_for</span>(<span class="ident">object_identifier</span>)),
                 },
-                <span class="ident">DirectAssignment::FullRecord</span>(<span class="ident">record</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">DirectAssignment::FullRecord</span>(<span class="ident">record</span>) =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_assignments</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                     <span class="kw">let</span> <span class="ident">nested_pre</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}  &quot;</span>, <span class="ident">pre</span>);
                     <span class="kw">for</span> (<span class="ident">field</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">record</span> {
@@ -941,8 +941,8 @@
                     }
                     <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;({}\n{})&quot;</span>, <span class="ident">field_assignments</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>), <span class="ident">pre</span>))
                 }
-                <span class="ident">DirectAssignment::FullArray</span>(<span class="ident">array</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">array</span> {
-                    <span class="ident">ArrayAssignment::Direct</span>(<span class="ident">direct</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">DirectAssignment::FullArray</span>(<span class="ident">array</span>) =&gt; <span class="kw">match</span> <span class="ident">array</span> {
+                    <span class="ident">ArrayAssignment::Direct</span>(<span class="ident">direct</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">positionals</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">direct</span> {
                             <span class="ident">positionals</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">declare_for</span>(
@@ -953,7 +953,7 @@
                         }
                         <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;( {} )&quot;</span>, <span class="ident">positionals</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)))
                     }
-                    <span class="ident">ArrayAssignment::Sliced</span> { <span class="ident">direct</span>, <span class="ident">others</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">ArrayAssignment::Sliced</span> { <span class="ident">direct</span>, <span class="ident">others</span> } =&gt; {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_assignments</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                         <span class="kw">let</span> <span class="ident">nested_pre</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}  &quot;</span>, <span class="ident">pre</span>);
                         <span class="kw">for</span> (<span class="ident">range</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">direct</span> {
@@ -981,7 +981,7 @@
                         }
                         <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;({}\n{})&quot;</span>, <span class="ident">field_assignments</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>), <span class="ident">pre</span>))
                     }
-                    <span class="ident">ArrayAssignment::Others</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(
+                    <span class="ident">ArrayAssignment::Others</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;( others =&gt; {} )&quot;</span>,
                         <span class="ident">value</span>.<span class="ident">declare_for</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&#39;element&quot;</span>, <span class="ident">object_identifier</span>), <span class="ident">pre</span>, <span class="ident">post</span>)<span class="question-mark">?</span>
                     )),
@@ -1001,7 +1001,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ObjectAssignment</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">object</span>().<span class="ident">identifier</span>().<span class="ident">to_string</span>();
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">from_field</span>() {
             <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">to_string</span>());
@@ -1012,12 +1012,12 @@
 
 <span class="kw">impl</span> <span class="ident">ObjectAssignment</span> {
     <span class="doccomment">/// Returns a reference to the object being assigned from</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ObjectDeclaration</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ObjectDeclaration</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">object</span>
     }
 
     <span class="doccomment">/// Select fields from the object being assigned</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assign_from</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assign_from</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">object</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">object</span>().<span class="ident">typ</span>().<span class="ident">clone</span>();
         <span class="comment">// Verify the fields exist</span>
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">from_field</span>() {
@@ -1031,12 +1031,12 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">from_field</span>
     }
 
     <span class="doccomment">/// Returns the object type of the selected field</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">typ</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjectType</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">typ</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjectType</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">object</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">object</span>().<span class="ident">typ</span>().<span class="ident">clone</span>();
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">from_field</span>() {
             <span class="ident">object</span> <span class="op">=</span> <span class="ident">object</span>.<span class="ident">get_field</span>(<span class="ident">field</span>)<span class="question-mark">?</span>;
@@ -1067,18 +1067,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">StdLogicValue</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_char</span>(<span class="ident">val</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StdLogicValue</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_char</span>(<span class="ident">val</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StdLogicValue</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">val</span> {
-            <span class="string">&#39;U&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::U</span>),
-            <span class="string">&#39;X&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::X</span>),
-            <span class="string">&#39;1&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::Logic</span>(<span class="bool-val">true</span>)),
-            <span class="string">&#39;0&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::Logic</span>(<span class="bool-val">false</span>)),
-            <span class="string">&#39;Z&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::Z</span>),
-            <span class="string">&#39;W&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::W</span>),
-            <span class="string">&#39;L&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::L</span>),
-            <span class="string">&#39;H&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::H</span>),
-            <span class="string">&#39;-&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::DontCare</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidArgument</span>(<span class="macro">format!</span>(
+            <span class="string">&#39;U&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::U</span>),
+            <span class="string">&#39;X&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::X</span>),
+            <span class="string">&#39;1&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::Logic</span>(<span class="bool-val">true</span>)),
+            <span class="string">&#39;0&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::Logic</span>(<span class="bool-val">false</span>)),
+            <span class="string">&#39;Z&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::Z</span>),
+            <span class="string">&#39;W&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::W</span>),
+            <span class="string">&#39;L&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::L</span>),
+            <span class="string">&#39;H&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::H</span>),
+            <span class="string">&#39;-&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StdLogicValue::DontCare</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidArgument</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;Unsupported std_logic value {}&quot;</span>,
                 <span class="ident">val</span>
             ))),
@@ -1087,22 +1087,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">StdLogicValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">symbol</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">StdLogicValue::U</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;U&quot;</span>,
-            <span class="ident">StdLogicValue::X</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;X&quot;</span>,
-            <span class="ident">StdLogicValue::Logic</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">StdLogicValue::U</span> =&gt; <span class="string">&quot;U&quot;</span>,
+            <span class="ident">StdLogicValue::X</span> =&gt; <span class="string">&quot;X&quot;</span>,
+            <span class="ident">StdLogicValue::Logic</span>(<span class="ident">value</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">value</span> {
                     <span class="string">&quot;1&quot;</span>
                 } <span class="kw">else</span> {
                     <span class="string">&quot;0&quot;</span>
                 }
             }
-            <span class="ident">StdLogicValue::Z</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Z&quot;</span>,
-            <span class="ident">StdLogicValue::W</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;W&quot;</span>,
-            <span class="ident">StdLogicValue::L</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;L&quot;</span>,
-            <span class="ident">StdLogicValue::H</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;H&quot;</span>,
-            <span class="ident">StdLogicValue::DontCare</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;-&quot;</span>,
+            <span class="ident">StdLogicValue::Z</span> =&gt; <span class="string">&quot;Z&quot;</span>,
+            <span class="ident">StdLogicValue::W</span> =&gt; <span class="string">&quot;W&quot;</span>,
+            <span class="ident">StdLogicValue::L</span> =&gt; <span class="string">&quot;L&quot;</span>,
+            <span class="ident">StdLogicValue::H</span> =&gt; <span class="string">&quot;H&quot;</span>,
+            <span class="ident">StdLogicValue::DontCare</span> =&gt; <span class="string">&quot;-&quot;</span>,
         };
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">symbol</span>)
     }
@@ -1138,34 +1138,34 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FieldSelection</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldSelection::Range</span>(<span class="ident">range</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">range</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">FieldSelection::Name</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;.{}&quot;</span>, <span class="ident">name</span>),
+            <span class="ident">FieldSelection::Range</span>(<span class="ident">range</span>) =&gt; <span class="ident">range</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">FieldSelection::Name</span>(<span class="ident">name</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;.{}&quot;</span>, <span class="ident">name</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FieldSelection</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to</span>(<span class="ident">start</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>, <span class="ident">end</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to</span>(<span class="ident">start</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>, <span class="ident">end</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">FieldSelection::Range</span>(<span class="ident">RangeConstraint::to</span>(
             <span class="ident">start</span>.<span class="ident">into</span>(),
             <span class="ident">end</span>.<span class="ident">into</span>(),
         )<span class="question-mark">?</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downto</span>(<span class="ident">start</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>, <span class="ident">end</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downto</span>(<span class="ident">start</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>, <span class="ident">end</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">FieldSelection::Range</span>(<span class="ident">RangeConstraint::downto</span>(
             <span class="ident">start</span>.<span class="ident">into</span>(),
             <span class="ident">end</span>.<span class="ident">into</span>(),
         )<span class="question-mark">?</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="ident">index</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldSelection</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="ident">index</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) -&gt; <span class="ident">FieldSelection</span> {
         <span class="ident">FieldSelection::Range</span>(<span class="ident">RangeConstraint::Index</span>(<span class="ident">index</span>.<span class="ident">into</span>()))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldSelection</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">FieldSelection</span> {
         <span class="ident">FieldSelection::Name</span>(<span class="ident">name</span>.<span class="ident">into</span>())
     }
 }
@@ -1182,18 +1182,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RangeConstraint</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RangeConstraint::To</span> { <span class="ident">start</span>, <span class="ident">end</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;({} to {})&quot;</span>, <span class="ident">start</span>, <span class="ident">end</span>),
-            <span class="ident">RangeConstraint::Downto</span> { <span class="ident">start</span>, <span class="ident">end</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;({} downto {})&quot;</span>, <span class="ident">start</span>, <span class="ident">end</span>),
-            <span class="ident">RangeConstraint::Index</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;({})&quot;</span>, <span class="ident">index</span>),
+            <span class="ident">RangeConstraint::To</span> { <span class="ident">start</span>, <span class="ident">end</span> } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;({} to {})&quot;</span>, <span class="ident">start</span>, <span class="ident">end</span>),
+            <span class="ident">RangeConstraint::Downto</span> { <span class="ident">start</span>, <span class="ident">end</span> } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;({} downto {})&quot;</span>, <span class="ident">start</span>, <span class="ident">end</span>),
+            <span class="ident">RangeConstraint::Index</span>(<span class="ident">index</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;({})&quot;</span>, <span class="ident">index</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RangeConstraint</span> {
     <span class="doccomment">/// Create a `RangeConstraint::To` and ensure correctness (end &gt; start)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to</span>(<span class="ident">start</span>: <span class="ident">i32</span>, <span class="ident">end</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">crate</span><span class="ident">::Result</span><span class="op">&lt;</span><span class="ident">RangeConstraint</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to</span>(<span class="ident">start</span>: <span class="ident">i32</span>, <span class="ident">end</span>: <span class="ident">i32</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">RangeConstraint</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">start</span> <span class="op">&gt;</span> <span class="ident">end</span> {
             <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidArgument</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;{} &gt; {}!\nStart cannot be greater than end when constraining a range [start] to [end]&quot;</span>,
@@ -1205,7 +1205,7 @@
     }
 
     <span class="doccomment">/// Create a `RangeConstraint::DownTo` and ensure correctness (start &gt; end)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downto</span>(<span class="ident">start</span>: <span class="ident">i32</span>, <span class="ident">end</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">crate</span><span class="ident">::Result</span><span class="op">&lt;</span><span class="ident">RangeConstraint</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downto</span>(<span class="ident">start</span>: <span class="ident">i32</span>, <span class="ident">end</span>: <span class="ident">i32</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">RangeConstraint</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">end</span> <span class="op">&gt;</span> <span class="ident">start</span> {
             <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidArgument</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;{} &gt; {}!\nEnd cannot be greater than start when constraining a range [start] downto [end]&quot;</span>,
@@ -1217,56 +1217,56 @@
     }
 
     <span class="doccomment">/// Returns the width of the range</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Width</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Width</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RangeConstraint::To</span> { <span class="ident">start</span>, <span class="ident">end</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RangeConstraint::To</span> { <span class="ident">start</span>, <span class="ident">end</span> } =&gt; {
                 <span class="ident">Width::Vector</span>((<span class="number">1</span> <span class="op">+</span> <span class="ident">end</span> <span class="op">-</span> <span class="ident">start</span>).<span class="ident">try_into</span>().<span class="ident">unwrap</span>())
             }
-            <span class="ident">RangeConstraint::Downto</span> { <span class="ident">start</span>, <span class="ident">end</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RangeConstraint::Downto</span> { <span class="ident">start</span>, <span class="ident">end</span> } =&gt; {
                 <span class="ident">Width::Vector</span>((<span class="number">1</span> <span class="op">+</span> <span class="ident">start</span> <span class="op">-</span> <span class="ident">end</span>).<span class="ident">try_into</span>().<span class="ident">unwrap</span>())
             }
-            <span class="ident">RangeConstraint::Index</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Width::Scalar</span>,
+            <span class="ident">RangeConstraint::Index</span>(<span class="kw">_</span>) =&gt; <span class="ident">Width::Scalar</span>,
         }
     }
 
     <span class="doccomment">/// Returns the width of the range</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">width_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">width_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">width</span>() {
-            <span class="ident">Width::Scalar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">Width::Vector</span>(<span class="ident">width</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">width</span>,
+            <span class="ident">Width::Scalar</span> =&gt; <span class="number">1</span>,
+            <span class="ident">Width::Vector</span>(<span class="ident">width</span>) =&gt; <span class="ident">width</span>,
         }
     }
 
     <span class="doccomment">/// Returns the greatest index within the range constraint</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">high</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">high</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RangeConstraint::To</span> { <span class="ident">start</span>: <span class="kw">_</span>, <span class="ident">end</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">end</span>,
-            <span class="ident">RangeConstraint::Downto</span> { <span class="ident">start</span>, <span class="ident">end</span>: <span class="kw">_</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">start</span>,
-            <span class="ident">RangeConstraint::Index</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">index</span>,
+            <span class="ident">RangeConstraint::To</span> { <span class="ident">start</span>: <span class="kw">_</span>, <span class="ident">end</span> } =&gt; <span class="kw-2">*</span><span class="ident">end</span>,
+            <span class="ident">RangeConstraint::Downto</span> { <span class="ident">start</span>, <span class="ident">end</span>: <span class="kw">_</span> } =&gt; <span class="kw-2">*</span><span class="ident">start</span>,
+            <span class="ident">RangeConstraint::Index</span>(<span class="ident">index</span>) =&gt; <span class="kw-2">*</span><span class="ident">index</span>,
         }
     }
 
     <span class="doccomment">/// Returns the smallest index within the range constraint</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">low</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">low</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RangeConstraint::To</span> { <span class="ident">start</span>, <span class="ident">end</span>: <span class="kw">_</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">start</span>,
-            <span class="ident">RangeConstraint::Downto</span> { <span class="ident">start</span>: <span class="kw">_</span>, <span class="ident">end</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">end</span>,
-            <span class="ident">RangeConstraint::Index</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">index</span>,
+            <span class="ident">RangeConstraint::To</span> { <span class="ident">start</span>, <span class="ident">end</span>: <span class="kw">_</span> } =&gt; <span class="kw-2">*</span><span class="ident">start</span>,
+            <span class="ident">RangeConstraint::Downto</span> { <span class="ident">start</span>: <span class="kw">_</span>, <span class="ident">end</span> } =&gt; <span class="kw-2">*</span><span class="ident">end</span>,
+            <span class="ident">RangeConstraint::Index</span>(<span class="ident">index</span>) =&gt; <span class="kw-2">*</span><span class="ident">index</span>,
         }
     }
 
     <span class="doccomment">/// Verifies whether a range constraint overlaps with this range constraint</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">overlaps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RangeConstraint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">overlaps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RangeConstraint</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">low</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">high</span>() <span class="op">&amp;&amp;</span> <span class="ident">other</span>.<span class="ident">low</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">high</span>()
     }
 
     <span class="doccomment">/// Verifies whether a range constraint is inside of this range constraint</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RangeConstraint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RangeConstraint</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">high</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">high</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">low</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">low</span>()
     }
 
     <span class="doccomment">/// Verifies whether this range constraint is between `high` and `low`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_between</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">high</span>: <span class="ident">i32</span>, <span class="ident">low</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_between</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">high</span>: <span class="ident">i32</span>, <span class="ident">low</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">low</span> <span class="op">&gt;</span> <span class="ident">high</span> {
             <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidArgument</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;{} &gt; {}! Low cannot be greater than high&quot;</span>,
@@ -1277,5 +1277,6 @@
         }
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="tydi" data-search-index-js="../../../../../../search-index.js" data-search-js="../../../../../../search.js"></div><script src="../../../../../../main.js"></script><script src="../../../../../../source-script.js"></script><script src="../../../../../../source-files.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="tydi" data-search-index-js="../../../../../../search-index.js" data-search-js="../../../../../../search.js"></div>
+</body></html>
